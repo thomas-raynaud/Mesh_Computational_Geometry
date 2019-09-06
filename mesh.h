@@ -3,50 +3,7 @@
 
 #include <QGLWidget>
 
-// TO MODIFY
-// Advice => You should create a new file for each module but not necessarily for each class
-class Point
-{
-    double _x;
-    double _y;
-    double _z;
-
-
-public:
-    Point():_x(),_y(),_z() {}
-    Point(float x_, float y_, float z_):_x(x_),_y(y_),_z(z_) {}
-    // get
-    double x() const { return _x; }
-    double y() const { return _y; }
-    double z() const { return _z; }
-};
-
-class Vertex {
-    Point _point;
-    int _face;
-public:
-    Vertex(Point p, int face): _point(p), _face(face) {}
-    Vertex() {}
-    // get
-    Point point() const { return _point; }
-    int face() const { return _face; }
-    // set
-    void setFace(int face) { _face = face; }
-};
-
-class Face {
-    std::array<int, 3> _vertices;
-    std::array<int, 3> _adjacentFaces;
-public:
-    Face(std::array<int, 3> vertices, std::array<int, 3> adjacentFaces={-1,-1,-1}) : _vertices(vertices), _adjacentFaces(adjacentFaces) {}
-    Face() {}
-    void addAdjacentFace(int faceIndex, int pos) {
-        _adjacentFaces[pos] = faceIndex;
-    }
-    //get
-    const std::array<int, 3> vertices() const { return _vertices; }
-    const std::array<int, 3> adjacentFaces() const { return _adjacentFaces; }
-};
+#include "math_util.h"
 
 class Iterator_on_faces;
 class Iterator_on_vertices;

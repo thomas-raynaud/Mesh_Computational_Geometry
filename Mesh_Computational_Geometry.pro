@@ -19,7 +19,8 @@ SOURCES += main.cpp\
 
 HEADERS  += mainwindow.h \
     gldisplaywidget.h \
-    mesh.h
+    mesh.h \
+    math_util.h
 
 FORMS    += mainwindow.ui
 
