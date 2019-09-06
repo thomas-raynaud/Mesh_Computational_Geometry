@@ -9,6 +9,43 @@ Mesh::Mesh() {}
 
 Mesh::~Mesh() {}
 
+QVector<QVector<double>> Mesh::getLap(){
+    QVector<QVector<double>> answ; //Les valeurs du lapacien
+    QVector<double> tmp; //Valeur temporaire du laplacien pour ajouter a answ
+    double x,y,z; //Coordones du laplacien
+    float A; // Aire
+    Point a,b,c; //Vector du triangle pour les calculs
+
+    //On utilise l'iterateur sur les verticies pour parcourir tous les vertex
+    Iterator_on_vertices its;
+    Circulator_on_faces cf ;
+    for (its=this->vertices_begin(); its !=this.vertices_past_the_end(); ++its){ //On parcour tous les vertex du mesh
+        //On utilise le circulateur sur les faces pour recuperer un tableau des sommets adjacents
+        Circulator_on_faces cfbegin=this->incident_faces(*its) ;
+	//Calcul de l'aire
+	A=0;
+        for (cf=cfbegin,++cf; cf!=cfbegin; cf++){ //On parcours toutes les faces qui ont le sommet its
+		a=cf->vertex[0].point();
+		b=cf->vertex[1].point();
+		c=cf->vertex[2].point();
+		A=A+1/3*(1/2*(crossProduct(b.difference(a), c.difference(a))).norm());
+	}
+	std::cout<<A<<std::endl;
+        }
+
+        //MAJ du vector de resultats
+	/*
+        tmp.push_back(x);
+        tmp.push_back(y);
+        tmp.push_back(z);
+        answ.push_back(tmp);
+	*/
+    }
+
+
+    return answ;
+}
+
 Tetrahedron::Tetrahedron() {
     // Création des points
     vertexTab.push_back(Vertex(Point(-0.5,-0.5,-0.5), 0));
