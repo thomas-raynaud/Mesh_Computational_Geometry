@@ -9,7 +9,7 @@ Mesh::Mesh() {}
 
 Mesh::~Mesh() {}
 
-QVector<QVector<double>> Mesh::getLap(){
+QVector<QVector<double>> Mesh::getLap() {
     QVector<QVector<double>> answ; //Les valeurs du lapacien
     QVector<double> tmp; //Valeur temporaire du laplacien pour ajouter a answ
     double x,y,z; //Coordones du laplacien
@@ -18,20 +18,24 @@ QVector<QVector<double>> Mesh::getLap(){
 
     //On utilise l'iterateur sur les verticies pour parcourir tous les vertex
     Iterator_on_vertices its;
-    Circulator_on_faces cf ;
-    for (its=this->vertices_begin(); its !=this.vertices_past_the_end(); ++its){ //On parcour tous les vertex du mesh
+    Circulator_on_faces cf;
+    for (its=this->vertices_begin(); its !=this->vertices_past_the_end(); ++its){ //On parcour tous les vertex du mesh
         //On utilise le circulateur sur les faces pour recuperer un tableau des sommets adjacents
         Circulator_on_faces cfbegin=this->incident_faces(*its) ;
-	//Calcul de l'aire
-	A=0;
+        //Calcul de l'aire
+        A=0;
         for (cf=cfbegin,++cf; cf!=cfbegin; cf++){ //On parcours toutes les faces qui ont le sommet its
-		a=cf->vertex[0].point();
-		b=cf->vertex[1].point();
-		c=cf->vertex[2].point();
-		A=A+1/3*(1/2*(crossProduct(b.difference(a), c.difference(a))).norm());
-	}
-	std::cout<<A<<std::endl;
+            a = vertexTab[cf->vertices()[0]].point();
+            b = vertexTab[cf->vertices()[1]].point();
+            c = vertexTab[cf->vertices()[2]].point();
+            A=A+1.f/3.f*(1.f/2.f*(produitVectoriel(b.difference(a), c.difference(a))).norm());
         }
+        cf=cfbegin;
+        a = vertexTab[cf->vertices()[0]].point();
+        b = vertexTab[cf->vertices()[1]].point();
+        c = vertexTab[cf->vertices()[2]].point();
+        A=A+1/3*(1/2*(produitVectoriel(b.difference(a), c.difference(a))).norm());
+    }
 
         //MAJ du vector de resultats
 	/*
@@ -39,10 +43,8 @@ QVector<QVector<double>> Mesh::getLap(){
         tmp.push_back(y);
         tmp.push_back(z);
         answ.push_back(tmp);
-	*/
-    }
 
-
+    }*/
     return answ;
 }
 
@@ -218,6 +220,7 @@ void glVertexDraw(const Vertex & v) {
 
 //Example with a tetraedra
 void Mesh::drawMesh() {
+    getLap();
     int color_ind = 0;
     // Iteration sur chaque face du mesh
     for (QVector<Face>::iterator face_it = faceTab.begin() ; face_it != faceTab.end(); ++face_it) {

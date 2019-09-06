@@ -23,6 +23,7 @@ public:
     
     void drawMesh();
     void drawMeshWireFrame();
+    QVector<QVector<double>> getLap();
 
     friend class Iterator_on_faces;
     Iterator_on_faces faces_begin();

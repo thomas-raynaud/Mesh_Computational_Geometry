@@ -1,6 +1,9 @@
 #ifndef MATH_UTIL_H
 #define MATH_UTIL_H
 
+#include <math.h>
+#include <QGLWidget>
+
 class Point {
 protected:
     double _x;
@@ -16,17 +19,11 @@ public:
     virtual double y() const { return _y; }
     virtual double z() const { return _z; }
     Point difference(Point p) {
-        Point diffP(_x - p.x, _y - p.y, _z - _p.z);
+        Point diffP(_x - p.x(), _y - p.y(), _z - p.z());
         return diffP;
     }
     double norm() {
-        return sqrt(x * x + y * y + z * z);
-    }
-    Point crossProduct(Point u, Point v) {
-        double w1 = u.y() * v.z() - u.z() * v.y();
-        double w2 = u.z() * v.x() - u.x() * v.z();
-        double w3 = u.x() * v.y() - u.y() * v.x();
-        return Point(w1, w2, w3);
+        return sqrt(_x * _x + _y * _y + _z * _z);
     }
 };
 
@@ -57,5 +54,6 @@ public:
     const std::array<int, 3> adjacentFaces() const { return _adjacentFaces; }
 };
 
+Point produitVectoriel(Point u, Point v);
 
 #endif // MATH_UTIL_H

@@ -15,7 +15,8 @@ TEMPLATE = app
 SOURCES += main.cpp\
         mainwindow.cpp \
     gldisplaywidget.cpp \
-    mesh.cpp
+    mesh.cpp \
+    math_util.cpp
 
 HEADERS  += mainwindow.h \
     gldisplaywidget.h \

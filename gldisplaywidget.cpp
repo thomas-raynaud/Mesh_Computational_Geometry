@@ -30,10 +30,10 @@ void GLDisplayWidget::initializeGL()
     glEnable(GL_COLOR_MATERIAL);
 
     // Construction of the mesh before it is displayed
-    //_mesh = new Tetrahedron();
-    _mesh = new QueenMesh();
+    _mesh = new Tetrahedron();
+    //_mesh = new QueenMesh();
 
-    Iterator_on_vertices its;
+    /*Iterator_on_vertices its;
     Circulator_on_faces cf;
     for (its = _mesh->vertices_begin(); its != _mesh->vertices_past_the_end(); ++its) {
         Circulator_on_faces cfbegin = _mesh->incident_faces(*its);
@@ -42,7 +42,7 @@ void GLDisplayWidget::initializeGL()
             cmpt++;
         }
         std::cout << "valence of the vertex " << cmpt + 1 << std::endl;
-    }
+    }*/
 }
 
 void GLDisplayWidget::paintGL(){
