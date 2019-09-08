@@ -11,8 +11,7 @@ GLDisplayWidget::~GLDisplayWidget() {
     delete _mesh;
 }
 
-GLDisplayWidget::GLDisplayWidget(QWidget *parent) : QGLWidget(parent)
-{
+GLDisplayWidget::GLDisplayWidget(QWidget *parent) : QGLWidget(parent) {
     // Update the scene
     connect( &_timer, SIGNAL(timeout()), this, SLOT(updateGL()));
     _timer.start(16);
@@ -30,19 +29,9 @@ void GLDisplayWidget::initializeGL()
     glEnable(GL_COLOR_MATERIAL);
 
     // Construction of the mesh before it is displayed
+    //_mesh = new Tetrahedron();
     _mesh = new Tetrahedron();
-    //_mesh = new QueenMesh();
-
-    /*Iterator_on_vertices its;
-    Circulator_on_faces cf;
-    for (its = _mesh->vertices_begin(); its != _mesh->vertices_past_the_end(); ++its) {
-        Circulator_on_faces cfbegin = _mesh->incident_faces(*its);
-        int cmpt = 0;
-        for (cf = cfbegin, ++cf; cf!=cfbegin; cf++) {
-            cmpt++;
-        }
-        std::cout << "valence of the vertex " << cmpt + 1 << std::endl;
-    }*/
+    _mesh->computeLaplacians();
 }
 
 void GLDisplayWidget::paintGL(){
@@ -101,6 +90,7 @@ void GLDisplayWidget::switchMesh(int index) {
             _mesh = new Tetrahedron();
             break;
     }
+    _mesh->computeLaplacians();
 }
 
 // - - - - - - - - - - - - Mouse Management  - - - - - - - - - - - - - - - -
