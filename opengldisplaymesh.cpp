@@ -22,7 +22,7 @@ void Mesh::drawMesh() {
         a = vertexTab[faceVertices[0]];
         b = vertexTab[faceVertices[1]];
         c = vertexTab[faceVertices[2]];
-        std::array<int, 3> rgb = face_it->color();
+        std::array<double, 3> rgb = face_it->color();
 
         // Couleur
         /*switch(color_ind % 6) {

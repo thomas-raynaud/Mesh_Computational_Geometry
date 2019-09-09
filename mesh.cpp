@@ -14,24 +14,20 @@ Mesh::~Mesh() {}
 
 void Mesh::computeLaplacians() {
     float A; // Aire
-    Point a, b, c; // Vecteur du triangle pour les calculs
+    Point a, b, c, d; // Vecteur du triangle pour les calculs
 
     // On utilise l'itérateur sur les vertices pour parcourir tous les vertex
     Iterator_on_vertices it_v;
     Circulator_on_faces cf, cfbegin;
-    Circulator_on_vertices cv, cvbegin;
-    std::vector<double> alpha; // tableau des angles alpha pour le laplacien
-    std::vector<double> beta; // tableau des angles beta
-    size_t alpha_idx, beta_idx, i_idx;
+    Circulator_on_vertices cv, cvbegin, cvtemp;
     double lap_x, lap_y, lap_z;
+    double opp, adj, cot_alpha, cot_beta; // Calcul de trigo
     int i = -1;
     for (it_v = this->vertices_begin(); it_v !=this->vertices_past_the_end(); it_v++) { // on parcourt tous les sommets du mesh
         i++;
         cfbegin = this->incident_faces(*it_v);
         A = 0;
         cf = cfbegin;
-        alpha.clear();
-        beta.clear();
         // On parcourt toutes les faces qui ont le sommet it_v
         do {
             // Calcul de l'aire
@@ -39,50 +35,49 @@ void Mesh::computeLaplacians() {
             b = vertexTab[cf->vertices()[1]].point();
             c = vertexTab[cf->vertices()[2]].point();
             A = A + (1.f / 3.f) * ((1.f / 2.f) * (crossProduct(difference(b, a), difference(c, a))).norm());
-            // On recueille les angles alpha et beta
-            // Trouver l'indice du sommet i sur la face
-            for (size_t i = 0; i < 3; ++i) {
-                if (it_v == &(vertexTab[cf->vertices()[i]])) {
-                    i_idx = i;
-                    break;
-                }
-            }
-            alpha.push_back(findAngle(vertexTab[cf->vertices()[i_idx]].point(),
-                                      vertexTab[cf->vertices()[(i_idx + 1) % 3]].point(),
-                                      vertexTab[cf->vertices()[(i_idx + 2) % 3]].point()));
-            beta.push_back(findAngle(vertexTab[cf->vertices()[(i_idx + 1) % 3]].point(),
-                                     vertexTab[cf->vertices()[(i_idx + 2) % 3]].point(),
-                                     vertexTab[cf->vertices()[i_idx]].point()));
             cf++;
         } while (cf != cfbegin);
 
-        lap_x = 0;
-        lap_y = 0;
-        lap_z = 0;
-        alpha_idx = alpha.size() - 1;
-        beta_idx = 0;
-        int idx = 0;
+        lap_x = lap_y = lap_z = 0;
         cvbegin = this->incident_vertices(*it_v);
         cv = cvbegin;
+        a = it_v->point();
         do {
-            lap_x += (1.f / std::tan(alpha[alpha_idx]) + 1.f / std::tan(beta[beta_idx])) * difference(cv->point(), it_v->point()).x();
-            lap_y += (1.f / std::tan(alpha[alpha_idx]) + 1.f / std::tan(beta[beta_idx])) * difference(cv->point(), it_v->point()).y();
-            lap_z += (1.f / std::tan(alpha[alpha_idx]) + 1.f / std::tan(beta[beta_idx])) * difference(cv->point(), it_v->point()).z();
-            alpha_idx = (alpha_idx + 1) % alpha.size();
-            beta_idx = (beta_idx + 1) % beta.size();
-            idx++;
+            cvtemp = cv;
+            --cvtemp;
+            b = cvtemp->point();
+            cvtemp++;
+            c = cvtemp->point();
+            cvtemp++;
+            d = cvtemp->point();
+            // cot alpha
+            opp = difference(a, c).norm();
+            adj = difference(a, b).norm();
+            cot_alpha=adj/opp;
+
+            // cot beta
+            adj = difference(a, d).norm();
+            cot_beta=adj/opp;
+
+            // sommes
+            lap_x = lap_x +cot_alpha+cot_beta*(c.x()-a.x());
+            lap_y = lap_y +cot_alpha+cot_beta*(c.y()-a.y());
+            lap_z = lap_z +cot_alpha+cot_beta*(c.z()-a.z());
+
             cv++;
         } while (cv != cvbegin);
         // Calcul du Laplacien pour le sommet it_v;
         lap_x = (1.f / (2.f * A)) * lap_x;
         lap_y = (1.f / (2.f * A)) * lap_y;
         lap_z = (1.f / (2.f * A)) * lap_z;
+        //std::cout << lap_x << " " << lap_y << " " << lap_z << std::endl;
         it_v->setLaplacian(Point(lap_x, lap_y, lap_z));
+
     }
 }
 
 void Mesh::computeCurvature() {
-    for (QVector<Face>::iterator face_it = faceTab.begin() ; face_it != faceTab.end(); ++face_it) {
+    for (QVector<Face>::iterator face_it = faceTab.begin(); face_it != faceTab.end(); ++face_it) {
 
         Vertex a, b, c;
         std::array<int, 3> faceVertices = face_it->vertices();
@@ -99,13 +94,17 @@ void Mesh::computeCurvature() {
         Point laplacian_face((a_l_n.x() + b_l_n.x() + c_l_n.x()) / 3,
                              (a_l_n.y() + b_l_n.y() + c_l_n.y()) / 3,
                              (a_l_n.z() + b_l_n.z() + c_l_n.z()) / 3);
-        face_it->setCurvature(laplacian_face.norm() / 2.f);
+        //face_it->setCurvature(laplacian_face.norm());
+        face_it->setCurvature(a_l_n.x());
+        //std::cout << a_l_n.x() << " " << a_l_n.y() << " " << a_l_n.z() << std::endl;
     }
 }
 
 void Mesh::computeColors() {
     for (QVector<Face>::iterator face_it = faceTab.begin() ; face_it != faceTab.end(); ++face_it) {
-        face_it->setColor(hsv2rgb(face_it->curvature() * 255, 255, 255));
+        face_it->setColor(hsv2rgb((int)std::floor(face_it->curvature() * 360.f), 1.0, 1.0));
+        //std::cout << "color " << (int)std::floor(face_it->curvature() * 360.f) << std::endl;
+        //std::cout << "rgb " << face_it->color()[0] << " " << face_it->color()[1] << " " << face_it->color()[2] << std::endl;
     }
 }
 
@@ -345,9 +344,8 @@ Circulator_on_vertices Mesh::incident_vertices(Vertex &v) {
                 break;
             }
         }
-        if (id_v_oppose != -1) {
-            sommets_adjacents.push_back(&(vertexTab[id_v_oppose]));
-        }
+        if (faceTab[face_actuelle].vertices()[id_v_oppose] != -1)
+            sommets_adjacents.push_back(&(vertexTab[faceTab[face_actuelle].vertices()[id_v_oppose]]));
         face_actuelle = faceTab[face_actuelle].adjacentFaces()[id_v_oppose];
         if(face_actuelle == first_face) {
             break;

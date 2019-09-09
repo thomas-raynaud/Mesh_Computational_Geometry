@@ -31,7 +31,7 @@ class Face {
     std::array<int, 3> _adjacentFaces; // Faces adjacentes à la face.
     // 1e face = face opposée au 1er sommet, etc...
     double _curvature;
-    std::array<int, 3> _color;
+    std::array<double, 3> _color;
 
 public:
     Face(std::array<int, 3> vertices,
@@ -45,10 +45,10 @@ public:
     const std::array<int, 3> vertices() const { return _vertices; }
     const std::array<int, 3> adjacentFaces() const { return _adjacentFaces; }
     double curvature() const { return _curvature; }
-    std::array<int, 3> color() const { return _color; }
+    std::array<double, 3> color() const { return _color; }
     //set
     void setCurvature(double curvature) { _curvature = curvature; }
-    void setColor(std::array<int, 3> color) { _color = color; }
+    void setColor(std::array<double, 3> color) { _color = color; }
 };
 
 
@@ -190,6 +190,15 @@ public:
 
     Circulator_on_vertices& operator++() {
         idx = (idx + 1) % adjacentVertices.size();
+        return *this;
+    }
+
+    Circulator_on_vertices& operator--() {
+        idx--;
+        if (idx < 0) {
+            if (adjacentVertices.size() == 0) idx = 0;
+            else idx = adjacentVertices.size() - 1;
+        }
         return *this;
     }
 
