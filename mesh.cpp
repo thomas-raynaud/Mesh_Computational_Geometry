@@ -81,6 +81,34 @@ void Mesh::computeLaplacians() {
     }
 }
 
+void Mesh::computeCurvature() {
+    for (QVector<Face>::iterator face_it = faceTab.begin() ; face_it != faceTab.end(); ++face_it) {
+
+        Vertex a, b, c;
+        std::array<int, 3> faceVertices = face_it->vertices();
+        if (faceVertices[0] == -1 || faceVertices[1] == -1 || faceVertices[2] == -1) continue;
+        a = vertexTab[faceVertices[0]];
+        b = vertexTab[faceVertices[1]];
+        c = vertexTab[faceVertices[2]];
+        double norm_l_a = a.laplacian().norm();
+        double norm_l_b = b.laplacian().norm();
+        double norm_l_c = c.laplacian().norm();
+        Point a_l_n = Point(a.laplacian().x() / norm_l_a, a.laplacian().y() / norm_l_a, a.laplacian().z() / norm_l_a);
+        Point b_l_n = Point(b.laplacian().x() / norm_l_b, b.laplacian().y() / norm_l_b, b.laplacian().z() / norm_l_b);
+        Point c_l_n = Point(c.laplacian().x() / norm_l_c, c.laplacian().y() / norm_l_c, c.laplacian().z() / norm_l_c);
+        Point laplacian_face((a_l_n.x() + b_l_n.x() + c_l_n.x()) / 3,
+                             (a_l_n.y() + b_l_n.y() + c_l_n.y()) / 3,
+                             (a_l_n.z() + b_l_n.z() + c_l_n.z()) / 3);
+        face_it->setCurvature(laplacian_face.norm() / 2.f);
+    }
+}
+
+void Mesh::computeColors() {
+    for (QVector<Face>::iterator face_it = faceTab.begin() ; face_it != faceTab.end(); ++face_it) {
+        face_it->setColor(hsv2rgb(face_it->curvature() * 255, 255, 255));
+    }
+}
+
 void Mesh::connectAdjacentFaces() {
     std::unordered_map<std::string, int> edges; // map des arêtes du mesh
     std::array<int, 3> ind_vertices; // indice des sommets d'une face

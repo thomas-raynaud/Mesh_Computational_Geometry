@@ -17,12 +17,14 @@ SOURCES += main.cpp\
     gldisplaywidget.cpp \
     mesh.cpp \
     point.cpp \
-    opengldisplaymesh.cpp
+    opengldisplaymesh.cpp \
+    color.cpp
 
 HEADERS  += mainwindow.h \
     gldisplaywidget.h \
     mesh.h \
-    point.h
+    point.h \
+    color.h
 
 FORMS    += mainwindow.ui
 

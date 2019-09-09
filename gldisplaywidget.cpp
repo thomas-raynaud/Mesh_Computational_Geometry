@@ -32,6 +32,8 @@ void GLDisplayWidget::initializeGL()
     //_mesh = new Tetrahedron();
     _mesh = new Tetrahedron();
     _mesh->computeLaplacians();
+    _mesh->computeCurvature();
+    _mesh->computeColors();
 }
 
 void GLDisplayWidget::paintGL(){
@@ -91,6 +93,8 @@ void GLDisplayWidget::switchMesh(int index) {
             break;
     }
     _mesh->computeLaplacians();
+    _mesh->computeCurvature();
+    _mesh->computeColors();
 }
 
 // - - - - - - - - - - - - Mouse Management  - - - - - - - - - - - - - - - -

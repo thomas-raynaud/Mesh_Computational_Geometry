@@ -3,6 +3,7 @@
 
 #include <QGLWidget>
 #include "point.h"
+#include "color.h"
 
 
 class Vertex {
@@ -29,6 +30,8 @@ class Face {
     std::array<int, 3> _vertices; // Sommets de la face
     std::array<int, 3> _adjacentFaces; // Faces adjacentes à la face.
     // 1e face = face opposée au 1er sommet, etc...
+    double _curvature;
+    std::array<int, 3> _color;
 
 public:
     Face(std::array<int, 3> vertices,
@@ -41,6 +44,11 @@ public:
     //get
     const std::array<int, 3> vertices() const { return _vertices; }
     const std::array<int, 3> adjacentFaces() const { return _adjacentFaces; }
+    double curvature() const { return _curvature; }
+    std::array<int, 3> color() const { return _color; }
+    //set
+    void setCurvature(double curvature) { _curvature = curvature; }
+    void setColor(std::array<int, 3> color) { _color = color; }
 };
 
 
@@ -64,6 +72,8 @@ public:
     void drawMesh(); // Afficher les faces du mesh
     void drawMeshWireFrame(); // Afficher les arêtes du mesh
     void computeLaplacians(); // Calculer les Laplaciens de chaque sommet
+    void computeCurvature();
+    void computeColors();
 
     friend class Iterator_on_faces;
     Iterator_on_faces faces_begin();
@@ -189,5 +199,7 @@ public:
        return temp;
     }
 };
+
+std::array<int, 3> hsv2rgb(double h, double s, double v);
 
 #endif // MESH_H
