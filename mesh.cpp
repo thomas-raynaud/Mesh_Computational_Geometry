@@ -11,10 +11,11 @@ Mesh::~Mesh() {}
 
 QVector<QVector<double>> Mesh::getLap() {
     QVector<QVector<double>> answ; //Les valeurs du lapacien
-    QVector<double> tmp; //Valeur temporaire du laplacien pour ajouter a answ
     double x,y,z; //Coordones du laplacien
-    float A; // Aire
-    Point a,b,c; //Vector du triangle pour les calculs
+    double A; // Aire
+    Point a,b,c,d; //Vector du triangle pour les calculs
+    double s_x,s_y,s_z; //Somme sur les vertices adjacents pour chacune des coordone du laplacien
+    double opp,adj,cot_alpha,cot_beta; //Calcul de trigo
 
     //On utilise l'iterateur sur les verticies pour parcourir tous les vertex
     Iterator_on_vertices its;
@@ -22,6 +23,7 @@ QVector<QVector<double>> Mesh::getLap() {
     for (its=this->vertices_begin(); its !=this->vertices_past_the_end(); ++its){ //On parcour tous les vertex du mesh
         //On utilise le circulateur sur les faces pour recuperer un tableau des sommets adjacents
         Circulator_on_faces cfbegin=this->incident_faces(*its) ;
+
         //Calcul de l'aire
         A=0;
         for (cf=cfbegin,++cf; cf!=cfbegin; cf++){ //On parcours toutes les faces qui ont le sommet its
@@ -35,16 +37,69 @@ QVector<QVector<double>> Mesh::getLap() {
         b = vertexTab[cf->vertices()[1]].point();
         c = vertexTab[cf->vertices()[2]].point();
         A=A+1/3*(1/2*(produitVectoriel(b.difference(a), c.difference(a))).norm());
-    }
 
-        //MAJ du vector de resultats
-	/*
+        //Calcul de la somme
+        s_x=s_y=s_z=0;
+        Circulator_on_vertices cv;
+        Circulator_on_vertices cvbegin=this->incident_vertices(*its);
+        int index; //0 est le cvbegin
+        index=1;
+        a=its->point();
+        for (cv=cvbegin,cv++; cv!=cvbegin; cv++){
+
+            b=cv->point();
+            c=(cv++)->point();
+            d=(cv++)->point();
+            cv=cvbegin;
+            for(int i=0; i<index; i++){
+                cv++;
+            }
+            index++;
+            // cot_alpha
+            opp=(a.difference(c)).norm();
+            adj=(a.difference(b)).norm();
+            cot_alpha=adj/opp;
+
+            // cot_beta
+            adj=(a.difference(d)).norm();
+            cot_beta=adj/opp;
+
+            // sommes
+            s_x=s_x+cot_alpha+cot_beta*(c.x()-a.x());
+            s_y=s_y+cot_alpha+cot_beta*(c.y()-a.y());
+            s_z=s_z+cot_alpha+cot_beta*(c.z()-a.z());
+        }
+
+        cv=cvbegin;
+        b=cv->point();
+        c=(cv++)->point();
+        d=(cv++)->point();
+        // cot_alpha
+        opp=(a.difference(c)).norm();
+        adj=(a.difference(b)).norm();
+        cot_alpha=adj/opp;
+        // cot_beta
+        adj=(a.difference(d)).norm();
+        cot_beta=adj/opp;
+
+        // sommes
+        s_x=s_x+cot_alpha+cot_beta*(c.x()-a.x());
+        s_y=s_y+cot_alpha+cot_beta*(c.y()-a.y());
+        s_z=s_z+cot_alpha+cot_beta*(c.z()-a.z());
+
+        x=1/(2*A)*s_x;
+        y=1/(2*A)*s_y;
+        z=1/(2*A)*s_z;
+
+        QVector<double> tmp; //Valeur temporaire du laplacien pour ajouter a answ
+        tmp.clear();
         tmp.push_back(x);
         tmp.push_back(y);
         tmp.push_back(z);
         answ.push_back(tmp);
 
-    }*/
+    }
+    std::cout<<answ.size()<<std::endl;
     return answ;
 }
 
@@ -220,7 +275,8 @@ void glVertexDraw(const Vertex & v) {
 
 //Example with a tetraedra
 void Mesh::drawMesh() {
-    getLap();
+    QVector<QVector<double>> lap;
+    lap=getLap();
     int color_ind = 0;
     // Iteration sur chaque face du mesh
     for (QVector<Face>::iterator face_it = faceTab.begin() ; face_it != faceTab.end(); ++face_it) {
@@ -232,6 +288,7 @@ void Mesh::drawMesh() {
         b = vertexTab[faceVertices[1]];
         c = vertexTab[faceVertices[2]];
         // Couleur
+        /*
         switch(color_ind % 6) {
             case 0: glColor3d(1,0,0); break; // Red
             case 1: glColor3d(0,1,0); break; // Green
@@ -240,6 +297,9 @@ void Mesh::drawMesh() {
             case 4: glColor3d(0.4, 0.2, 0.8); break;
             default: glColor3d(1,1,0); break; // Yellow
         }
+        */
+        //Utilisation de la courbure pour definir une couleur
+        glColor3d(lap[color_ind][1], lap[color_ind][1], lap[color_ind][1]);
         // Création du triangle
         glBegin(GL_TRIANGLES);
         glVertexDraw(a); // 1er point de la face
