@@ -36,8 +36,11 @@ void Mesh::drawMesh() {
         glColor3d(rgb[0], rgb[1], rgb[2]);
         // Création du triangle
         glBegin(GL_TRIANGLES);
+        glColor3d(1, 0, 0);
         glVertexDraw(a); // 1er point de la face
+        glColor3d(0, 1, 0);
         glVertexDraw(b); // 2e point de la face
+        glColor3d(0, 0, 1);
         glVertexDraw(c); // 3e point de la face
         glEnd();
 

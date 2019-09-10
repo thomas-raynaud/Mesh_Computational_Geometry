@@ -60,9 +60,9 @@ void Mesh::computeLaplacians() {
             cot_beta=adj/opp;
 
             // sommes
-            lap_x = lap_x +cot_alpha+cot_beta*(c.x()-a.x());
-            lap_y = lap_y +cot_alpha+cot_beta*(c.y()-a.y());
-            lap_z = lap_z +cot_alpha+cot_beta*(c.z()-a.z());
+            lap_x = (lap_x +cot_alpha+cot_beta)*(c.x()-a.x());
+            lap_y = (lap_y +cot_alpha+cot_beta)*(c.y()-a.y());
+            lap_z = (lap_z +cot_alpha+cot_beta)*(c.z()-a.z());
 
             cv++;
         } while (cv != cvbegin);
@@ -72,8 +72,15 @@ void Mesh::computeLaplacians() {
         lap_z = (1.f / (2.f * A)) * lap_z;
         //std::cout << lap_x << " " << lap_y << " " << lap_z << std::endl;
         it_v->setLaplacian(Point(lap_x, lap_y, lap_z));
-
     }
+
+    // Afficher les 5 premiers laplaciens
+    /*int t = 0;
+    for (it_v = this->vertices_begin(); it_v !=this->vertices_past_the_end(); it_v++) {
+        std::cout << it_v->laplacian().x() << " " << it_v->laplacian().y() << " " << it_v->laplacian().z() << std::endl;
+        t++;
+        if (t == 5) break;
+    }*/
 }
 
 void Mesh::computeCurvature() {
@@ -94,9 +101,7 @@ void Mesh::computeCurvature() {
         Point laplacian_face((a_l_n.x() + b_l_n.x() + c_l_n.x()) / 3,
                              (a_l_n.y() + b_l_n.y() + c_l_n.y()) / 3,
                              (a_l_n.z() + b_l_n.z() + c_l_n.z()) / 3);
-        //face_it->setCurvature(laplacian_face.norm());
         face_it->setCurvature(a_l_n.x());
-        //std::cout << a_l_n.x() << " " << a_l_n.y() << " " << a_l_n.z() << std::endl;
     }
 }
 
