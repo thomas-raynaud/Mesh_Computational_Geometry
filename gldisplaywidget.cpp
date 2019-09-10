@@ -31,9 +31,7 @@ void GLDisplayWidget::initializeGL()
     // Construction of the mesh before it is displayed
     //_mesh = new Tetrahedron();
     _mesh = new Tetrahedron();
-    _mesh->computeLaplacians();
-    _mesh->computeCurvature();
-    _mesh->computeColors();
+    _mesh->computeColors(0);
 }
 
 void GLDisplayWidget::paintGL(){
@@ -92,9 +90,28 @@ void GLDisplayWidget::switchMesh(int index) {
             _mesh = new Tetrahedron();
             break;
     }
-    _mesh->computeLaplacians();
-    _mesh->computeCurvature();
-    _mesh->computeColors();
+    _mesh->computeColors(0);
+}
+
+void GLDisplayWidget::switchCurveAxis(int index) {
+    switch(index) {
+        case 0:
+            _mesh->computeColors(0);
+            break;
+        case 1:
+            _mesh->computeColors(1);
+            break;
+        case 2:
+            _mesh->computeColors(2);
+            break;
+        case 3:
+            _mesh->computeColors(3);
+            break;
+        default:
+            _mesh->computeColors(0);
+            break;
+    }
+    _mesh->computeColors(0);
 }
 
 // - - - - - - - - - - - - Mouse Management  - - - - - - - - - - - - - - - -

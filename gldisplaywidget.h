@@ -19,6 +19,7 @@ public:
     void resizeGL(int width, int height);
     void toggleDisplayType();
     void switchMesh(int index);
+    void switchCurveAxis(int index);
 
 protected:
     // Mouse Management

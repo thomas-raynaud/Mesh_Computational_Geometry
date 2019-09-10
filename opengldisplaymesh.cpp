@@ -33,14 +33,13 @@ void Mesh::drawMesh() {
             case 4: glColor3d(0.4, 0.2, 0.8); break;
             default: glColor3d(1,1,0); break; // Yellow
         }*/
-        glColor3d(rgb[0], rgb[1], rgb[2]);
         // Création du triangle
         glBegin(GL_TRIANGLES);
-        glColor3d(1, 0, 0);
+        glColor3d(a.color()[0], a.color()[1], a.color()[2]);
         glVertexDraw(a); // 1er point de la face
-        glColor3d(0, 1, 0);
+        glColor3d(b.color()[0], b.color()[1], b.color()[2]);
         glVertexDraw(b); // 2e point de la face
-        glColor3d(0, 0, 1);
+        glColor3d(c.color()[0], c.color()[1], c.color()[2]);
         glVertexDraw(c); // 3e point de la face
         glEnd();
 

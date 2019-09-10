@@ -12,10 +12,10 @@ void Face::addAdjacentFace(int faceIndex, int pos) {
 Mesh::Mesh() {}
 Mesh::~Mesh() {}
 
-void Mesh::computeLaplacians() {
+std::vector<std::array<double, 3>> Mesh::getLaplacians() {
     float A; // Aire
     Point a, b, c, d; // Vecteur du triangle pour les calculs
-
+    std::vector<std::array<double, 3>> laplacians;
     // On utilise l'itérateur sur les vertices pour parcourir tous les vertex
     Iterator_on_vertices it_v;
     Circulator_on_faces cf, cfbegin;
@@ -70,46 +70,24 @@ void Mesh::computeLaplacians() {
         lap_x = (1.f / (2.f * A)) * lap_x;
         lap_y = (1.f / (2.f * A)) * lap_y;
         lap_z = (1.f / (2.f * A)) * lap_z;
-        //std::cout << lap_x << " " << lap_y << " " << lap_z << std::endl;
-        it_v->setLaplacian(Point(lap_x, lap_y, lap_z));
+        laplacians.push_back({lap_x, lap_y, lap_z});
     }
-
-    // Afficher les 5 premiers laplaciens
-    /*int t = 0;
-    for (it_v = this->vertices_begin(); it_v !=this->vertices_past_the_end(); it_v++) {
-        std::cout << it_v->laplacian().x() << " " << it_v->laplacian().y() << " " << it_v->laplacian().z() << std::endl;
-        t++;
-        if (t == 5) break;
-    }*/
+    return laplacians;
 }
 
-void Mesh::computeCurvature() {
-    for (QVector<Face>::iterator face_it = faceTab.begin(); face_it != faceTab.end(); ++face_it) {
-
-        Vertex a, b, c;
-        std::array<int, 3> faceVertices = face_it->vertices();
-        if (faceVertices[0] == -1 || faceVertices[1] == -1 || faceVertices[2] == -1) continue;
-        a = vertexTab[faceVertices[0]];
-        b = vertexTab[faceVertices[1]];
-        c = vertexTab[faceVertices[2]];
-        double norm_l_a = a.laplacian().norm();
-        double norm_l_b = b.laplacian().norm();
-        double norm_l_c = c.laplacian().norm();
-        Point a_l_n = Point(a.laplacian().x() / norm_l_a, a.laplacian().y() / norm_l_a, a.laplacian().z() / norm_l_a);
-        Point b_l_n = Point(b.laplacian().x() / norm_l_b, b.laplacian().y() / norm_l_b, b.laplacian().z() / norm_l_b);
-        Point c_l_n = Point(c.laplacian().x() / norm_l_c, c.laplacian().y() / norm_l_c, c.laplacian().z() / norm_l_c);
-        Point laplacian_face((a_l_n.x() + b_l_n.x() + c_l_n.x()) / 3,
-                             (a_l_n.y() + b_l_n.y() + c_l_n.y()) / 3,
-                             (a_l_n.z() + b_l_n.z() + c_l_n.z()) / 3);
-        face_it->setCurvature(a_l_n.x());
+void Mesh::computeColors(int curveAxis) {
+    double xMax, yMax, zMax;
+    xMax = yMax = zMax = 0.0;
+    std::vector<std::array<double, 3>> laplacians = getLaplacians();
+    for (int i = 0; i < vertexTab.size(); ++i) {
+        xMax = std::max(xMax, std::abs(laplacians[i][0]));
+        yMax = std::max(yMax, std::abs(laplacians[i][1]));
+        zMax = std::max(zMax, std::abs(laplacians[i][2]));
     }
-}
-
-void Mesh::computeColors() {
-    for (QVector<Face>::iterator face_it = faceTab.begin() ; face_it != faceTab.end(); ++face_it) {
-        face_it->setColor(hsv2rgb((int)std::floor(face_it->curvature() * 360.f), 1.0, 1.0));
-        //std::cout << "color " << (int)std::floor(face_it->curvature() * 360.f) << std::endl;
-        //std::cout << "rgb " << face_it->color()[0] << " " << face_it->color()[1] << " " << face_it->color()[2] << std::endl;
+    double hue = 0.0;
+    for (int i = 0; i < vertexTab.size(); ++i) {
+        hue = (std::abs(laplacians[i][1]) / yMax) * 360.0;
+        vertexTab[i].setColor(hsv2rgb((int)hue, 1.0, 1.0));
     }
 }
 

@@ -10,7 +10,7 @@ class Vertex {
 
     Point _point;
     int _face; // Face incidente au sommet
-    Point _laplacian;
+    std::array<double, 3> _rgb;
 
 public:
     Vertex(Point p, int face) : _point(p), _face(face) {}
@@ -18,10 +18,10 @@ public:
     // get
     Point point() const { return _point; }
     int face() const { return _face; }
-    Point laplacian() const { return _laplacian; }
+    std::array<double, 3> color() const { return _rgb; }
     // set
     void setFace(int face) { _face = face; }
-    void setLaplacian(Point laplacian) { _laplacian = laplacian; }
+    void setColor(std::array<double, 3> rgb) { _rgb = rgb; }
 };
 
 
@@ -71,9 +71,8 @@ public:
     // du mesh
     void drawMesh(); // Afficher les faces du mesh
     void drawMeshWireFrame(); // Afficher les arêtes du mesh
-    void computeLaplacians(); // Calculer les Laplaciens de chaque sommet
-    void computeCurvature();
-    void computeColors();
+    std::vector<std::array<double, 3>> getLaplacians(); // Calculer les Laplaciens de chaque sommet
+    void computeColors(int curveAxis);
 
     friend class Iterator_on_faces;
     Iterator_on_faces faces_begin();

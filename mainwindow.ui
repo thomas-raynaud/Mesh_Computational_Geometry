@@ -29,7 +29,7 @@
          <x>20</x>
          <y>10</y>
          <width>151</width>
-         <height>111</height>
+         <height>331</height>
         </rect>
        </property>
        <layout class="QVBoxLayout" name="verticalLayout_2">
@@ -67,6 +67,25 @@
           <item>
            <property name="text">
             <string>Queen</string>
+           </property>
+          </item>
+         </widget>
+        </item>
+        <item>
+         <widget class="QComboBox" name="comboBox_2">
+          <item>
+           <property name="text">
+            <string>Courbure en X</string>
+           </property>
+          </item>
+          <item>
+           <property name="text">
+            <string>Courbure en Y</string>
+           </property>
+          </item>
+          <item>
+           <property name="text">
+            <string>Courbure en Z</string>
            </property>
           </item>
          </widget>
