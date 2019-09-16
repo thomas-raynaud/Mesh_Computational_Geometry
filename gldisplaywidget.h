@@ -32,6 +32,7 @@ private:
     QTimer _timer; // To update the scene
     float _X, _Y ,_Z; // Translation
     float _angle; // Rotation
+    int _curveAxis;
     bool _wireframe_display;
 
     QPoint _lastPosMouse; // To keep the last position of the mouse

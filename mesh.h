@@ -62,6 +62,7 @@ class Mesh {
 protected:
     QVector<Vertex> vertexTab; // "Sac" de sommets
     QVector<Face> faceTab; // "Sac" de faces
+    std::vector<std::array<double, 3>> laplacianTab;
 
 public:
     Mesh();

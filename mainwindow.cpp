@@ -24,7 +24,6 @@ void MainWindow::on_comboBox_currentIndexChanged(int index) {
     ui->widget->switchMesh(index);
 }
 
-void MainWindow::on_comboBox_2_currentIndexChanged(int index)
-{
+void MainWindow::on_comboBox_2_currentIndexChanged(int index) {
     ui->widget->switchCurveAxis(index);
 }

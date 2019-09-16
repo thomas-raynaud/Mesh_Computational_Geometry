@@ -22,17 +22,7 @@ void Mesh::drawMesh() {
         a = vertexTab[faceVertices[0]];
         b = vertexTab[faceVertices[1]];
         c = vertexTab[faceVertices[2]];
-        std::array<double, 3> rgb = face_it->color();
 
-        // Couleur
-        /*switch(color_ind % 6) {
-            case 0: glColor3d(1,0,0); break; // Red
-            case 1: glColor3d(0,1,0); break; // Green
-            case 2: glColor3d(0,0,1); break; // Blue
-            case 3: glColor3d(0.8, 0, 0.8); break;
-            case 4: glColor3d(0.4, 0.2, 0.8); break;
-            default: glColor3d(1,1,0); break; // Yellow
-        }*/
         // Création du triangle
         glBegin(GL_TRIANGLES);
         glColor3d(a.color()[0], a.color()[1], a.color()[2]);

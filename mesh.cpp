@@ -4,6 +4,7 @@
 #include <string>
 #include <unordered_map>
 #include <iostream>
+#include <fstream>
 
 void Face::addAdjacentFace(int faceIndex, int pos) {
     _adjacentFaces[pos] = faceIndex;
@@ -13,6 +14,7 @@ Mesh::Mesh() {}
 Mesh::~Mesh() {}
 
 std::vector<std::array<double, 3>> Mesh::getLaplacians() {
+    if (laplacianTab.size() != 0) return laplacianTab;
     float A; // Aire
     Point a, b, c, d; // Vecteur du triangle pour les calculs
     std::vector<std::array<double, 3>> laplacians;
@@ -42,6 +44,7 @@ std::vector<std::array<double, 3>> Mesh::getLaplacians() {
         cvbegin = this->incident_vertices(*it_v);
         cv = cvbegin;
         a = it_v->point();
+        // On parcourt les arêtes du sommet it_v
         do {
             cvtemp = cv;
             --cvtemp;
@@ -53,16 +56,16 @@ std::vector<std::array<double, 3>> Mesh::getLaplacians() {
             // cot alpha
             opp = difference(a, c).norm();
             adj = difference(a, b).norm();
-            cot_alpha=adj/opp;
+            cot_alpha = adj / opp;
 
             // cot beta
             adj = difference(a, d).norm();
-            cot_beta=adj/opp;
+            cot_beta = adj / opp;
 
             // sommes
-            lap_x = (lap_x +cot_alpha+cot_beta)*(c.x()-a.x());
-            lap_y = (lap_y +cot_alpha+cot_beta)*(c.y()-a.y());
-            lap_z = (lap_z +cot_alpha+cot_beta)*(c.z()-a.z());
+            lap_x = lap_x + (cot_alpha + cot_beta) * (c.x() - a.x());
+            lap_y = lap_y + (cot_alpha + cot_beta) * (c.y() - a.y());
+            lap_z = lap_z + (cot_alpha + cot_beta) * (c.z() - a.z());
 
             cv++;
         } while (cv != cvbegin);
@@ -72,22 +75,27 @@ std::vector<std::array<double, 3>> Mesh::getLaplacians() {
         lap_z = (1.f / (2.f * A)) * lap_z;
         laplacians.push_back({lap_x, lap_y, lap_z});
     }
+    laplacianTab = laplacians;
     return laplacians;
 }
 
 void Mesh::computeColors(int curveAxis) {
-    double xMax, yMax, zMax;
-    xMax = yMax = zMax = 0.0;
+    double max;
     std::vector<std::array<double, 3>> laplacians = getLaplacians();
-    for (int i = 0; i < vertexTab.size(); ++i) {
-        xMax = std::max(xMax, std::abs(laplacians[i][0]));
-        yMax = std::max(yMax, std::abs(laplacians[i][1]));
-        zMax = std::max(zMax, std::abs(laplacians[i][2]));
-    }
-    double hue = 0.0;
-    for (int i = 0; i < vertexTab.size(); ++i) {
-        hue = (std::abs(laplacians[i][1]) / yMax) * 360.0;
-        vertexTab[i].setColor(hsv2rgb((int)hue, 1.0, 1.0));
+    if(curveAxis < 3) {
+        max= 0.0;
+        for (int i = 0; i < vertexTab.size(); ++i) {
+            max = std::max(max, std::abs(laplacians[i][curveAxis]));
+           }
+        double hue = 0.0;
+        for (int i = 0; i < vertexTab.size(); ++i) {
+            hue = (std::abs(laplacians[i][curveAxis]) / max) * 270.0 + 90.0;
+            vertexTab[i].setColor(hsv2rgb((int)hue, 1.0, 1.0));
+        }
+    } else if (curveAxis == 3) {
+
+    } else {
+        // ...
     }
 }
 
