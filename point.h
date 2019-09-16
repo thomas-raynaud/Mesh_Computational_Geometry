@@ -17,6 +17,14 @@ public:
     double x() const { return _x; }
     double y() const { return _y; }
     double z() const { return _z; }
+    double& operator[] (int x) {
+        switch(x) {
+            case 0: return _x;
+            case 1: return _y;
+            case 2: return _z;
+          }
+        return _x;
+    }
     // Opérations sur des points/vectors
     double norm();
 };

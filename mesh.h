@@ -4,6 +4,8 @@
 #include <QGLWidget>
 #include "point.h"
 #include "color.h"
+#include <float.h>
+#include <math.h>
 
 
 class Vertex {
@@ -62,7 +64,7 @@ class Mesh {
 protected:
     QVector<Vertex> vertexTab; // "Sac" de sommets
     QVector<Face> faceTab; // "Sac" de faces
-    std::vector<std::array<double, 3>> laplacianTab;
+    std::vector<Point> laplacianTab;
 
 public:
     Mesh();
@@ -72,7 +74,7 @@ public:
     // du mesh
     void drawMesh(); // Afficher les faces du mesh
     void drawMeshWireFrame(); // Afficher les arêtes du mesh
-    std::vector<std::array<double, 3>> getLaplacians(); // Calculer les Laplaciens de chaque sommet
+    std::vector<Point> getLaplacians(); // Calculer les Laplaciens de chaque sommet
     void computeColors(int curveAxis);
 
     friend class Iterator_on_faces;

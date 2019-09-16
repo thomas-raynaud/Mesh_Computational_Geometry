@@ -13,11 +13,11 @@ void Face::addAdjacentFace(int faceIndex, int pos) {
 Mesh::Mesh() {}
 Mesh::~Mesh() {}
 
-std::vector<std::array<double, 3>> Mesh::getLaplacians() {
+std::vector<Point> Mesh::getLaplacians() {
     if (laplacianTab.size() != 0) return laplacianTab;
     float A; // Aire
     Point a, b, c, d; // Vecteur du triangle pour les calculs
-    std::vector<std::array<double, 3>> laplacians;
+    std::vector<Point> laplacians;
     // On utilise l'itérateur sur les vertices pour parcourir tous les vertex
     Iterator_on_vertices it_v;
     Circulator_on_faces cf, cfbegin;
@@ -73,29 +73,32 @@ std::vector<std::array<double, 3>> Mesh::getLaplacians() {
         lap_x = (1.f / (2.f * A)) * lap_x;
         lap_y = (1.f / (2.f * A)) * lap_y;
         lap_z = (1.f / (2.f * A)) * lap_z;
-        laplacians.push_back({lap_x, lap_y, lap_z});
+        laplacians.push_back(Point(lap_x, lap_y, lap_z));
     }
     laplacianTab = laplacians;
     return laplacians;
 }
 
 void Mesh::computeColors(int curveAxis) {
-    double max;
-    std::vector<std::array<double, 3>> laplacians = getLaplacians();
+    double min, max, mean_curvature;
+    std::vector<double> curvature;
+    std::vector<Point> laplacians = getLaplacians();
     if(curveAxis < 3) {
-        max= 0.0;
+        min = DBL_MAX;
+        max = 0.0;
         for (int i = 0; i < vertexTab.size(); ++i) {
-            max = std::max(max, std::abs(laplacians[i][curveAxis]));
+            mean_curvature = std::abs((laplacians[i][curveAxis] / laplacians[i].norm()) / -2);
+            min = std::min(min, mean_curvature);
+            max = std::max(max, mean_curvature);
+            curvature.push_back(mean_curvature);
            }
+        min = std::max(min, 0.0); // pour éviter que min soit égal à -inf
         double hue = 0.0;
         for (int i = 0; i < vertexTab.size(); ++i) {
-            hue = (std::abs(laplacians[i][curveAxis]) / max) * 270.0 + 90.0;
+            mean_curvature = curvature[i];
+            hue = ((mean_curvature - min) / max) * 270.0 + 90.0;
             vertexTab[i].setColor(hsv2rgb((int)hue, 1.0, 1.0));
         }
-    } else if (curveAxis == 3) {
-
-    } else {
-        // ...
     }
 }
 
