@@ -1,3 +1,7 @@
+/*
+ * Classe pour travailler avec des points ou des vecteurs.
+*/
+
 #ifndef MATH_UTIL_H
 #define MATH_UTIL_H
 
@@ -32,6 +36,5 @@ public:
 Point difference(Point, Point);
 Point crossProduct(Point, Point);
 double dotProduct(Point a, Point);
-double findAngle(Point, Point, Point);
 
 #endif // MATH_UTIL_H

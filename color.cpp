@@ -1,7 +1,5 @@
 #include "color.h"
 
-
-
 std::array<double, 3> hsv2rgb(int H, double S, double V) {
     double              hh, p, q, t, ff;
     long                i;

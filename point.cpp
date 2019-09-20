@@ -18,9 +18,3 @@ Point crossProduct(Point u, Point v) {
 double dotProduct(Point a, Point b) {
     return a.x() * b.x() + a.y() * b.y() + a.z() * b.z();
 }
-
-double findAngle(Point a, Point b, Point c) {
-    Point u = difference(b, a);
-    Point v = difference(b, c);
-    return std::acos(dotProduct(u, v) / (u.norm() * v.norm()));
-}

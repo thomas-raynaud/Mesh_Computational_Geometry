@@ -15,15 +15,17 @@ MainWindow::~MainWindow()
 }
 
 void MainWindow::on_pushButtonDisplayType_released() {
-    if (ui->pushButtonDisplayType->text() == "Show wireframe")  ui->pushButtonDisplayType->setText("Show plain faces");
-    else ui->pushButtonDisplayType->setText("Show wireframe");
+    if (ui->pushButtonDisplayType->text() == "Show wireframe")
+        ui->pushButtonDisplayType->setText("Show plain faces");
+    else
+        ui->pushButtonDisplayType->setText("Show wireframe");
     ui->widget->toggleDisplayType();
 }
 
-void MainWindow::on_comboBox_currentIndexChanged(int index) {
+void MainWindow::on_comboBoxMeshswitch_currentIndexChanged(int index) {
     ui->widget->switchMesh(index);
 }
 
-void MainWindow::on_comboBox_2_currentIndexChanged(int index) {
+void MainWindow::on_comboBoxColorswitch_currentIndexChanged(int index) {
     ui->widget->switchCurveAxis(index);
 }
