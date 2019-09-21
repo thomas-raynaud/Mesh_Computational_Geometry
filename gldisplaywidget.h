@@ -17,8 +17,18 @@ public:
     void initializeGL(); // The scene may be initialized in this function since the mesh is a data member...
     void paintGL(); // Display the scene Gl
     void resizeGL(int width, int height);
-    void toggleDisplayType();
+    void toggleDisplayType(); // Plain faces ou wireframe
+
+    /*
+     * Changer le mesh à afficher : on détruit le mesh actuel pour en construire
+     * un autre.
+    */
     void switchMesh(int index);
+
+    /*
+     * On modifie les couleurs du mesh en fonction du type de la courbure
+     * sélectionnée : courbure moyenne, courbure moyenne dans l'axe des X, Y, Z.
+    */
     void switchCurveAxis(int index);
 
 protected:

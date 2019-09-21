@@ -26,20 +26,13 @@
       <widget class="QWidget" name="verticalLayoutWidget">
        <property name="geometry">
         <rect>
-         <x>20</x>
+         <x>10</x>
          <y>10</y>
-         <width>151</width>
+         <width>171</width>
          <height>331</height>
         </rect>
        </property>
-       <layout class="QVBoxLayout" name="verticalLayout_2">
-        <item>
-         <widget class="QPushButton" name="pushButtonExit">
-          <property name="text">
-           <string>Exit</string>
-          </property>
-         </widget>
-        </item>
+       <layout class="QVBoxLayout" name="verticalLayout">
         <item>
          <widget class="QPushButton" name="pushButtonDisplayType">
           <property name="text">
@@ -48,7 +41,7 @@
          </widget>
         </item>
         <item>
-         <widget class="QComboBox" name="comboBox">
+         <widget class="QComboBox" name="comboBoxMeshswitch">
           <item>
            <property name="text">
             <string>Tetrahedron</string>
@@ -66,33 +59,40 @@
           </item>
           <item>
            <property name="text">
-            <string>Queen</string>
+            <string>Statue (OFF file)</string>
            </property>
           </item>
          </widget>
         </item>
         <item>
-         <widget class="QComboBox" name="comboBox_2">
+         <widget class="QComboBox" name="comboBoxColorswitch">
           <item>
            <property name="text">
-            <string>Courbure en X</string>
+            <string>Mean curvature</string>
            </property>
           </item>
           <item>
            <property name="text">
-            <string>Courbure en Y</string>
+            <string>X mean curvature</string>
            </property>
           </item>
           <item>
            <property name="text">
-            <string>Courbure en Z</string>
+            <string>Y mean curvature</string>
            </property>
           </item>
           <item>
            <property name="text">
-            <string>Courbure moyenne</string>
+            <string>Z mean curvature</string>
            </property>
           </item>
+         </widget>
+        </item>
+        <item>
+         <widget class="QPushButton" name="pushButtonExit">
+          <property name="text">
+           <string>Exit</string>
+          </property>
          </widget>
         </item>
        </layout>

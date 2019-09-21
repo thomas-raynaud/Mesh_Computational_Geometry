@@ -1,14 +1,4 @@
 #include "mesh.h"
-#include <fstream>
-#include <sstream>
-#include <string>
-#include <unordered_map>
-#include <iostream>
-#include <fstream>
-
-void Face::addAdjacentFace(int faceIndex, int pos) {
-    _adjacentFaces[pos] = faceIndex;
-}
 
 Mesh::Mesh() {}
 Mesh::~Mesh() {}
@@ -16,35 +6,36 @@ Mesh::~Mesh() {}
 std::vector<Point> Mesh::getLaplacians() {
     if (laplacianTab.size() != 0) return laplacianTab;
     float A; // Aire
-    Point a, b, c, d; // Vecteur du triangle pour les calculs
-    std::vector<Point> laplacians;
-    // On utilise l'itérateur sur les vertices pour parcourir tous les vertex
+    Point a, b, c, d; // Points adjacents au sommet traité.
     Iterator_on_vertices it_v;
     Circulator_on_faces cf, cfbegin;
     Circulator_on_vertices cv, cvbegin, cvtemp;
     double lap_x, lap_y, lap_z;
-    double opp, adj, cot_alpha, cot_beta; // Calcul de trigo
-    int i = -1;
-    for (it_v = this->vertices_begin(); it_v !=this->vertices_past_the_end(); it_v++) { // on parcourt tous les sommets du mesh
-        i++;
-        cfbegin = this->incident_faces(*it_v);
-        A = 0;
-        cf = cfbegin;
+    double opp, adj, cot_alpha, cot_beta, angles; // Calculs de trigo
+
+    // Parcours de tous les sommets du mesh
+    for (it_v = this->vertices_begin(); it_v !=this->vertices_past_the_end(); ++it_v) {
+
+        // Calcul de de l'aire
         // On parcourt toutes les faces qui ont le sommet it_v
+        cfbegin = this->incident_faces(*it_v);
+        cf = cfbegin;
+        A = 0;
+
         do {
-            // Calcul de l'aire
             a = vertexTab[cf->vertices()[0]].point();
             b = vertexTab[cf->vertices()[1]].point();
             c = vertexTab[cf->vertices()[2]].point();
-            A = A + (1.f / 3.f) * ((1.f / 2.f) * (crossProduct(difference(b, a), difference(c, a))).norm());
+            A += (1.f / 3.f) * ((1.f / 2.f) * (crossProduct(difference(b, a), difference(c, a))).norm());
             cf++;
         } while (cf != cfbegin);
 
+        // Calcul du laplacien
+        // On parcourt toutes les arêtes du sommet it_v
         lap_x = lap_y = lap_z = 0;
-        cvbegin = this->incident_vertices(*it_v);
+        cvbegin = this->neighbour_vertices(*it_v);
         cv = cvbegin;
         a = it_v->point();
-        // On parcourt les arêtes du sommet it_v
         do {
             cvtemp = cv;
             --cvtemp;
@@ -53,6 +44,7 @@ std::vector<Point> Mesh::getLaplacians() {
             c = cvtemp->point();
             cvtemp++;
             d = cvtemp->point();
+
             // cot alpha
             opp = difference(a, c).norm();
             adj = difference(a, b).norm();
@@ -63,26 +55,30 @@ std::vector<Point> Mesh::getLaplacians() {
             cot_beta = adj / opp;
 
             // sommes
-            lap_x = lap_x + (cot_alpha + cot_beta) * (c.x() - a.x());
-            lap_y = lap_y + (cot_alpha + cot_beta) * (c.y() - a.y());
-            lap_z = lap_z + (cot_alpha + cot_beta) * (c.z() - a.z());
+            angles = cot_alpha + cot_beta;
+            lap_x += angles * (c.x() - a.x());
+            lap_y += angles * (c.y() - a.y());
+            lap_z += angles * (c.z() - a.z());
 
             cv++;
         } while (cv != cvbegin);
+
         // Calcul du Laplacien pour le sommet it_v;
-        lap_x = (1.f / (2.f * A)) * lap_x;
-        lap_y = (1.f / (2.f * A)) * lap_y;
-        lap_z = (1.f / (2.f * A)) * lap_z;
-        laplacians.push_back(Point(lap_x, lap_y, lap_z));
+        A = 1.f / (2.f * A);
+        lap_x = A * lap_x;
+        lap_y = A * lap_y;
+        lap_z = A * lap_z;
+        laplacianTab.push_back(Point(lap_x, lap_y, lap_z));
     }
-    laplacianTab = laplacians;
-    return laplacians;
+    return laplacianTab;
 }
 
 void Mesh::computeColors(int curveAxis) {
-    double min, max, mean_curvature;
+    double min = DBL_MAX, max = 0.0, mean_curvature;
+    int hue = 0;
     std::vector<double> curvature;
     std::vector<Point> laplacians = getLaplacians();
+<<<<<<< HEAD
     if(curveAxis < 3) {
         min = DBL_MAX;
         max = 0.0;
@@ -99,6 +95,25 @@ void Mesh::computeColors(int curveAxis) {
             hue = ((mean_curvature - min) / max) * 270.0 + 90.0;
             vertexTab[i].setColor(hsv2rgb((int)hue, 1.0, 1.0));
         }
+=======
+    // Calculer la courbure moyenne
+    for (int i = 0; i < vertexTab.size(); ++i) {
+        if (curveAxis == 0)
+            mean_curvature = std::abs(std::log(laplacians[i].norm()) / -2);
+        else
+            mean_curvature = std::abs((laplacians[i][curveAxis - 1] / laplacians[i].norm()) / -2);
+        min = std::min(min, mean_curvature);
+        max = std::max(max, mean_curvature);
+        curvature.push_back(mean_curvature);
+    }
+
+    // Trouver la teinte de la couleur en fonction de la courbure
+    for (int i = 0; i < vertexTab.size(); ++i) {
+        mean_curvature = curvature[i];
+        // Courbure faible : vert, à courbure forte : rouge
+        hue = ((mean_curvature - min) / max) * 270.0 + 90.0;
+        vertexTab[i].setColor(hsv2rgb(hue, 1.0, 1.0));
+>>>>>>> master
     }
 
 }
@@ -137,10 +152,10 @@ void Mesh::connectAdjacentFaces() {
 
 Tetrahedron::Tetrahedron() {
     // Création des points
-    vertexTab.push_back(Vertex(Point(-0.5,-0.5,-0.5), 0));
-    vertexTab.push_back(Vertex(Point(0.5,-0.5,-0.5), 1));
-    vertexTab.push_back(Vertex(Point(0,0.5,-0.5), 2));
-    vertexTab.push_back(Vertex(Point(0,-0.5,0.5), 3));
+    vertexTab.push_back(Vertex(Point(-0.5,-0.5,-0.5), 0, 0));
+    vertexTab.push_back(Vertex(Point(0.5,-0.5,-0.5), 1, 1));
+    vertexTab.push_back(Vertex(Point(0,0.5,-0.5), 2, 2));
+    vertexTab.push_back(Vertex(Point(0,-0.5,0.5), 3, 3));
     // Création des faces
     std::array<int, 3> ind_vertices; // indice des sommets
     std::array<int, 3> ind_faces; // indice des faces
@@ -156,11 +171,11 @@ Tetrahedron::Tetrahedron() {
 
 Pyramid::Pyramid() {
     // Création des points
-    vertexTab.push_back(Vertex(Point(-0.5,-0.5,-0.5), 0));
-    vertexTab.push_back(Vertex(Point(-0.5,0.5,-0.5), 0));
-    vertexTab.push_back(Vertex(Point(0.5,-0.5,-0.5), 0));
-    vertexTab.push_back(Vertex(Point(0.5,0.5,-0.5), 1));
-    vertexTab.push_back(Vertex(Point(0,0,0.5), 2));
+    vertexTab.push_back(Vertex(Point(-0.5,-0.5,-0.5), 0, 0));
+    vertexTab.push_back(Vertex(Point(-0.5,0.5,-0.5), 0, 1));
+    vertexTab.push_back(Vertex(Point(0.5,-0.5,-0.5), 0, 2));
+    vertexTab.push_back(Vertex(Point(0.5,0.5,-0.5), 1, 3));
+    vertexTab.push_back(Vertex(Point(0,0,0.5), 2, 4));
     // Création des faces
     std::array<int, 3> ind_vertices; // indice des sommets
     std::array<int, 3> ind_faces; // indice des faces
@@ -180,10 +195,10 @@ Pyramid::Pyramid() {
 
 BoundingBox2D::BoundingBox2D() {
     // Création des points
-    vertexTab.push_back(Vertex(Point(-0.5,-0.5,-0.5), 0));
-    vertexTab.push_back(Vertex(Point(-0.5,0.5,-0.5), 0));
-    vertexTab.push_back(Vertex(Point(0.5,-0.5,-0.5), 0));
-    vertexTab.push_back(Vertex(Point(0.5,0.5,-0.5), 1));
+    vertexTab.push_back(Vertex(Point(-0.5,-0.5,-0.5), 0, 0));
+    vertexTab.push_back(Vertex(Point(-0.5,0.5,-0.5), 0, 1));
+    vertexTab.push_back(Vertex(Point(0.5,-0.5,-0.5), 0, 2));
+    vertexTab.push_back(Vertex(Point(0.5,0.5,-0.5), 1, 3));
     // Création des faces
     std::array<int, 3> ind_vertices; // indice des sommets
     std::array<int, 3> ind_faces; // indice des faces
@@ -223,7 +238,7 @@ QueenMesh::QueenMesh() {
         y = atof(line.substr(delimiterPos1, delimiterPos2).c_str()); // y
         delimiterPos3 = line.find(" ", delimiterPos2 + 1);
         z = atof(line.substr(delimiterPos2, delimiterPos3 ).c_str()); // z
-        vertexTab.push_back(Vertex(Point(x, y, z), -1));
+        vertexTab.push_back(Vertex(Point(x, y, z), -1, i));
     }
 
     /**** Création des faces ****/
@@ -284,25 +299,17 @@ Iterator_on_vertices Mesh::vertices_past_the_end() {
 }
 
 Circulator_on_faces Mesh::incident_faces(Vertex &v) {
-    // Récupérer l'index de v
-    int ind_v = -1;
-    for (int i = 0; i < vertexTab.size(); ++i) {
-        if (&v == &(vertexTab[i])) {
-            ind_v = i;
-            break;
-        }
-    }
+    // Trouver les faces incidentes à v
     int first_face = v.face();
-    // Trouver les faces incidentes à v.
     std::vector<Face*> faces_incidentes;
     int id_v_oppose, face_actuelle = first_face;
     bool isFaceFictitious;
-    while(true) {
+    do { // Tant qu'on n'a pas faire le tour du sommet v, on accumule les faces incidentes.
         isFaceFictitious = false;
         // Trouver l'indice de v dans la face actuelle.
         for (int i = 0; i < 3; ++i) {
             if (faceTab[face_actuelle].vertices()[i] == -1) isFaceFictitious = true;
-            if(faceTab[face_actuelle].vertices()[i] == ind_v) {
+            if (faceTab[face_actuelle].vertices()[i] == v.idx()) {
                 id_v_oppose = (i + 1) % 3;
             }
         }
@@ -310,42 +317,32 @@ Circulator_on_faces Mesh::incident_faces(Vertex &v) {
             faces_incidentes.push_back(&(faceTab[face_actuelle]));
         }
         face_actuelle = faceTab[face_actuelle].adjacentFaces()[id_v_oppose];
-        if(face_actuelle == first_face) {
-            break;
-        }
     }
+    while(face_actuelle != first_face);
+
     Circulator_on_faces cof(faces_incidentes);
     return cof;
 }
 
-Circulator_on_vertices Mesh::incident_vertices(Vertex &v) {
-    // Récupérer l'index de v
-    int ind_v = -1;
-    for (int i = 0; i < vertexTab.size(); ++i) {
-        if (&v == &(vertexTab[i])) {
-            ind_v = i;
-            break;
-        }
-    }
+Circulator_on_vertices Mesh::neighbour_vertices(Vertex &v) {
+    // Trouver les sommets voisins de v
     int first_face = v.face();
-    // Trouver les faces incidentes à v.
-    std::vector<Vertex*> sommets_adjacents;
+    std::vector<Vertex*> sommets_voisins;
     int id_v_oppose, face_actuelle = first_face;
-    while(true) {
+    do {
         // Trouver l'indice de v dans la face actuelle.
         for (int i = 0; i < 3; ++i) {
-            if(faceTab[face_actuelle].vertices()[i] == ind_v) {
+            if(faceTab[face_actuelle].vertices()[i] == v.idx()) {
                 id_v_oppose = (i + 1) % 3;
                 break;
             }
         }
         if (faceTab[face_actuelle].vertices()[id_v_oppose] != -1)
-            sommets_adjacents.push_back(&(vertexTab[faceTab[face_actuelle].vertices()[id_v_oppose]]));
+            sommets_voisins.push_back(&(vertexTab[faceTab[face_actuelle].vertices()[id_v_oppose]]));
         face_actuelle = faceTab[face_actuelle].adjacentFaces()[id_v_oppose];
-        if(face_actuelle == first_face) {
-            break;
-        }
     }
-    Circulator_on_vertices cov(sommets_adjacents);
+    while(face_actuelle != first_face);
+
+    Circulator_on_vertices cov(sommets_voisins);
     return cov;
 }

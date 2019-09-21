@@ -2,24 +2,31 @@
 #define MESH_H
 
 #include <QGLWidget>
+#include <float.h>
+#include <sstream>
+#include <unordered_map>
+#include <fstream>
+
 #include "point.h"
 #include "color.h"
-#include <float.h>
-#include <math.h>
+
 
 
 class Vertex {
 
-    Point _point;
-    int _face; // Face incidente au sommet
-    std::array<double, 3> _rgb;
+    Point _point;               // Coordonnées
+    int _face;                  // Face incidente au sommet
+    std::array<double, 3> _rgb; // couleur du sommet
+    int _idx;                   // Indice du sommet dans le mesh
 
 public:
-    Vertex(Point p, int face) : _point(p), _face(face) {}
+    Vertex(Point p, int face, int idx) : _point(p), _face(face), _idx(idx) {}
     Vertex() {}
+
     // get
     Point point() const { return _point; }
     int face() const { return _face; }
+    int idx() const { return _idx; }
     std::array<double, 3> color() const { return _rgb; }
     // set
     void setFace(int face) { _face = face; }
@@ -27,67 +34,74 @@ public:
 };
 
 
+
 class Face {
 
-    std::array<int, 3> _vertices; // Sommets de la face
-    std::array<int, 3> _adjacentFaces; // Faces adjacentes à la face.
+    std::array<int, 3> _vertices;       // Sommets de la face
+    std::array<int, 3> _adjacentFaces;  // Faces adjacentes à la face.
     // 1e face = face opposée au 1er sommet, etc...
-    double _curvature;
-    std::array<double, 3> _color;
 
 public:
     Face(std::array<int, 3> vertices,
          std::array<int, 3> adjacentFaces={-1,-1,-1}
          ): _vertices(vertices), _adjacentFaces(adjacentFaces) {}
     Face() {}
-    void addAdjacentFace(int faceIndex, int pos); // Ajouter la face adjacente
-    // faceIndex opposée au sommet numéro pos
 
     //get
     const std::array<int, 3> vertices() const { return _vertices; }
     const std::array<int, 3> adjacentFaces() const { return _adjacentFaces; }
-    double curvature() const { return _curvature; }
-    std::array<double, 3> color() const { return _color; }
-    //set
-    void setCurvature(double curvature) { _curvature = curvature; }
-    void setColor(std::array<double, 3> color) { _color = color; }
+
+    // Ajouter la face adjacente faceIndex opposée au sommet numéro pos
+    void addAdjacentFace(int faceIndex, int pos) { _adjacentFaces[pos] = faceIndex; }
 };
 
 
-class Iterator_on_faces; // Itérer sur les faces du mesh
-class Iterator_on_vertices; // Itérer sur les sommets du mesh
-class Circulator_on_faces; // Itérer sur les faces incidentes à un sommet
+
+class Iterator_on_faces;      // Itérer sur les faces du mesh
+class Iterator_on_vertices;   // Itérer sur les sommets du mesh
+class Circulator_on_faces;    // Itérer sur les faces incidentes à un sommet
 class Circulator_on_vertices; // Itérer sur les sommets adjacents à un sommet
+
+
 
 class Mesh {
 
 protected:
-    QVector<Vertex> vertexTab; // "Sac" de sommets
-    QVector<Face> faceTab; // "Sac" de faces
-    std::vector<Point> laplacianTab;
+    QVector<Vertex> vertexTab;       // "Sac" de sommets
+    QVector<Face> faceTab;           // "Sac" de faces
+    std::vector<Point> laplacianTab; // Vecteurs laplaciens de chaque sommet
 
 public:
     Mesh();
     virtual ~Mesh()=0;
-    
-    void connectAdjacentFaces(); // Détecter et connecter les faces adjacentes
-    // du mesh
-    void drawMesh(); // Afficher les faces du mesh
+
+    void drawMesh();          // Afficher les faces du mesh
     void drawMeshWireFrame(); // Afficher les arêtes du mesh
-    std::vector<Point> getLaplacians(); // Calculer les Laplaciens de chaque sommet
+    
+    // Détecter et connecter les faces adjacentes du mesh
+    void connectAdjacentFaces();
+    // Calculer les Laplaciens de chaque sommet
+    std::vector<Point> getLaplacians();
+    // Calculer la couleur des sommets en fonction de la courbure moyenne
     void computeColors(int curveAxis);
+
 
     friend class Iterator_on_faces;
     Iterator_on_faces faces_begin();
     Iterator_on_faces faces_end();
+
     friend class Iterator_on_vertices;
     Iterator_on_vertices vertices_begin();
     Iterator_on_vertices vertices_past_the_end();
+
     friend class Circulator_on_faces;
     Circulator_on_faces incident_faces(Vertex &);
+
     friend class Circulator_on_vertices;
-    Circulator_on_vertices incident_vertices(Vertex &);
+    Circulator_on_vertices neighbour_vertices(Vertex &);
 };
+
+
 
 class Tetrahedron : public Mesh {
 public:
@@ -95,17 +109,23 @@ public:
     virtual ~Tetrahedron() {}
 };
 
+
+
 class Pyramid : public Mesh {
 public:
     Pyramid();
     virtual ~Pyramid() {}
 };
 
+
+
 class BoundingBox2D : public Mesh {
 public:
     BoundingBox2D();
     virtual ~BoundingBox2D() {}
 };
+
+
 
 class QueenMesh : public Mesh { // Mesh chargé à partir d'un fichier OFF
 public:
@@ -114,15 +134,21 @@ public:
 };
 
 
+
 class Iterator_on_faces {
+
     Face* p;
+
 public:
     Iterator_on_faces() : p(nullptr) {}
     Iterator_on_faces(Face* x) : p(x) {}
+
     bool operator!=(const Iterator_on_faces& it) const { return p != it.p; }
     bool operator==(const Iterator_on_faces& it) const { return p == it.p; }
-    Face& operator*() { return *p; }
-    Face* operator->() { return p; }
+
+    Face& operator*()  { return *p; }
+    Face* operator->() { return p;  }
+
     Iterator_on_faces& operator++() { ++p; return *this; }
     Iterator_on_faces operator++(int) {
        Iterator_on_faces temp = *this;
@@ -131,15 +157,22 @@ public:
     }
 };
 
+
+
 class Iterator_on_vertices {
+
     Vertex* p;
+
 public:
     Iterator_on_vertices() : p(nullptr) {}
     Iterator_on_vertices(Vertex* x) : p(x) {}
+
     bool operator!=(const Iterator_on_vertices& it) const { return p != it.p; }
     bool operator==(const Iterator_on_vertices& it) const { return p == it.p; }
-    Vertex& operator*() { return *p; }
-    Vertex* operator->() { return p; }
+
+    Vertex& operator*()  { return *p; }
+    Vertex* operator->() { return p;  }
+
     Iterator_on_vertices& operator++() { ++p; return *this; }
     Iterator_on_vertices operator++(int) {
        Iterator_on_vertices temp = *this;
@@ -148,26 +181,29 @@ public:
     }
 };
 
-class Circulator_on_faces {
-    std::vector<Face*> incidentFaces; // Faces adjacentes d'un sommet
-    int idx; // Indice actuel sur le tableau faces_adjacentes
-public:
-    Circulator_on_faces(std::vector<Face*> adjacent_faces):
-        incidentFaces(adjacent_faces), idx(0) {}
-    Circulator_on_faces() : idx(-1) {}
 
-    Face& operator*() { return *(incidentFaces[idx]); }
-    Face* operator->() { return incidentFaces[idx]; }
+
+class Circulator_on_faces {
+
+    std::vector<Face*> incidentFaces; // Faces incidentes à un sommet
+    int idx;                          // Indice actuel sur le tableau incidentFaces
+
+public:
+    Circulator_on_faces(std::vector<Face*> adjacent_faces): incidentFaces(adjacent_faces), idx(0) {}
+    Circulator_on_faces() : idx(-1) {}
 
     bool operator!=(const Circulator_on_faces& it) const {
         return incidentFaces != it.incidentFaces || idx != it.idx;
     }
 
+    Face& operator*() { return *(incidentFaces[idx]); }
+    Face* operator->() { return incidentFaces[idx]; }
+
+
     Circulator_on_faces& operator++() {
         idx = (idx + 1) % incidentFaces.size();
         return *this;
     }
-
     Circulator_on_faces operator++(int) {
        Circulator_on_faces temp = *this;
        ++(*this);
@@ -175,42 +211,42 @@ public:
     }
 };
 
+
+
 class Circulator_on_vertices {
-    std::vector<Vertex*> adjacentVertices;
-    int idx;
+
+    std::vector<Vertex*> neighborVertices; // Sommets voisins
+    int idx;                               // Indice actuel sur le tableau adjacentVertices
+
 public:
-    Circulator_on_vertices(std::vector<Vertex*> adjacent_vertices):
-        adjacentVertices(adjacent_vertices), idx(0) {}
+    Circulator_on_vertices(std::vector<Vertex*> neighbor_vertices): neighborVertices(neighbor_vertices), idx(0) {}
     Circulator_on_vertices() : idx(-1) {}
 
-    Vertex& operator*() { return *(adjacentVertices[idx]); }
-    Vertex* operator->() { return adjacentVertices[idx]; }
-
     bool operator!=(const Circulator_on_vertices& it) const {
-        return adjacentVertices != it.adjacentVertices || idx != it.idx;
+        return neighborVertices != it.neighborVertices || idx != it.idx;
     }
+
+    Vertex& operator*() { return *(neighborVertices[idx]); }
+    Vertex* operator->() { return neighborVertices[idx]; }
+
 
     Circulator_on_vertices& operator++() {
-        idx = (idx + 1) % adjacentVertices.size();
+        idx = (idx + 1) % neighborVertices.size();
         return *this;
     }
-
     Circulator_on_vertices& operator--() {
         idx--;
         if (idx < 0) {
-            if (adjacentVertices.size() == 0) idx = 0;
-            else idx = adjacentVertices.size() - 1;
+            if (neighborVertices.size() == 0) idx = 0;
+            else idx = neighborVertices.size() - 1;
         }
         return *this;
     }
-
     Circulator_on_vertices operator++(int) {
        Circulator_on_vertices temp = *this;
        ++(*this);
        return temp;
     }
 };
-
-std::array<int, 3> hsv2rgb(double h, double s, double v);
 
 #endif // MESH_H

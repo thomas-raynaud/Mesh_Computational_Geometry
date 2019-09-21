@@ -75,21 +75,11 @@ void GLDisplayWidget::toggleDisplayType() {
 void GLDisplayWidget::switchMesh(int index) {
     delete _mesh;
     switch(index) {
-        case 0:
-            _mesh = new Tetrahedron();
-            break;
-        case 1:
-            _mesh = new Pyramid();
-            break;
-        case 2:
-            _mesh = new BoundingBox2D();
-            break;
-        case 3:
-            _mesh = new QueenMesh();
-            break;
-        default:
-            _mesh = new Tetrahedron();
-            break;
+        case 0:     _mesh = new Tetrahedron(); break;
+        case 1:     _mesh = new Pyramid(); break;
+        case 2:     _mesh = new BoundingBox2D(); break;
+        case 3:     _mesh = new QueenMesh(); break;
+        default:    _mesh = new Tetrahedron(); break;
     }
     _mesh->computeColors(_curveAxis);
 }

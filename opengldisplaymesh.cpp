@@ -10,7 +10,7 @@ void glVertexDraw(const Vertex & v) {
     glVertex3f(p.x(), p.y(), p.z());
 }
 
-//Example with a tetraedra
+// Draw mesh with plain faces
 void Mesh::drawMesh() {
     //getLap();
     int color_ind = 0;
@@ -18,7 +18,9 @@ void Mesh::drawMesh() {
     for (QVector<Face>::iterator face_it = faceTab.begin() ; face_it != faceTab.end(); ++face_it) {
         Vertex a, b, c;
         std::array<int, 3> faceVertices = face_it->vertices();
+        // Ne pas afficher les faces ayant un point fictif
         if (faceVertices[0] == -1 || faceVertices[1] == -1 || faceVertices[2] == -1) continue;
+
         a = vertexTab[faceVertices[0]];
         b = vertexTab[faceVertices[1]];
         c = vertexTab[faceVertices[2]];
@@ -37,15 +39,18 @@ void Mesh::drawMesh() {
     }
 }
 
-//Example with a wireframe tedraedra
+// Draw the wireframe of the mesh
 void Mesh::drawMeshWireFrame() {
     for (QVector<Face>::iterator face_it = faceTab.begin() ; face_it != faceTab.end(); ++face_it) {
         Vertex a, b, c;
         std::array<int, 3> faceVertices = face_it->vertices();
+        // Ne pas afficher les faces ayant un point fictif
         if (faceVertices[0] == -1 || faceVertices[1] == -1 || faceVertices[2] == -1) continue;
+
         a = vertexTab[faceVertices[0]];
         b = vertexTab[faceVertices[1]];
         c = vertexTab[faceVertices[2]];
+
         glBegin(GL_LINE_STRIP);
         glVertexDraw(a);
         glVertexDraw(b);

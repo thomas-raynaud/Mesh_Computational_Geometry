@@ -18,9 +18,9 @@ public:
 private slots:
     void on_pushButtonDisplayType_released();
 
-    void on_comboBox_currentIndexChanged(int index);
+    void on_comboBoxMeshswitch_currentIndexChanged(int index);
 
-    void on_comboBox_2_currentIndexChanged(int index);
+    void on_comboBoxColorswitch_currentIndexChanged(int index);
 
 private:
     Ui::MainWindow *ui;
