@@ -87,7 +87,7 @@ void Mesh::computeColors(int curveAxis) {
         min = DBL_MAX;
         max = 0.0;
         for (int i = 0; i < vertexTab.size(); ++i) {
-            mean_curvature = std::abs((laplacians[i][curveAxis] / laplacians[i].norm()) / -2);
+            mean_curvature = std::abs((std::log(laplacians[i].norm()) / 1) / -2);
             min = std::min(min, mean_curvature);
             max = std::max(max, mean_curvature);
             curvature.push_back(mean_curvature);
@@ -100,6 +100,7 @@ void Mesh::computeColors(int curveAxis) {
             vertexTab[i].setColor(hsv2rgb((int)hue, 1.0, 1.0));
         }
     }
+
 }
 
 void Mesh::connectAdjacentFaces() {
