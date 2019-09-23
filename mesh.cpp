@@ -96,6 +96,7 @@ void Mesh::computeColors(int curveAxis) {
         hue = ((mean_curvature - min) / max) * 270.0 + 90.0;
         vertexTab[i].setColor(hsv2rgb(hue, 1.0, 1.0));
     }
+
 }
 
 void Mesh::connectAdjacentFaces() {
@@ -132,6 +133,41 @@ void Mesh::connectAdjacentFaces() {
 
 void flipEdge(const int &f1, const int &f2) {
 
+}
+
+void Mesh::splitTriangle(int vertexIndex, int faceIndex){
+    //Récuperation des attributs de la face à splitter
+    std::array<int, 3> verticesOfFace;
+    verticesOfFace=this->faceTab[faceIndex].vertices();
+    std::array<int, 3> adjacentFaces;
+    adjacentFaces=this->faceTab[faceIndex].adjacentFaces();
+
+    //Indices des deux nouvelles faces
+    int faceAIndex=this->faceTab.size();
+    int faceBIndex=this->faceTab.size()+1;
+
+    //Set faceA
+    std::array<int,3> vertexTmp;
+    vertexTmp = {vertexIndex, verticesOfFace[0], verticesOfFace[1]};
+    std::array<int, 3> facesTmp;
+    facesTmp = {adjacentFaces[2], faceBIndex, faceIndex};
+    Face faceA = Face(vertexTmp, facesTmp);
+    this->faceTab.push_back(faceA);
+
+    //Set faceB
+    vertexTmp = {vertexIndex, verticesOfFace[1], verticesOfFace[2]};
+    facesTmp = {adjacentFaces[0], faceIndex, faceAIndex};
+    Face faceB = Face(vertexTmp, facesTmp);
+    this->faceTab.push_back(faceB);
+
+    //Modification de la face splité
+    this->faceTab[faceIndex].setVertices(std::array<int,3>{vertexIndex, verticesOfFace[2], verticesOfFace[0]});
+    this->faceTab[faceIndex].setAdjacentFaces(std::array<int,3>{adjacentFaces[1], faceAIndex, faceBIndex});
+
+    //Modfication de la face incidente à A
+    //Recuperation de l'indice du vecteur de la face incidente à A
+    //std::array<int,3>
+    //this->faceTab[adjacentFaces[2]].setAdjacentFaces();
 }
 
 Tetrahedron::Tetrahedron() {

@@ -21,7 +21,7 @@ double dotProduct(Point a, Point b) {
 
 int testOrientation(const Point &a, const Point &b, const Point &c) {
     // On travaille en 2D -> Z à 0
-    Point p(a.x(). a.y(), 0), q(b.x(), b.y(), 0), r(c.x(), c.y(), 0);
+    Point p(a.x(), a.y(), 0), q(b.x(), b.y(), 0), r(c.x(), c.y(), 0);
     Point pq(difference(p, q));
     Point pr(difference(p, r));
     return dotProduct(crossProduct(pq, pr), Point(0, 0, 1));

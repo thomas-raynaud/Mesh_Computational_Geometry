@@ -51,6 +51,10 @@ public:
     const std::array<int, 3> vertices() const { return _vertices; }
     const std::array<int, 3> adjacentFaces() const { return _adjacentFaces; }
 
+    //Set
+    void setVertices(std::array<int,3> vertices){_vertices=vertices; }
+    void setAdjacentFaces(std::array<int,3> adjacentFaces){_adjacentFaces=adjacentFaces; }
+
     // Ajouter la face adjacente faceIndex opposée au sommet numéro pos
     void addAdjacentFace(int faceIndex, int pos) { _adjacentFaces[pos] = faceIndex; }
 };
@@ -79,6 +83,7 @@ public:
     void drawMeshWireFrame(); // Afficher les arêtes du mesh
 
     void flipEdge(const int &f1, const int &f2);
+    void splitTriangle(int vertexIndex, int faceIndex); // Sépare une face en trois quand un nouveau sommet est dedans
     
     // Détecter et connecter les faces adjacentes du mesh
     void connectAdjacentFaces();
