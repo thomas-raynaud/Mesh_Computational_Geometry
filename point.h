@@ -37,4 +37,8 @@ Point difference(Point, Point);
 Point crossProduct(Point, Point);
 double dotProduct(Point a, Point);
 
+// Prédicats géométriques
+int testOrientation(Point a, Point b, Point c);
+int isInTriangle(const Point &a, const Point &b, const Point &c, const Point &d);
+
 #endif // MATH_UTIL_H

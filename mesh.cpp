@@ -130,6 +130,10 @@ void Mesh::connectAdjacentFaces() {
     }
 }
 
+void flipEdge(const int &f1, const int &f2) {
+
+}
+
 Tetrahedron::Tetrahedron() {
     // Création des points
     vertexTab.push_back(Vertex(Point(-0.5,-0.5,-0.5), 0, 0));

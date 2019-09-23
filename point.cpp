@@ -18,3 +18,31 @@ Point crossProduct(Point u, Point v) {
 double dotProduct(Point a, Point b) {
     return a.x() * b.x() + a.y() * b.y() + a.z() * b.z();
 }
+
+int testOrientation(const Point &a, const Point &b, const Point &c) {
+    // On travaille en 2D -> Z à 0
+    Point p(a.x(). a.y(), 0), q(b.x(), b.y(), 0), r(c.x(), c.y(), 0);
+    Point pq(difference(p, q));
+    Point pr(difference(p, r));
+    return dotProduct(crossProduct(pq, pr), Point(0, 0, 1));
+}
+
+int isInTriangle(const Point &a, const Point &b, const Point &c, const Point &d) {
+    int orientationABC = sign(testOrientation(a, b, c));
+    int orientationABD = sign(testOrientation(a, b, d));
+    int orientationCAD = sign(testOrientation(a, c, d));
+    int orientationCBD = sign(testOrientation(c, b, d));
+    if (orientationABC != orientationABD ||
+        orientationABC != orientationCAD ||
+        orientationABC != orientationCBD) { // Orientation différente -> d en dehors
+        return -1;
+    } else if (orientationABD == 0 || orientationCAD == 0 || orientationCBD == 0) { // d sur une des arêtes
+        return 0;
+    }
+    return 1; // d dans le triangle
+}
+
+int sign(int val) {
+    if (val >= 0) return 1;
+    return -1;
+}

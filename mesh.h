@@ -77,6 +77,8 @@ public:
 
     void drawMesh();          // Afficher les faces du mesh
     void drawMeshWireFrame(); // Afficher les arêtes du mesh
+
+    void flipEdge(const int &f1, const int &f2);
     
     // Détecter et connecter les faces adjacentes du mesh
     void connectAdjacentFaces();
