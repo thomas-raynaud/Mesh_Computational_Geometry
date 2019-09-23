@@ -78,24 +78,6 @@ void Mesh::computeColors(int curveAxis) {
     int hue = 0;
     std::vector<double> curvature;
     std::vector<Point> laplacians = getLaplacians();
-<<<<<<< HEAD
-    if(curveAxis < 3) {
-        min = DBL_MAX;
-        max = 0.0;
-        for (int i = 0; i < vertexTab.size(); ++i) {
-            mean_curvature = std::abs((std::log(laplacians[i].norm()) / 1) / -2);
-            min = std::min(min, mean_curvature);
-            max = std::max(max, mean_curvature);
-            curvature.push_back(mean_curvature);
-           }
-        min = std::max(min, 0.0); // pour éviter que min soit égal à -inf
-        double hue = 0.0;
-        for (int i = 0; i < vertexTab.size(); ++i) {
-            mean_curvature = curvature[i];
-            hue = ((mean_curvature - min) / max) * 270.0 + 90.0;
-            vertexTab[i].setColor(hsv2rgb((int)hue, 1.0, 1.0));
-        }
-=======
     // Calculer la courbure moyenne
     for (int i = 0; i < vertexTab.size(); ++i) {
         if (curveAxis == 0)
@@ -113,7 +95,6 @@ void Mesh::computeColors(int curveAxis) {
         // Courbure faible : vert, à courbure forte : rouge
         hue = ((mean_curvature - min) / max) * 270.0 + 90.0;
         vertexTab[i].setColor(hsv2rgb(hue, 1.0, 1.0));
->>>>>>> master
     }
 
 }
@@ -148,6 +129,43 @@ void Mesh::connectAdjacentFaces() {
             }
         }
     }
+}
+
+void Mesh::splitTriangle(int vertexIndex, int faceIndex){
+    //Récuperation des attributs de la face à splitter
+    std::array<int, 3> verticesOfFace;
+    verticesOfFace=this->faceTab[faceIndex].vertices();
+    std::array<int, 3> adjacentFaces;
+    adjacentFaces=this->faceTab[faceIndex].adjacentFaces();
+
+    //Indices des deux nouvelles faces
+    int faceAIndex=this->faceTab.size();
+    int faceBIndex=this->faceTab.size()+1;
+
+    //Set faceA
+    std::array<int,3> vertexTmp;
+    vertexTmp = {vertexIndex, verticesOfFace[0], verticesOfFace[1]};
+    std::array<int, 3> facesTmp;
+    facesTmp = {adjacentFaces[2], faceBIndex, faceIndex};
+    Face faceA = Face(vertexTmp, facesTmp);
+    this->faceTab.push_back(faceA);
+
+    //Set faceB
+    vertexTmp = {vertexIndex, verticesOfFace[1], verticesOfFace[2]};
+    facesTmp = {adjacentFaces[0], faceIndex, faceAIndex};
+    Face faceB = Face(vertexTmp, facesTmp);
+    this->faceTab.push_back(faceB);
+
+    //Modification de la face splité
+    this->faceTab[faceIndex].setVertices(std::array<int,3>{vertexIndex, verticesOfFace[2], verticesOfFace[0]});
+    this->faceTab[faceIndex].setAdjacentFaces(std::array<int,3>{adjacentFaces[1], faceAIndex, faceBIndex});
+
+    //Modfication de la face incidente à A
+    //Recuperation de l'indice du vecteur de la face incidente à A
+    std::array<int,3>
+    this->faceTab[adjacentFaces[2]].setAdjacentFaces()
+
+
 }
 
 Tetrahedron::Tetrahedron() {
