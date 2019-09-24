@@ -190,7 +190,9 @@ void Mesh::splitTriangle(int vertexIndex, int faceIndex){
     this->vertexTab[verticesOfFace[1]].setFace(faceBIndex);
     this->vertexTab[verticesOfFace[2]].setFace(faceIndex);
     this->vertexTab[verticesOfFace[vertexIndex]].setFace(faceAIndex);
+}
 
+void Mesh::insertion(Point p){
 
 }
 
@@ -324,7 +326,50 @@ QueenMesh::QueenMesh() {
     // Ajout des connexions des faces adjacentes entre faces fictives
     connectAdjacentFaces();
 }
+Parabola::Parabola(){
+    //Initialisation du maillage, on crée une grosse boite
+    // Création des points
+    vertexTab.push_back(Vertex(Point(-5,-5,-5), 0, 0));
+    vertexTab.push_back(Vertex(Point(-5,5,-5), 0, 1));
+    vertexTab.push_back(Vertex(Point(5,-5,-5), 0, 2));
+    vertexTab.push_back(Vertex(Point(5,5,-5), 1, 3));
+    // Création des faces
+    std::array<int, 3> ind_vertices; // indice des sommets
+    std::array<int, 3> ind_faces; // indice des faces
+    ind_vertices = {0, 1, 2}; ind_faces = {1, 5, 2};
+    faceTab.push_back(Face(ind_vertices, ind_faces)); // face 0
+    ind_vertices = {1, 3, 2}; ind_faces = {4, 0, 3};
+    faceTab.push_back(Face(ind_vertices, ind_faces)); // face 1
+    ind_vertices = {0, -1, 1}; ind_faces = {3, 0, 5};
+    faceTab.push_back(Face(ind_vertices, ind_faces)); // face 2
+    ind_vertices = {1, -1, 3}; ind_faces = {4, 1, 2};
+    faceTab.push_back(Face(ind_vertices, ind_faces)); // face 3
+    ind_vertices = {2, 3, -1}; ind_faces = {3, 5, 1};
+    faceTab.push_back(Face(ind_vertices, ind_faces)); // face 4
+    ind_vertices = {0, 2, -1}; ind_faces = {4, 2, 0};
+    faceTab.push_back(Face(ind_vertices, ind_faces)); // face 5a
 
+
+    //On simule la fonction
+    for(int xIndex = 0; xIndex < 1000; xIndex++){
+        for(int yIndex = 0; yIndex < 1000; yIndex++){
+            double x;
+            double y;
+            double z;
+
+            // Discretisation de l'espace 2D [-5,5]^2 sur un maillage de taille 1000*1000
+            x = -5*(1-xIndex/1000.f)+5*(xIndex/1000.f);
+            y = -5*(1-yIndex/1000.f)+5*(yIndex/1000.f);
+
+            // Definition de la fonctionelle de R^2 |--> R
+            z = x*x+y*y;
+
+            //Ajout du point
+            insertion(Point(x, y, z));
+        }
+    }
+
+}
 
 Iterator_on_faces Mesh::faces_begin() {
     return Iterator_on_faces(faceTab.begin());

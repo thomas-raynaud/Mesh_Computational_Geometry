@@ -84,6 +84,7 @@ public:
 
     void flipEdge(const int &f1, const int &f2);
     void splitTriangle(int vertexIndex, int faceIndex); // Sépare une face en trois quand un nouveau sommet est dedans
+    void insertion(Point p); // Prend un point et l'insert à la structure
     
     // Détecter et connecter les faces adjacentes du mesh
     void connectAdjacentFaces();
@@ -140,6 +141,10 @@ public:
     virtual ~QueenMesh() {}
 };
 
+class Parabola : public Mesh{ // Mesh construit à partir de (x,y) |--> (x^2+y^2)
+public: Parabola();
+    virtual ~Parabola() {}
+};
 
 
 class Iterator_on_faces {
