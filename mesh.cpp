@@ -207,7 +207,18 @@ int Mesh::orientation(std::array<double, 2> a, std::array<double, 2> b, std::arr
     }
 }
 
+int Mesh::inTriangle(std::array<std::array<double, 2>, 3> t, std::array<double, 2> p){
 
+    if(orientation(t[0], t[1], p)*orientation(t[0], t[1],p)*orientation(t[0], t[1], p)){
+        return 0;
+    }else{
+        if ((orientation(t[0],t[1],p) < 0) || (orientation(t[1],t[2],p) < 0) || orientation(t[2],t[0],p)){
+            return -1;
+        }else{
+            return 1;
+        }
+    }
+}
 void Mesh::insertion(Point p){
 
 }
