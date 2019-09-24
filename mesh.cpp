@@ -192,6 +192,22 @@ void Mesh::splitTriangle(int vertexIndex, int faceIndex){
     this->vertexTab[verticesOfFace[vertexIndex]].setFace(faceAIndex);
 }
 
+int Mesh::orientation(std::array<double, 2> a, std::array<double, 2> b, std::array<double, 2> c){
+    Point ab = Point(b[0]-a[0], b[1]-a[1], 0);
+    Point ac = Point(c[0]-a[0], c[1]-a[1], 0);
+    Point z =Point(0, 0, 1);
+
+    double compute = dotProduct(crossProduct(ab, ac), z);
+    if(compute >0){
+        return 1;
+    }else if (compute == 0) {
+        return 0;
+    }else{
+        return -1;
+    }
+}
+
+
 void Mesh::insertion(Point p){
 
 }

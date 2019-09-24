@@ -84,6 +84,7 @@ public:
 
     void flipEdge(const int &f1, const int &f2);
     void splitTriangle(int vertexIndex, int faceIndex); // Sépare une face en trois quand un nouveau sommet est dedans
+    int orientation(std::array<double, 2>, std::array<double, 2>, std::array<double, 2>); //Renvoi l'orientaiton (-1 -> inverse trigo ; 0 -> colinéaire ; 1 -> trigo)
     void insertion(Point p); // Prend un point et l'insert à la structure
     
     // Détecter et connecter les faces adjacentes du mesh
