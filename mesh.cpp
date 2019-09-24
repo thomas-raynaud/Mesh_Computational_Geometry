@@ -220,7 +220,29 @@ int Mesh::inTriangle(std::array<std::array<double, 2>, 3> t, std::array<double, 
     }
 }
 void Mesh::insertion(Point p){
+    Iterator_on_faces it_f = this->faces_begin();
+    bool into = false;
+    int faceIndex = 0;
+    while(!into & (faceIndex >= this->faceTab.size()-1)){
+        //Projection du point sur le plan du triangle et changement de base
+        //Calcul des vecteurs directeurs du plan du triangle
+        std::array<int, 3> vertexOfface;
+        vertexOfface = this->faceTab[faceIndex].vertices();
+        Point e1 = difference(this->vertexTab[vertexOfface[1]].point(), this->vertexTab[vertexOfface[0]].point());
+        Point e2 = difference(this->vertexTab[vertexOfface[2]].point(), this->vertexTab[vertexOfface[0]].point());
 
+        //Calcul des coordoné du projeté de p sur le plan du triangle dans la base e1, e2
+        double p1p = dotProduct(p, e1)/(e1.norm()*e1.norm());
+        double p2p = dotProduct(p, e2)/(e2.norm()*e2.norm());
+
+        std::array<std::array<double, 2>, 3> u = {std::array<double, 2>{0,0}, std::array<double, 2>{1,0}, std::array<double, 2>{0,1}};
+
+        if(inTriangle(u, std::array<double, 2>{p1p, p2p}) > 0){
+            splitTriangle(this->vertexTab.size()-1, faceIndex);
+            into=true;
+            std::cout<<"ok"<<std::endl;
+        }
+    }
 }
 
 Tetrahedron::Tetrahedron() {
