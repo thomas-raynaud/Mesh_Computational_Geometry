@@ -147,7 +147,7 @@ void Mesh::splitTriangle(int vertexIndex, int faceIndex){
     int faceBIndex=this->faceTab.size()+1;
 
     //Set faceA
-    std::array<int,3> vertexTmp;
+    std::array<int, 3> vertexTmp;
     vertexTmp = {vertexIndex, verticesOfFace[0], verticesOfFace[1]};
     std::array<int, 3> facesTmp;
     facesTmp = {adjacentFaces[2], faceBIndex, faceIndex};
@@ -165,9 +165,33 @@ void Mesh::splitTriangle(int vertexIndex, int faceIndex){
     this->faceTab[faceIndex].setAdjacentFaces(std::array<int,3>{adjacentFaces[1], faceAIndex, faceBIndex});
 
     //Modfication de la face incidente à A
-    //Recuperation de l'indice du vecteur de la face incidente à A
-    //std::array<int,3>
-    //this->faceTab[adjacentFaces[2]].setAdjacentFaces();
+    //Recuperation de l'indice local du sommet opposé à la face A dans la face incidente à A
+    vertexTmp = this->faceTab[adjacentFaces[2]].vertices();
+    for(int i = 0; i<3; i++){
+        if(vertexTmp[i] != verticesOfFace[0] & vertexTmp[i] != verticesOfFace[1]){
+            vertexTmp[i] = faceAIndex;
+        }
+    }
+    this->faceTab[adjacentFaces[2]].setAdjacentFaces(vertexTmp);
+
+    //Modfication de la face incidente à B
+    //Recuperation de l'indice local du sommet opposé à la face B dans la face incidente à B
+    vertexTmp = this->faceTab[adjacentFaces[0]].vertices();
+    for(int i = 0; i<3; i++){
+        if(vertexTmp[i] != verticesOfFace[1] & vertexTmp[i] != verticesOfFace[2]){
+            vertexTmp[i] = faceBIndex;
+        }
+    }
+    this->faceTab[adjacentFaces[0]].setAdjacentFaces(vertexTmp);
+
+    //Correction de tous les vertex qui doivent avoir une face incidente
+    //0 -> A ; 1 -> B ; 2 -> face splité ; nouveau vertex -> face A
+    this->vertexTab[verticesOfFace[0]].setFace(faceAIndex);
+    this->vertexTab[verticesOfFace[1]].setFace(faceBIndex);
+    this->vertexTab[verticesOfFace[2]].setFace(faceIndex);
+    this->vertexTab[verticesOfFace[vertexIndex]].setFace(faceAIndex);
+
+
 }
 
 Tetrahedron::Tetrahedron() {
