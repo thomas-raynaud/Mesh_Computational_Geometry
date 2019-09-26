@@ -39,6 +39,7 @@ class Face {
 
     std::array<int, 3> _vertices;       // Sommets de la face
     std::array<int, 3> _adjacentFaces;  // Faces adjacentes à la face.
+    std::array<double, 3> _rgb; // couleur de la face
     // 1e face = face opposée au 1er sommet, etc...
 
 public:
@@ -50,13 +51,20 @@ public:
     //get
     const std::array<int, 3> vertices() const { return _vertices; }
     const std::array<int, 3> adjacentFaces() const { return _adjacentFaces; }
+    std::array<double, 3> color() const { return _rgb; }
 
     //Set
     void setVertices(std::array<int,3> vertices){_vertices=vertices; }
     void setAdjacentFaces(std::array<int,3> adjacentFaces){_adjacentFaces=adjacentFaces; }
+    void setRandomColor() {
+        _rgb = {((double) rand() / (RAND_MAX)), ((double) rand() / (RAND_MAX)), ((double) rand() / (RAND_MAX))};
+    }
 
     // Ajouter la face adjacente faceIndex opposée au sommet numéro pos
-    void addAdjacentFace(int faceIndex, int pos) { _adjacentFaces[pos] = faceIndex; }
+    void setAdjacentFace(int faceIndex, int pos) { _adjacentFaces[pos] = faceIndex; }
+    bool isFictive() {
+        return _vertices[0] == -1 || _vertices[1] == -1 || _vertices[2] == -1;
+    }
 };
 
 
@@ -79,11 +87,8 @@ public:
     Mesh();
     virtual ~Mesh()=0;
 
-    void drawMesh();          // Afficher les faces du mesh
-    void drawMeshWireFrame(); // Afficher les arêtes du mesh
-
-    void flipEdge(const int &f1, const int &f2);
-    void splitTriangle(int vertexIndex, int faceIndex); // Sépare une face en trois quand un nouveau sommet est dedans
+    virtual void drawMesh();          // Afficher les faces du mesh
+    virtual void drawMeshWireFrame(); // Afficher les arêtes du mesh
     
     // Détecter et connecter les faces adjacentes du mesh
     void connectAdjacentFaces();
@@ -138,6 +143,20 @@ class QueenMesh : public Mesh { // Mesh chargé à partir d'un fichier OFF
 public:
     QueenMesh();
     virtual ~QueenMesh() {}
+};
+
+class Mesh2D : public Mesh {
+public:
+    Mesh2D();
+    virtual ~Mesh2D() {}
+
+    void flipEdge(const int &f1, const int &f2);
+    void splitTriangle(int vertexIndex, int faceIndex); // Sépare une face en trois quand un nouveau sommet est dedans
+
+    void flipRandomEdge();
+
+    virtual void drawMesh();
+    virtual void drawMeshWireFrame();
 };
 
 

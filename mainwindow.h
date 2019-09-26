@@ -22,6 +22,10 @@ private slots:
 
     void on_comboBoxColorswitch_currentIndexChanged(int index);
 
+    void on_comboBoxTPswitch_currentIndexChanged(int index);
+
+    void on_pushButtonFlipEdge_released();
+
 private:
     Ui::MainWindow *ui;
 };

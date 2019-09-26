@@ -117,12 +117,12 @@ void Mesh::connectAdjacentFaces() {
                 // connexion des faces adjacentes
                 int adjacentFace = edges[edgeKey];
                 // connecter la face adjacente à la face courante
-                faceTab[i].addAdjacentFace(adjacentFace, (j + 2) % 3);
+                faceTab[i].setAdjacentFace(adjacentFace, (j + 2) % 3);
                 // ajouter la face courante à la face adjacente
                 for (size_t k = 0; k < 3; ++k) {
                     if (faceTab[adjacentFace].vertices()[k] != first_v
                             && faceTab[adjacentFace].vertices()[k] != scnd_v) {
-                        faceTab[adjacentFace].addAdjacentFace(i, k);
+                        faceTab[adjacentFace].setAdjacentFace(i, k);
                         break;
                     }
                 }
@@ -131,11 +131,65 @@ void Mesh::connectAdjacentFaces() {
     }
 }
 
-void flipEdge(const int &f1, const int &f2) {
+void Mesh2D::flipEdge(const int &f1, const int &f2) {
+    int v00, v01, v02; // Sommets de f1 tel que v00 opposé à f2
+    int v10, v11, v12; // Sommets de f2 tel que v10 opposé à f1
+    int f01, f02, f11, f12; // faces opposées resp. à v01, v02, v11, v12
+    int ind_v00 = 0, ind_v10 = 0;
+    for (int i = 0; i < 3; ++i) {
+        if (faceTab[f1].adjacentFaces()[i] == f2) ind_v00 = i;
+        if (faceTab[f2].adjacentFaces()[i] == f1) ind_v10 = i;
+    }
+    // Sommets de f1
+    v00 = faceTab[f1].vertices()[ind_v00];
+    v01 = faceTab[f1].vertices()[(ind_v00 + 1) % 3];
+    v02 = faceTab[f1].vertices()[(ind_v00 + 2) % 3];
+    // Sommets de f2
+    v10 = faceTab[f2].vertices()[ind_v10];
+    v11 = faceTab[f2].vertices()[(ind_v10 + 1) % 3];
+    v12 = faceTab[f2].vertices()[(ind_v10 + 2) % 3];
+    // Faces opposées
+    f01 = faceTab[f1].adjacentFaces()[(ind_v00 + 1) % 3];
+    f02 = faceTab[f1].adjacentFaces()[(ind_v00 + 2) % 3];
+    f11 = faceTab[f2].adjacentFaces()[(ind_v10 + 1) % 3];
+    f12 = faceTab[f2].adjacentFaces()[(ind_v10 + 2) % 3];
 
+    // Changer les sommets de f1 et f2
+    faceTab[f1].setVertices({v00, v10, v11});
+    faceTab[f2].setVertices({v00, v01, v10});
+    // Changer les faces adjacentes
+    faceTab[f1].setAdjacentFaces({f12, f01, f2});
+    faceTab[f2].setAdjacentFaces({f11, f1, f01});
+    // Changer les connexions des sommets aux faces
+    vertexTab[v00].setFace(f1);
+    vertexTab[v01].setFace(f2);
+    vertexTab[v10].setFace(f2);
+    vertexTab[v11].setFace(f1);
+    // Changer les faces adjacentes des faces adjacentes (f02 et f12)
+    for (int i = 0; i < 3; ++i) if (faceTab[f02].adjacentFaces()[i] == f1) faceTab[f02].setAdjacentFace(f2, i);
+    for (int i = 0; i < 3; ++i) if (faceTab[f12].adjacentFaces()[i] == f2) faceTab[f02].setAdjacentFace(f1, i);
 }
 
-void Mesh::splitTriangle(int vertexIndex, int faceIndex){
+void Mesh2D::flipRandomEdge() {
+    // Take 2 adjacent nonfictive faces and flip the edge between them.
+    int randomFace = rand() % faceTab.size();
+    int count = 0;
+    while (faceTab[randomFace].isFictive() && count < faceTab.size()) {
+        randomFace = (randomFace + 1) % faceTab.size();
+        count++;
+    }
+    if (count == faceTab.size()) return; // pas de face non fictive
+    int f2;
+    for (int i = 0; i < 3; ++i) {
+        f2 = faceTab[randomFace].adjacentFaces()[i];
+        if (!faceTab[f2].isFictive()) {
+            flipEdge(randomFace, f2);
+            return;
+        }
+    }
+}
+
+void Mesh2D::splitTriangle(int vertexIndex, int faceIndex){
     //Récuperation des attributs de la face à splitter
     std::array<int, 3> verticesOfFace;
     verticesOfFace=this->faceTab[faceIndex].vertices();
@@ -292,13 +346,39 @@ QueenMesh::QueenMesh() {
                                         faceTab[i].vertices()[(j + 2) % 3],
                                         -1}, // sommet fictif
                                         {-1, -1, i}));
-                faceTab[i].addAdjacentFace(faceTab.size() -1, j);
+                faceTab[i].setAdjacentFace(faceTab.size() -1, j);
             }
         }
     }
 
     // Ajout des connexions des faces adjacentes entre faces fictives
     connectAdjacentFaces();
+}
+
+Mesh2D::Mesh2D() {
+    // Création des points
+    vertexTab.push_back(Vertex(Point(-0.5,-0.5,-0.5), 0, 0));
+    vertexTab.push_back(Vertex(Point(-0.5,0.5,-0.5), 0, 1));
+    vertexTab.push_back(Vertex(Point(0.5,-0.5,-0.5), 0, 2));
+    vertexTab.push_back(Vertex(Point(0.5,0.5,-0.5), 1, 3));
+    // Création des faces
+    std::array<int, 3> ind_vertices; // indice des sommets
+    std::array<int, 3> ind_faces; // indice des faces
+    ind_vertices = {0, 1, 2}; ind_faces = {1, 5, 2};
+    faceTab.push_back(Face(ind_vertices, ind_faces)); // face 0
+    faceTab[0].setRandomColor();
+    ind_vertices = {1, 3, 2}; ind_faces = {4, 0, 3};
+    faceTab.push_back(Face(ind_vertices, ind_faces)); // face 1
+    faceTab[1].setRandomColor();
+    ind_vertices = {0, -1, 1}; ind_faces = {3, 0, 5};
+    faceTab.push_back(Face(ind_vertices, ind_faces)); // face 2
+    ind_vertices = {1, -1, 3}; ind_faces = {4, 1, 2};
+    faceTab.push_back(Face(ind_vertices, ind_faces)); // face 3
+    ind_vertices = {2, 3, -1}; ind_faces = {3, 5, 1};
+    faceTab.push_back(Face(ind_vertices, ind_faces)); // face 4
+    ind_vertices = {0, 2, -1}; ind_faces = {4, 2, 0};
+    faceTab.push_back(Face(ind_vertices, ind_faces)); // face 5
+
 }
 
 
