@@ -34,6 +34,7 @@ public:
     void switchTP(int index);
 
     void flipRandomEdge();
+    void splitRandomTriangle();
 
 protected:
     // Mouse Management

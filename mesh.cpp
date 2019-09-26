@@ -132,8 +132,8 @@ void Mesh::connectAdjacentFaces() {
 }
 
 void Mesh2D::flipEdge(const int &f1, const int &f2) {
-    int v00, v01, v02; // Sommets de f1 tel que v00 opposé à f2
-    int v10, v11, v12; // Sommets de f2 tel que v10 opposé à f1
+    int v00, v01; // Sommets de f1 tel que v00 opposé à f2
+    int v10, v11; // Sommets de f2 tel que v10 opposé à f1
     int f01, f02, f11, f12; // faces opposées resp. à v01, v02, v11, v12
     int ind_v00 = 0, ind_v10 = 0;
     for (int i = 0; i < 3; ++i) {
@@ -143,11 +143,9 @@ void Mesh2D::flipEdge(const int &f1, const int &f2) {
     // Sommets de f1
     v00 = faceTab[f1].vertices()[ind_v00];
     v01 = faceTab[f1].vertices()[(ind_v00 + 1) % 3];
-    v02 = faceTab[f1].vertices()[(ind_v00 + 2) % 3];
     // Sommets de f2
     v10 = faceTab[f2].vertices()[ind_v10];
     v11 = faceTab[f2].vertices()[(ind_v10 + 1) % 3];
-    v12 = faceTab[f2].vertices()[(ind_v10 + 2) % 3];
     // Faces opposées
     f01 = faceTab[f1].adjacentFaces()[(ind_v00 + 1) % 3];
     f02 = faceTab[f1].adjacentFaces()[(ind_v00 + 2) % 3];
@@ -201,7 +199,7 @@ void Mesh2D::splitTriangle(int vertexIndex, int faceIndex){
     int faceBIndex=this->faceTab.size()+1;
 
     //Set faceA
-    std::array<int,3> vertexTmp;
+    std::array<int, 3> vertexTmp;
     vertexTmp = {vertexIndex, verticesOfFace[0], verticesOfFace[1]};
     std::array<int, 3> facesTmp;
     facesTmp = {adjacentFaces[2], faceBIndex, faceIndex};
@@ -219,9 +217,56 @@ void Mesh2D::splitTriangle(int vertexIndex, int faceIndex){
     this->faceTab[faceIndex].setAdjacentFaces(std::array<int,3>{adjacentFaces[1], faceAIndex, faceBIndex});
 
     //Modfication de la face incidente à A
-    //Recuperation de l'indice du vecteur de la face incidente à A
-    //std::array<int,3>
-    //this->faceTab[adjacentFaces[2]].setAdjacentFaces();
+    //Recuperation de l'indice local du sommet opposé à la face A dans la face incidente à A
+    vertexTmp = this->faceTab[adjacentFaces[2]].vertices();
+    for(int i = 0; i<3; i++){
+        if(vertexTmp[i] != verticesOfFace[0] && vertexTmp[i] != verticesOfFace[1]){
+            vertexTmp[i] = faceAIndex;
+            break;
+        }
+    }
+    this->faceTab[adjacentFaces[2]].setAdjacentFaces(vertexTmp);
+
+    //Modfication de la face incidente à B
+    //Recuperation de l'indice local du sommet opposé à la face B dans la face incidente à B
+    vertexTmp = this->faceTab[adjacentFaces[0]].vertices();
+    for(int i = 0; i<3; i++){
+        if(vertexTmp[i] != verticesOfFace[1] && vertexTmp[i] != verticesOfFace[2]){
+            vertexTmp[i] = faceBIndex;
+            break;
+        }
+    }
+    this->faceTab[adjacentFaces[0]].setAdjacentFaces(vertexTmp);
+
+    //Correction de tous les vertex qui doivent avoir une face incidente
+    //0 -> A ; 1 -> B ; 2 -> face splité ; nouveau vertex -> face A
+    this->vertexTab[verticesOfFace[0]].setFace(faceAIndex);
+    this->vertexTab[verticesOfFace[1]].setFace(faceBIndex);
+    this->vertexTab[verticesOfFace[2]].setFace(faceIndex);
+    this->vertexTab[vertexIndex].setFace(faceAIndex);
+}
+
+void Mesh2D::splitRandomTriangle() {
+    // Take 2 adjacent nonfictive faces and flip the edge between them.
+    int randomFace = rand() % faceTab.size();
+    int count = 0;
+    while (faceTab[randomFace].isFictive() && count < faceTab.size()) {
+        randomFace = (randomFace + 1) % faceTab.size();
+        count++;
+    }
+    if (count == faceTab.size()) return; // pas de face non fictive
+    // Générer le point au milieu de la face
+    std::array<int, 3> vs = faceTab[randomFace].vertices();
+    Point a = vertexTab[vs[0]].point();
+    Point b = vertexTab[vs[1]].point();
+    Point c = vertexTab[vs[2]].point();
+    Point p((a.x() + b.x() + c.x()) / 3, (a.x() + b.x() + c.x()) / 3, a.z());
+    vertexTab.push_back(Vertex(p, -1, vertexTab.size())); // Ajouter le point en tant que sommet
+    splitTriangle(vertexTab.size() - 1, randomFace);
+}
+
+void Mesh::insertion(Point p){
+
 }
 
 Tetrahedron::Tetrahedron() {
@@ -354,6 +399,49 @@ QueenMesh::QueenMesh() {
     // Ajout des connexions des faces adjacentes entre faces fictives
     connectAdjacentFaces();
 }
+Parabola::Parabola(){
+    //Initialisation du maillage, on crée une grosse boite
+    // Création des points
+    vertexTab.push_back(Vertex(Point(-5,-5,-5), 0, 0));
+    vertexTab.push_back(Vertex(Point(-5,5,-5), 0, 1));
+    vertexTab.push_back(Vertex(Point(5,-5,-5), 0, 2));
+    vertexTab.push_back(Vertex(Point(5,5,-5), 1, 3));
+    // Création des faces
+    std::array<int, 3> ind_vertices; // indice des sommets
+    std::array<int, 3> ind_faces; // indice des faces
+    ind_vertices = {0, 1, 2}; ind_faces = {1, 5, 2};
+    faceTab.push_back(Face(ind_vertices, ind_faces)); // face 0
+    ind_vertices = {1, 3, 2}; ind_faces = {4, 0, 3};
+    faceTab.push_back(Face(ind_vertices, ind_faces)); // face 1
+    ind_vertices = {0, -1, 1}; ind_faces = {3, 0, 5};
+    faceTab.push_back(Face(ind_vertices, ind_faces)); // face 2
+    ind_vertices = {1, -1, 3}; ind_faces = {4, 1, 2};
+    faceTab.push_back(Face(ind_vertices, ind_faces)); // face 3
+    ind_vertices = {2, 3, -1}; ind_faces = {3, 5, 1};
+    faceTab.push_back(Face(ind_vertices, ind_faces)); // face 4
+    ind_vertices = {0, 2, -1}; ind_faces = {4, 2, 0};
+    faceTab.push_back(Face(ind_vertices, ind_faces)); // face 5a
+
+
+    //On simule la fonction
+    for(int xIndex = 0; xIndex < 1000; xIndex++){
+        for(int yIndex = 0; yIndex < 1000; yIndex++){
+            double x;
+            double y;
+            double z;
+
+            // Discretisation de l'espace 2D [-5,5]^2 sur un maillage de taille 1000*1000
+            x = -5*(1-xIndex/1000.f)+5*(xIndex/1000.f);
+            y = -5*(1-yIndex/1000.f)+5*(yIndex/1000.f);
+
+            // Definition de la fonctionelle de R^2 |--> R
+            z = x*x+y*y;
+
+            //Ajout du point
+            insertion(Point(x, y, z));
+        }
+    }
+}
 
 Mesh2D::Mesh2D() {
     // Création des points
@@ -366,10 +454,8 @@ Mesh2D::Mesh2D() {
     std::array<int, 3> ind_faces; // indice des faces
     ind_vertices = {0, 1, 2}; ind_faces = {1, 5, 2};
     faceTab.push_back(Face(ind_vertices, ind_faces)); // face 0
-    faceTab[0].setRandomColor();
     ind_vertices = {1, 3, 2}; ind_faces = {4, 0, 3};
     faceTab.push_back(Face(ind_vertices, ind_faces)); // face 1
-    faceTab[1].setRandomColor();
     ind_vertices = {0, -1, 1}; ind_faces = {3, 0, 5};
     faceTab.push_back(Face(ind_vertices, ind_faces)); // face 2
     ind_vertices = {1, -1, 3}; ind_faces = {4, 1, 2};
@@ -380,7 +466,6 @@ Mesh2D::Mesh2D() {
     faceTab.push_back(Face(ind_vertices, ind_faces)); // face 5
 
 }
-
 
 Iterator_on_faces Mesh::faces_begin() {
     return Iterator_on_faces(faceTab.begin());

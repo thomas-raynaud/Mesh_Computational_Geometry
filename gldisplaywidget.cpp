@@ -81,6 +81,7 @@ void GLDisplayWidget::switchMesh(int index) {
         case 1:     _mesh = new Pyramid(); break;
         case 2:     _mesh = new BoundingBox2D(); break;
         case 3:     _mesh = new QueenMesh(); break;
+        case 4:		_mesh = new Parabola(); break;
         default:    _mesh = new Tetrahedron(); break;
     }
     _mesh->computeColors(_curveAxis);
@@ -103,6 +104,10 @@ void GLDisplayWidget::switchTP(int index) {
 
 void GLDisplayWidget::flipRandomEdge() {
     ((Mesh2D*)_mesh)->flipRandomEdge();
+}
+
+void GLDisplayWidget::splitRandomTriangle() {
+    ((Mesh2D*)_mesh)->splitRandomTriangle();
 }
 
 // - - - - - - - - - - - - Mouse Management  - - - - - - - - - - - - - - - -

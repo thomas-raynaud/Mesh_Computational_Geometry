@@ -47,3 +47,8 @@ void MainWindow::on_pushButtonFlipEdge_released()
 {
     ui->widget->flipRandomEdge();
 }
+
+void MainWindow::on_pushButtonSplitTriangle_released()
+{
+    ui->widget->splitRandomTriangle();
+}

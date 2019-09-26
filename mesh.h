@@ -45,8 +45,12 @@ class Face {
 public:
     Face(std::array<int, 3> vertices,
          std::array<int, 3> adjacentFaces={-1,-1,-1}
-         ): _vertices(vertices), _adjacentFaces(adjacentFaces) {}
-    Face() {}
+         ): _vertices(vertices), _adjacentFaces(adjacentFaces) {
+        setRandomColor();
+    }
+    Face() {
+        setRandomColor();
+    }
 
     //get
     const std::array<int, 3> vertices() const { return _vertices; }
@@ -89,6 +93,8 @@ public:
 
     virtual void drawMesh();          // Afficher les faces du mesh
     virtual void drawMeshWireFrame(); // Afficher les arêtes du mesh
+
+    void insertion(Point p); // Prend un point et l'insert à la structure
     
     // Détecter et connecter les faces adjacentes du mesh
     void connectAdjacentFaces();
@@ -145,7 +151,8 @@ public:
     virtual ~QueenMesh() {}
 };
 
-class Mesh2D : public Mesh {
+
+class Mesh2D : public Mesh { // Mesh sur une surface 2D (TP2)
 public:
     Mesh2D();
     virtual ~Mesh2D() {}
@@ -154,11 +161,17 @@ public:
     void splitTriangle(int vertexIndex, int faceIndex); // Sépare une face en trois quand un nouveau sommet est dedans
 
     void flipRandomEdge();
+    void splitRandomTriangle();
 
     virtual void drawMesh();
     virtual void drawMeshWireFrame();
 };
 
+
+class Parabola : public Mesh{ // Mesh construit à partir de (x,y) |--> (x^2+y^2)
+public: Parabola();
+    virtual ~Parabola() {}
+};
 
 
 class Iterator_on_faces {
