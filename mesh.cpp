@@ -157,7 +157,7 @@ void Mesh2D::flipEdge(const int &f1, const int &f2) {
     faceTab[f2].setVertices({v00, v01, v10});
     // Changer les faces adjacentes
     faceTab[f1].setAdjacentFaces({f12, f01, f2});
-    faceTab[f2].setAdjacentFaces({f11, f1, f01});
+    faceTab[f2].setAdjacentFaces({f11, f1, f02});
     // Changer les connexions des sommets aux faces
     vertexTab[v00].setFace(f1);
     vertexTab[v01].setFace(f2);
@@ -165,7 +165,7 @@ void Mesh2D::flipEdge(const int &f1, const int &f2) {
     vertexTab[v11].setFace(f1);
     // Changer les faces adjacentes des faces adjacentes (f02 et f12)
     for (int i = 0; i < 3; ++i) if (faceTab[f02].adjacentFaces()[i] == f1) faceTab[f02].setAdjacentFace(f2, i);
-    for (int i = 0; i < 3; ++i) if (faceTab[f12].adjacentFaces()[i] == f2) faceTab[f02].setAdjacentFace(f1, i);
+    for (int i = 0; i < 3; ++i) if (faceTab[f12].adjacentFaces()[i] == f2) faceTab[f12].setAdjacentFace(f1, i);
 }
 
 void Mesh2D::flipRandomEdge() {
@@ -178,10 +178,21 @@ void Mesh2D::flipRandomEdge() {
     }
     if (count == faceTab.size()) return; // pas de face non fictive
     int f2;
+    std::array<int,3> fa1, fa2;
+    fa1 = faceTab[randomFace].adjacentFaces();
     for (int i = 0; i < 3; ++i) {
-        f2 = faceTab[randomFace].adjacentFaces()[i];
+        f2 = fa1[i];
         if (!faceTab[f2].isFictive()) {
+            // Vérifier qu'on ne flippe pas deux triangles qui ont en tout 4 faces dist
+            fa2 = faceTab[f2].adjacentFaces();
+            for (int j = 0; j < 3; ++j) {
+                if (fa2[j] == fa1[(i + 1) % 3] || fa2[j] == fa1[(i + 2) % 3]) return;
+            }
+            std::cout << "FLIP EDGE BETWEEN " << randomFace << " AND " << f2 << std::endl;
+            std::cout << *this << std::endl;
             flipEdge(randomFace, f2);
+            std::cout << "RESULT:" << std::endl;
+            std::cout << *this << std::endl;
             return;
         }
     }
@@ -221,22 +232,20 @@ void Mesh2D::splitTriangle(int vertexIndex, int faceIndex){
     vertexTmp = this->faceTab[adjacentFaces[2]].vertices();
     for(int i = 0; i<3; i++){
         if(vertexTmp[i] != verticesOfFace[0] && vertexTmp[i] != verticesOfFace[1]){
-            vertexTmp[i] = faceAIndex;
+            this->faceTab[adjacentFaces[2]].setAdjacentFace(faceAIndex, i);
             break;
         }
     }
-    this->faceTab[adjacentFaces[2]].setAdjacentFaces(vertexTmp);
 
     //Modfication de la face incidente à B
     //Recuperation de l'indice local du sommet opposé à la face B dans la face incidente à B
     vertexTmp = this->faceTab[adjacentFaces[0]].vertices();
     for(int i = 0; i<3; i++){
         if(vertexTmp[i] != verticesOfFace[1] && vertexTmp[i] != verticesOfFace[2]){
-            vertexTmp[i] = faceBIndex;
+            this->faceTab[adjacentFaces[0]].setAdjacentFace(faceBIndex, i);
             break;
         }
     }
-    this->faceTab[adjacentFaces[0]].setAdjacentFaces(vertexTmp);
 
     //Correction de tous les vertex qui doivent avoir une face incidente
     //0 -> A ; 1 -> B ; 2 -> face splité ; nouveau vertex -> face A
@@ -260,9 +269,13 @@ void Mesh2D::splitRandomTriangle() {
     Point a = vertexTab[vs[0]].point();
     Point b = vertexTab[vs[1]].point();
     Point c = vertexTab[vs[2]].point();
-    Point p((a.x() + b.x() + c.x()) / 3, (a.x() + b.x() + c.x()) / 3, a.z());
+    Point p((a.x() + b.x() + c.x()) / 3, (a.y() + b.y() + c.y()) / 3, a.z());
     vertexTab.push_back(Vertex(p, -1, vertexTab.size())); // Ajouter le point en tant que sommet
+    std::cout << "SPLIT TRIANGLE " << randomFace << " WITH V " << vertexTab.size() - 1 << std::endl;
+    std::cout << *this << std::endl;
     splitTriangle(vertexTab.size() - 1, randomFace);
+    std::cout << "RESULT:" << std::endl;
+    std::cout << *this << std::endl;
 }
 
 void Mesh::insertion(Point p){
@@ -445,25 +458,17 @@ Parabola::Parabola(){
 
 Mesh2D::Mesh2D() {
     // Création des points
-    vertexTab.push_back(Vertex(Point(-0.5,-0.5,-0.5), 0, 0));
-    vertexTab.push_back(Vertex(Point(-0.5,0.5,-0.5), 0, 1));
-    vertexTab.push_back(Vertex(Point(0.5,-0.5,-0.5), 0, 2));
-    vertexTab.push_back(Vertex(Point(0.5,0.5,-0.5), 1, 3));
+    vertexTab.push_back(Vertex(Point(-0.5,-0.5,0), 0, 0));
+    vertexTab.push_back(Vertex(Point(0.5,-0.5,0), 0, 1));
+    vertexTab.push_back(Vertex(Point(-0.5,0.5,0), 0, 2));
+    vertexTab.push_back(Vertex(Point(0.5,0.5,0), 1, 3));
     // Création des faces
-    std::array<int, 3> ind_vertices; // indice des sommets
-    std::array<int, 3> ind_faces; // indice des faces
-    ind_vertices = {0, 1, 2}; ind_faces = {1, 5, 2};
-    faceTab.push_back(Face(ind_vertices, ind_faces)); // face 0
-    ind_vertices = {1, 3, 2}; ind_faces = {4, 0, 3};
-    faceTab.push_back(Face(ind_vertices, ind_faces)); // face 1
-    ind_vertices = {0, -1, 1}; ind_faces = {3, 0, 5};
-    faceTab.push_back(Face(ind_vertices, ind_faces)); // face 2
-    ind_vertices = {1, -1, 3}; ind_faces = {4, 1, 2};
-    faceTab.push_back(Face(ind_vertices, ind_faces)); // face 3
-    ind_vertices = {2, 3, -1}; ind_faces = {3, 5, 1};
-    faceTab.push_back(Face(ind_vertices, ind_faces)); // face 4
-    ind_vertices = {0, 2, -1}; ind_faces = {4, 2, 0};
-    faceTab.push_back(Face(ind_vertices, ind_faces)); // face 5
+    faceTab.push_back(Face({0, 1, 2}, {1, 2, 3}));  // face 0
+    faceTab.push_back(Face({1, 3, 2}, {5, 0, 4}));  // face 1
+    faceTab.push_back(Face({0, 2, -1}, {5, 3, 0})); // face 2
+    faceTab.push_back(Face({0, -1, 1}, {4, 0, 2})); // face 3
+    faceTab.push_back(Face({1, -1, 3}, {5, 1, 3})); // face 4
+    faceTab.push_back(Face({2, 3, -1}, {4, 2, 1})); // face 5
 
 }
 
@@ -530,4 +535,25 @@ Circulator_on_vertices Mesh::neighbour_vertices(Vertex &v) {
 
     Circulator_on_vertices cov(sommets_voisins);
     return cov;
+}
+
+
+std::ostream& operator<<(std::ostream &strm, const Mesh &m) {
+    strm << "\nVertices:\n";
+    for (int i = 0; i < m.vertexTab.size(); ++i) {
+        strm << i << ": " << m.vertexTab[i].point().x() << " "
+                          << m.vertexTab[i].point().y() << " "
+                          << m.vertexTab[i].point().z() << std::endl;
+    }
+    strm << "Faces:\n";
+    for (int i = 0; i < m.faceTab.size(); ++i) {
+        strm << i << ":\n";
+        strm << "   v: " << m.faceTab[i].vertices()[0] << " "
+                        << m.faceTab[i].vertices()[1] << " "
+                        << m.faceTab[i].vertices()[2] << std::endl;
+        strm << "   a: " << m.faceTab[i].adjacentFaces()[0] << " "
+                        << m.faceTab[i].adjacentFaces()[1] << " "
+                        << m.faceTab[i].adjacentFaces()[2] << std::endl;
+    }
+    return strm;
 }

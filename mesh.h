@@ -117,6 +117,8 @@ public:
 
     friend class Circulator_on_vertices;
     Circulator_on_vertices neighbour_vertices(Vertex &);
+
+    friend std::ostream& operator<<(std::ostream &strm, const Mesh &m);
 };
 
 
@@ -287,5 +289,7 @@ public:
        return temp;
     }
 };
+
+std::ostream& operator<<(std::ostream &strm, const Mesh &m);
 
 #endif // MESH_H
