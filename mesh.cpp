@@ -167,29 +167,32 @@ void Mesh::splitTriangle(int vertexIndex, int faceIndex){
     //Modfication de la face incidente à A
     //Recuperation de l'indice local du sommet opposé à la face A dans la face incidente à A
     vertexTmp = this->faceTab[adjacentFaces[2]].vertices();
+    facesTmp = this->faceTab[adjacentFaces[2]].adjacentFaces();
     for(int i = 0; i<3; i++){
-        if(vertexTmp[i] != verticesOfFace[0] & vertexTmp[i] != verticesOfFace[1]){
-            vertexTmp[i] = faceAIndex;
+        if((vertexTmp[i] != verticesOfFace[0]) & (vertexTmp[i] != verticesOfFace[1])){
+            facesTmp[i] = faceAIndex;
         }
     }
-    this->faceTab[adjacentFaces[2]].setAdjacentFaces(vertexTmp);
+    this->faceTab[adjacentFaces[2]].setAdjacentFaces(facesTmp);
 
     //Modfication de la face incidente à B
     //Recuperation de l'indice local du sommet opposé à la face B dans la face incidente à B
     vertexTmp = this->faceTab[adjacentFaces[0]].vertices();
+    facesTmp = this->faceTab[adjacentFaces[0]].adjacentFaces();
     for(int i = 0; i<3; i++){
         if(vertexTmp[i] != verticesOfFace[1] & vertexTmp[i] != verticesOfFace[2]){
-            vertexTmp[i] = faceBIndex;
+            facesTmp[i] = faceBIndex;
         }
     }
-    this->faceTab[adjacentFaces[0]].setAdjacentFaces(vertexTmp);
+    this->faceTab[adjacentFaces[0]].setAdjacentFaces(facesTmp);
 
     //Correction de tous les vertex qui doivent avoir une face incidente
     //0 -> A ; 1 -> B ; 2 -> face splité ; nouveau vertex -> face A
     this->vertexTab[verticesOfFace[0]].setFace(faceAIndex);
     this->vertexTab[verticesOfFace[1]].setFace(faceBIndex);
     this->vertexTab[verticesOfFace[2]].setFace(faceIndex);
-    this->vertexTab[verticesOfFace[vertexIndex]].setFace(faceAIndex);
+    this->vertexTab[vertexIndex].setFace(faceAIndex);
+
 }
 
 int Mesh::orientation(std::array<double, 2> a, std::array<double, 2> b, std::array<double, 2> c){
@@ -209,10 +212,10 @@ int Mesh::orientation(std::array<double, 2> a, std::array<double, 2> b, std::arr
 
 int Mesh::inTriangle(std::array<std::array<double, 2>, 3> t, std::array<double, 2> p){
 
-    if(orientation(t[0], t[1], p)*orientation(t[0], t[1],p)*orientation(t[0], t[1], p)){
+    if(orientation(t[0], t[1], p)*orientation(t[1], t[2],p)*orientation(t[2], t[0], p) == 0){
         return 0;
     }else{
-        if ((orientation(t[0],t[1],p) < 0) || (orientation(t[1],t[2],p) < 0) || orientation(t[2],t[0],p)){
+        if ((orientation(t[0],t[1],p) < 0) || (orientation(t[1],t[2],p) < 0) || (orientation(t[2],t[0],p)<0)){
             return -1;
         }else{
             return 1;
@@ -220,29 +223,59 @@ int Mesh::inTriangle(std::array<std::array<double, 2>, 3> t, std::array<double, 
     }
 }
 void Mesh::insertion(Point p){
-    Iterator_on_faces it_f = this->faces_begin();
+
     bool into = false;
     int faceIndex = 0;
-    while(!into & (faceIndex >= this->faceTab.size()-1)){
+    while(!into & (faceIndex <= this->faceTab.size()-1)){
         //Projection du point sur le plan du triangle et changement de base
         //Calcul des vecteurs directeurs du plan du triangle
         std::array<int, 3> vertexOfface;
         vertexOfface = this->faceTab[faceIndex].vertices();
-        Point e1 = difference(this->vertexTab[vertexOfface[1]].point(), this->vertexTab[vertexOfface[0]].point());
+       /* Point e1 = difference(this->vertexTab[vertexOfface[1]].point(), this->vertexTab[vertexOfface[0]].point());
         Point e2 = difference(this->vertexTab[vertexOfface[2]].point(), this->vertexTab[vertexOfface[0]].point());
 
         //Calcul des coordoné du projeté de p sur le plan du triangle dans la base e1, e2
         double p1p = dotProduct(p, e1)/(e1.norm()*e1.norm());
         double p2p = dotProduct(p, e2)/(e2.norm()*e2.norm());
+*/
+        std::array<double, 2> a = {vertexTab[vertexOfface[0]].point().x(), vertexTab[vertexOfface[0]].point().y()};
+        std::array<double, 2> b = {vertexTab[vertexOfface[1]].point().x(), vertexTab[vertexOfface[1]].point().y()};
+        std::array<double, 2> c = {vertexTab[vertexOfface[2]].point().x(), vertexTab[vertexOfface[2]].point().y()};
 
-        std::array<std::array<double, 2>, 3> u = {std::array<double, 2>{0,0}, std::array<double, 2>{1,0}, std::array<double, 2>{0,1}};
+        std::array<std::array<double, 2>, 3> u = {a, b, c};
 
-        if(inTriangle(u, std::array<double, 2>{p1p, p2p}) > 0){
+        if(inTriangle(u, std::array<double, 2>{p.x(), p.y()}) > 0){
+            vertexTab.push_back(Vertex(p,0,vertexTab.size()));
             splitTriangle(this->vertexTab.size()-1, faceIndex);
             into=true;
-            std::cout<<"ok"<<std::endl;
         }
+        faceIndex++;
     }
+}
+
+void Mesh::print(){
+   int faceIndex = 0;
+   while(faceIndex <= faceTab.size()-1){
+       std::cout<<"face ";
+       std::cout<<faceIndex<<std::endl;
+       std::cout<<"-------"<<std::endl;
+       for(int i = 0; i<=2; i++){
+          std::cout<<faceTab[faceIndex].vertices()[i];
+          std::cout<<"  ";
+
+       }
+       std::cout<<std::endl;
+       for(int i = 0; i<=2 ; i++){
+        std::cout<<faceTab[faceIndex].adjacentFaces()[i];
+        std::cout<<"  ";
+       }
+       std::cout<<std::endl;
+       std::cout<<"--------";
+       std::cout<<std::endl;
+       std::cout<<std::endl;
+
+       faceIndex++;
+   }
 }
 
 Tetrahedron::Tetrahedron() {
@@ -376,39 +409,74 @@ QueenMesh::QueenMesh() {
     connectAdjacentFaces();
 }
 Parabola::Parabola(){
+
+
+
+
+
+
+
     //Initialisation du maillage, on crée une grosse boite
+
+
     // Création des points
-    vertexTab.push_back(Vertex(Point(-5,-5,-5), 0, 0));
-    vertexTab.push_back(Vertex(Point(-5,5,-5), 0, 1));
-    vertexTab.push_back(Vertex(Point(5,-5,-5), 0, 2));
-    vertexTab.push_back(Vertex(Point(5,5,-5), 1, 3));
+/*
+    vertexTab.push_back(Vertex(Point(-1,0,0), 0, 0));
+    vertexTab.push_back(Vertex(Point(1,-2,0), 0, 1));
+    vertexTab.push_back(Vertex(Point(1,2,0), 0, 2));
+    vertexTab.push_back(Vertex(Point(0,0,-1), 1, 3));
+*/
+    vertexTab.push_back(Vertex(Point(-1,0,0), 0, 0));
+    vertexTab.push_back(Vertex(Point(1,-1,0), 0, 1));
+    vertexTab.push_back(Vertex(Point(1,1,0), 0, 2));
+    vertexTab.push_back(Vertex(Point(0,0,-1), 1, 3));
+
+
     // Création des faces
     std::array<int, 3> ind_vertices; // indice des sommets
     std::array<int, 3> ind_faces; // indice des faces
-    ind_vertices = {0, 1, 2}; ind_faces = {1, 5, 2};
+    ind_vertices = {0, 1, 2}; ind_faces = {2, 3, 1};
     faceTab.push_back(Face(ind_vertices, ind_faces)); // face 0
-    ind_vertices = {1, 3, 2}; ind_faces = {4, 0, 3};
+    ind_vertices = {0, 3, 1}; ind_faces = {2, 0, 3};
     faceTab.push_back(Face(ind_vertices, ind_faces)); // face 1
-    ind_vertices = {0, -1, 1}; ind_faces = {3, 0, 5};
+    ind_vertices = {2, 1, 3}; ind_faces = {1, 3, 0};
     faceTab.push_back(Face(ind_vertices, ind_faces)); // face 2
-    ind_vertices = {1, -1, 3}; ind_faces = {4, 1, 2};
+    ind_vertices = {0, 2, 3}; ind_faces = {2, 1, 0};
     faceTab.push_back(Face(ind_vertices, ind_faces)); // face 3
-    ind_vertices = {2, 3, -1}; ind_faces = {3, 5, 1};
-    faceTab.push_back(Face(ind_vertices, ind_faces)); // face 4
-    ind_vertices = {0, 2, -1}; ind_faces = {4, 2, 0};
-    faceTab.push_back(Face(ind_vertices, ind_faces)); // face 5a
 
+
+
+/*
+    // Création des points
+    vertexTab.push_back(Vertex(Point(-0.5,-0.5,-0.5), 0, 0));
+    vertexTab.push_back(Vertex(Point(0.5,-0.5,-0.5), 1, 1));
+    vertexTab.push_back(Vertex(Point(0,0.5,-0.5), 2, 2));
+    vertexTab.push_back(Vertex(Point(0,-0.5,0.5), 3, 3));
+    // Création des faces
+    std::array<int, 3> ind_vertices; // indice des sommets
+    std::array<int, 3> ind_faces; // indice des faces
+    ind_vertices = {0, 1, 2}; ind_faces = {1, 2, 3};
+    faceTab.push_back(Face(ind_vertices, ind_faces)); // face 0
+    ind_vertices = {1, 3, 2}; ind_faces = {2, 0, 3};
+    faceTab.push_back(Face(ind_vertices, ind_faces)); // face 1
+    ind_vertices = {3, 0, 2}; ind_faces = {0, 1, 3};
+    faceTab.push_back(Face(ind_vertices, ind_faces)); // face 2
+    ind_vertices = {0, 3, 1}; ind_faces = {1, 0, 2};
+    faceTab.push_back(Face(ind_vertices, ind_faces)); // face 3
+
+*/
 
     //On simule la fonction
-    for(int xIndex = 0; xIndex < 1000; xIndex++){
-        for(int yIndex = 0; yIndex < 1000; yIndex++){
+    double n=100; //precision du maillage
+    for(int xIndex = 0; xIndex < n; xIndex++){
+        for(int yIndex = 0; yIndex < n; yIndex++){
             double x;
             double y;
             double z;
 
             // Discretisation de l'espace 2D [-5,5]^2 sur un maillage de taille 1000*1000
-            x = -5*(1-xIndex/1000.f)+5*(xIndex/1000.f);
-            y = -5*(1-yIndex/1000.f)+5*(yIndex/1000.f);
+            x = -1*(1-xIndex/n)+1*(xIndex/n);
+            y = -1*(1-yIndex/n)+1*(yIndex/n);
 
             // Definition de la fonctionelle de R^2 |--> R
             z = x*x+y*y;
@@ -417,8 +485,12 @@ Parabola::Parabola(){
             insertion(Point(x, y, z));
         }
     }
+    //insertion(Point(0, 0, 0));
+
+    print();
 
 }
+
 
 Iterator_on_faces Mesh::faces_begin() {
     return Iterator_on_faces(faceTab.begin());

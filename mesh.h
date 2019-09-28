@@ -87,6 +87,7 @@ public:
     int orientation(std::array<double, 2>, std::array<double, 2>, std::array<double, 2>); //Renvoi l'orientaiton (-1 -> inverse trigo ; 0 -> colinéaire ; 1 -> trigo)
     int inTriangle(std::array<std::array<double, 2>, 3>, std::array<double, 2>);
     void insertion(Point p); // Prend un point et l'insert à la structure
+    void print();
     
     // Détecter et connecter les faces adjacentes du mesh
     void connectAdjacentFaces();

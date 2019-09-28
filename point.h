@@ -36,6 +36,7 @@ public:
 Point difference(Point, Point);
 Point crossProduct(Point, Point);
 double dotProduct(Point a, Point);
+Point scalarProduct(double, Point);
 
 // Prédicats géométriques
 int testOrientation(const Point &a, const Point &b, const Point &c);

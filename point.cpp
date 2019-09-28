@@ -19,6 +19,10 @@ double dotProduct(Point a, Point b) {
     return a.x() * b.x() + a.y() * b.y() + a.z() * b.z();
 }
 
+Point scalarProduct(double t, Point x){
+    return Point(t*x.x(), t*x.y(), t*x.z());
+}
+
 int testOrientation(const Point &a, const Point &b, const Point &c) {
     // On travaille en 2D -> Z à 0
     Point p(a.x(), a.y(), 0), q(b.x(), b.y(), 0), r(c.x(), c.y(), 0);
