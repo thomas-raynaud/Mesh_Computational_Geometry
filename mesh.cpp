@@ -171,31 +171,43 @@ void Mesh2D::flipEdge(const int &f1, const int &f2) {
 void Mesh2D::flipRandomEdge() {
     // Take 2 adjacent nonfictive faces and flip the edge between them.
     int randomFace = rand() % faceTab.size();
-    int count = 0;
-    while (faceTab[randomFace].isFictive() && count < faceTab.size()) {
-        randomFace = (randomFace + 1) % faceTab.size();
-        count++;
-    }
-    if (count == faceTab.size()) return; // pas de face non fictive
     int f2;
-    std::array<int,3> fa1, fa2;
-    fa1 = faceTab[randomFace].adjacentFaces();
-    for (int i = 0; i < 3; ++i) {
-        f2 = fa1[i];
-        if (!faceTab[f2].isFictive()) {
-            // Vérifier qu'on ne flippe pas deux triangles qui ont en tout 4 faces dist
-            fa2 = faceTab[f2].adjacentFaces();
-            for (int j = 0; j < 3; ++j) {
-                if (fa2[j] == fa1[(i + 1) % 3] || fa2[j] == fa1[(i + 2) % 3]) return;
-            }
-            std::cout << "FLIP EDGE BETWEEN " << randomFace << " AND " << f2 << std::endl;
-            std::cout << *this << std::endl;
-            flipEdge(randomFace, f2);
-            std::cout << "RESULT:" << std::endl;
-            std::cout << *this << std::endl;
-            return;
+    bool foundEdge = false;
+    Point a, b, c, d; // Points de deux triangle adjacents pour tester leur concavité
+    Point ba, bd, ca, cd;
+    for(int i = 0; i < faceTab.size(); ++i) {
+        if (faceTab[randomFace].isFictive()) {
+            randomFace = (randomFace + 1) % faceTab.size();
+            continue;
         }
+        for (int j = 0; j < 3; ++j) { // Trouver une face adjacente
+            f2 = faceTab[randomFace].adjacentFaces()[j];
+            if (faceTab[f2].isFictive()) continue;
+            // Vérifier que les deux triangles ne forment pas un angle concave
+            a = vertexTab[faceTab[randomFace].vertices()[j]].point();
+            b = vertexTab[faceTab[randomFace].vertices()[(j + 1) % 3]].point();
+            c = vertexTab[faceTab[randomFace].vertices()[(j + 2) % 3]].point();
+            for (int k = 0; k < 3; ++k) {
+                if (faceTab[f2].adjacentFaces()[k] == randomFace) {
+                    d = vertexTab[faceTab[f2].vertices()[k]].point();
+                    break;
+                }
+            }
+            // Tester les angles ABD et ACD
+            ba = difference(b, a);
+            bd = difference(b, d);
+            ca = difference(c, a);
+            cd = difference(c, d);
+            if (crossProduct(ba, bd).z() < 0 && crossProduct(cd, ca).z() < 0) {
+                foundEdge = true;
+                break;
+            }
+        }
+        if (foundEdge == true) break;
+        randomFace = (randomFace + 1) % faceTab.size();
     }
+    if (foundEdge == false) return;
+    flipEdge(randomFace, f2);
 }
 
 void Mesh2D::splitTriangle(int vertexIndex, int faceIndex){
@@ -271,11 +283,7 @@ void Mesh2D::splitRandomTriangle() {
     Point c = vertexTab[vs[2]].point();
     Point p((a.x() + b.x() + c.x()) / 3, (a.y() + b.y() + c.y()) / 3, a.z());
     vertexTab.push_back(Vertex(p, -1, vertexTab.size())); // Ajouter le point en tant que sommet
-    std::cout << "SPLIT TRIANGLE " << randomFace << " WITH V " << vertexTab.size() - 1 << std::endl;
-    std::cout << *this << std::endl;
     splitTriangle(vertexTab.size() - 1, randomFace);
-    std::cout << "RESULT:" << std::endl;
-    std::cout << *this << std::endl;
 }
 
 void Mesh::insertion(Point p){
@@ -469,7 +477,6 @@ Mesh2D::Mesh2D() {
     faceTab.push_back(Face({0, -1, 1}, {4, 0, 2})); // face 3
     faceTab.push_back(Face({1, -1, 3}, {5, 1, 3})); // face 4
     faceTab.push_back(Face({2, 3, -1}, {4, 2, 1})); // face 5
-
 }
 
 Iterator_on_faces Mesh::faces_begin() {
