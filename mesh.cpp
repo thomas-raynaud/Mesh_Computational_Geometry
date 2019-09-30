@@ -467,7 +467,7 @@ Parabola::Parabola(){
 */
 
     //On simule la fonction
-    double n=100; //precision du maillage
+    double n=10; //precision du maillage
     for(int xIndex = 0; xIndex < n; xIndex++){
         for(int yIndex = 0; yIndex < n; yIndex++){
             double x;
@@ -475,8 +475,8 @@ Parabola::Parabola(){
             double z;
 
             // Discretisation de l'espace 2D [-5,5]^2 sur un maillage de taille 1000*1000
-            x = -1*(1-xIndex/n)+1*(xIndex/n);
-            y = -1*(1-yIndex/n)+1*(yIndex/n);
+            x = -0.5*(1-xIndex/n)+0.5*(xIndex/n);
+            y = -0.5*(1-yIndex/n)+0.5*(yIndex/n);
 
             // Definition de la fonctionelle de R^2 |--> R
             z = x*x+y*y;
@@ -485,7 +485,8 @@ Parabola::Parabola(){
             insertion(Point(x, y, z));
         }
     }
-    //insertion(Point(0, 0, 0));
+
+   // insertion(Point(0, 0, 0));
 
     print();
 
