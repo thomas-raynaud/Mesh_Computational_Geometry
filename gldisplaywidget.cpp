@@ -17,6 +17,7 @@ GLDisplayWidget::GLDisplayWidget(QWidget *parent) : QGLWidget(parent) {
     _timer.start(16);
     _wireframe_display = false;
     _curveAxis = 0;
+    _meshType = 0;
 }
 
 void GLDisplayWidget::initializeGL()
@@ -74,7 +75,8 @@ void GLDisplayWidget::toggleDisplayType() {
 
 void GLDisplayWidget::switchMesh(int index) {
     delete _mesh;
-    switch(index) {
+    _meshType = index;
+    switch(_meshType) {
         case 0:     _mesh = new Tetrahedron(); break;
         case 1:     _mesh = new Pyramid(); break;
         case 2:     _mesh = new BoundingBox2D(); break;
@@ -88,6 +90,24 @@ void GLDisplayWidget::switchMesh(int index) {
 void GLDisplayWidget::switchCurveAxis(int index) {
     _curveAxis = index;
     _mesh->computeColors(_curveAxis);
+}
+
+void GLDisplayWidget::switchTP(int index) {
+    if (index == 0) {
+        switchMesh(_meshType);
+        switchCurveAxis(_curveAxis);
+    } else {
+        delete _mesh;
+        _mesh = new Parabola();
+    }
+}
+
+void GLDisplayWidget::flipRandomEdge() {
+    ((Mesh2D*)_mesh)->flipRandomEdge();
+}
+
+void GLDisplayWidget::splitRandomTriangle() {
+    ((Mesh2D*)_mesh)->splitRandomTriangle();
 }
 
 // - - - - - - - - - - - - Mouse Management  - - - - - - - - - - - - - - - -

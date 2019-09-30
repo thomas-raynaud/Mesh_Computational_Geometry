@@ -117,12 +117,12 @@ void Mesh::connectAdjacentFaces() {
                 // connexion des faces adjacentes
                 int adjacentFace = edges[edgeKey];
                 // connecter la face adjacente à la face courante
-                faceTab[i].addAdjacentFace(adjacentFace, (j + 2) % 3);
+                faceTab[i].setAdjacentFace(adjacentFace, (j + 2) % 3);
                 // ajouter la face courante à la face adjacente
                 for (size_t k = 0; k < 3; ++k) {
                     if (faceTab[adjacentFace].vertices()[k] != first_v
                             && faceTab[adjacentFace].vertices()[k] != scnd_v) {
-                        faceTab[adjacentFace].addAdjacentFace(i, k);
+                        faceTab[adjacentFace].setAdjacentFace(i, k);
                         break;
                     }
                 }
@@ -131,11 +131,86 @@ void Mesh::connectAdjacentFaces() {
     }
 }
 
-void flipEdge(const int &f1, const int &f2) {
+void Mesh2D::flipEdge(const int &f1, const int &f2) {
+    int v00, v01; // Sommets de f1 tel que v00 opposé à f2
+    int v10, v11; // Sommets de f2 tel que v10 opposé à f1
+    int f01, f02, f11, f12; // faces opposées resp. à v01, v02, v11, v12
+    int ind_v00 = 0, ind_v10 = 0;
+    for (int i = 0; i < 3; ++i) {
+        if (faceTab[f1].adjacentFaces()[i] == f2) ind_v00 = i;
+        if (faceTab[f2].adjacentFaces()[i] == f1) ind_v10 = i;
+    }
+    // Sommets de f1
+    v00 = faceTab[f1].vertices()[ind_v00];
+    v01 = faceTab[f1].vertices()[(ind_v00 + 1) % 3];
+    // Sommets de f2
+    v10 = faceTab[f2].vertices()[ind_v10];
+    v11 = faceTab[f2].vertices()[(ind_v10 + 1) % 3];
+    // Faces opposées
+    f01 = faceTab[f1].adjacentFaces()[(ind_v00 + 1) % 3];
+    f02 = faceTab[f1].adjacentFaces()[(ind_v00 + 2) % 3];
+    f11 = faceTab[f2].adjacentFaces()[(ind_v10 + 1) % 3];
+    f12 = faceTab[f2].adjacentFaces()[(ind_v10 + 2) % 3];
 
+    // Changer les sommets de f1 et f2
+    faceTab[f1].setVertices({v00, v10, v11});
+    faceTab[f2].setVertices({v00, v01, v10});
+    // Changer les faces adjacentes
+    faceTab[f1].setAdjacentFaces({f12, f01, f2});
+    faceTab[f2].setAdjacentFaces({f11, f1, f02});
+    // Changer les connexions des sommets aux faces
+    vertexTab[v00].setFace(f1);
+    vertexTab[v01].setFace(f2);
+    vertexTab[v10].setFace(f2);
+    vertexTab[v11].setFace(f1);
+    // Changer les faces adjacentes des faces adjacentes (f02 et f12)
+    for (int i = 0; i < 3; ++i) if (faceTab[f02].adjacentFaces()[i] == f1) faceTab[f02].setAdjacentFace(f2, i);
+    for (int i = 0; i < 3; ++i) if (faceTab[f12].adjacentFaces()[i] == f2) faceTab[f12].setAdjacentFace(f1, i);
 }
 
-void Mesh::splitTriangle(int vertexIndex, int faceIndex){
+void Mesh2D::flipRandomEdge() {
+    // Take 2 adjacent nonfictive faces and flip the edge between them.
+    int randomFace = rand() % faceTab.size();
+    int f2;
+    bool foundEdge = false;
+    Point a, b, c, d; // Points de deux triangle adjacents pour tester leur concavité
+    Point ba, bd, ca, cd;
+    for(int i = 0; i < faceTab.size(); ++i) {
+        if (faceTab[randomFace].isFictive()) {
+            randomFace = (randomFace + 1) % faceTab.size();
+            continue;
+        }
+        for (int j = 0; j < 3; ++j) { // Trouver une face adjacente
+            f2 = faceTab[randomFace].adjacentFaces()[j];
+            if (faceTab[f2].isFictive()) continue;
+            // Vérifier que les deux triangles ne forment pas un angle concave
+            a = vertexTab[faceTab[randomFace].vertices()[j]].point();
+            b = vertexTab[faceTab[randomFace].vertices()[(j + 1) % 3]].point();
+            c = vertexTab[faceTab[randomFace].vertices()[(j + 2) % 3]].point();
+            for (int k = 0; k < 3; ++k) {
+                if (faceTab[f2].adjacentFaces()[k] == randomFace) {
+                    d = vertexTab[faceTab[f2].vertices()[k]].point();
+                    break;
+                }
+            }
+            // Tester les angles ABD et ACD
+            ba = difference(b, a);
+            bd = difference(b, d);
+            ca = difference(c, a);
+            cd = difference(c, d);
+            if (crossProduct(ba, bd).z() < 0 && crossProduct(cd, ca).z() < 0) {
+                foundEdge = true;
+                break;
+            }
+        }
+        if (foundEdge == true) break;
+        randomFace = (randomFace + 1) % faceTab.size();
+    }
+    if (foundEdge == false) return;
+    flipEdge(randomFace, f2);
+}
+
+void Mesh2D::splitTriangle(int vertexIndex, int faceIndex){
     //Récuperation des attributs de la face à splitter
     std::array<int, 3> verticesOfFace;
     verticesOfFace=this->faceTab[faceIndex].vertices();
@@ -169,19 +244,21 @@ void Mesh::splitTriangle(int vertexIndex, int faceIndex){
     vertexTmp = this->faceTab[adjacentFaces[2]].vertices();
     facesTmp = this->faceTab[adjacentFaces[2]].adjacentFaces();
     for(int i = 0; i<3; i++){
-        if((vertexTmp[i] != verticesOfFace[0]) & (vertexTmp[i] != verticesOfFace[1])){
+        if((vertexTmp[i] != verticesOfFace[0]) && (vertexTmp[i] != verticesOfFace[1])){
             facesTmp[i] = faceAIndex;
+            break;
         }
     }
     this->faceTab[adjacentFaces[2]].setAdjacentFaces(facesTmp);
 
-    //Modfication de la face incidente à B
+    //Modification de la face incidente à B
     //Recuperation de l'indice local du sommet opposé à la face B dans la face incidente à B
     vertexTmp = this->faceTab[adjacentFaces[0]].vertices();
     facesTmp = this->faceTab[adjacentFaces[0]].adjacentFaces();
     for(int i = 0; i<3; i++){
-        if(vertexTmp[i] != verticesOfFace[1] & vertexTmp[i] != verticesOfFace[2]){
+        if(vertexTmp[i] != verticesOfFace[1] && vertexTmp[i] != verticesOfFace[2]){
             facesTmp[i] = faceBIndex;
+            break;
         }
     }
     this->faceTab[adjacentFaces[0]].setAdjacentFaces(facesTmp);
@@ -192,44 +269,39 @@ void Mesh::splitTriangle(int vertexIndex, int faceIndex){
     this->vertexTab[verticesOfFace[1]].setFace(faceBIndex);
     this->vertexTab[verticesOfFace[2]].setFace(faceIndex);
     this->vertexTab[vertexIndex].setFace(faceAIndex);
-
 }
 
-int Mesh::orientation(std::array<double, 2> a, std::array<double, 2> b, std::array<double, 2> c){
-    Point ab = Point(b[0]-a[0], b[1]-a[1], 0);
-    Point ac = Point(c[0]-a[0], c[1]-a[1], 0);
-    Point z =Point(0, 0, 1);
-
-    double compute = dotProduct(crossProduct(ab, ac), z);
-    if(compute >0){
-        return 1;
-    }else if (compute == 0) {
-        return 0;
-    }else{
-        return -1;
+void Mesh2D::splitRandomTriangle() {
+    // Take 2 adjacent nonfictive faces and flip the edge between them.
+    int randomFace = rand() % faceTab.size();
+    int count = 0;
+    while (faceTab[randomFace].isFictive() && count < faceTab.size()) {
+        randomFace = (randomFace + 1) % faceTab.size();
+        count++;
     }
+    if (count == faceTab.size()) return; // pas de face non fictive
+    // Générer le point au milieu de la face
+    std::array<int, 3> vs = faceTab[randomFace].vertices();
+    Point a = vertexTab[vs[0]].point();
+    Point b = vertexTab[vs[1]].point();
+    Point c = vertexTab[vs[2]].point();
+    Point p((a.x() + b.x() + c.x()) / 3, (a.y() + b.y() + c.y()) / 3, a.z());
+    vertexTab.push_back(Vertex(p, -1, vertexTab.size())); // Ajouter le point en tant que sommet
+    splitTriangle(vertexTab.size() - 1, randomFace);
 }
 
-int Mesh::inTriangle(std::array<std::array<double, 2>, 3> t, std::array<double, 2> p){
-
-    if(orientation(t[0], t[1], p)*orientation(t[1], t[2],p)*orientation(t[2], t[0], p) == 0){
-        return 0;
-    }else{
-        if ((orientation(t[0],t[1],p) < 0) || (orientation(t[1],t[2],p) < 0) || (orientation(t[2],t[0],p)<0)){
-            return -1;
-        }else{
-            return 1;
-        }
-    }
-}
-void Mesh::insertion(Point p){
+void Mesh2D::insertion(Point p){
 
     bool into = false;
     int faceIndex = 0;
-    while(!into & (faceIndex <= this->faceTab.size()-1)){
+    while(!into && (faceIndex < this->faceTab.size())){
         //Projection du point sur le plan du triangle et changement de base
         //Calcul des vecteurs directeurs du plan du triangle
         std::array<int, 3> vertexOfface;
+        if (this->faceTab[faceIndex].isFictive()) {
+            faceIndex++;
+            continue;
+        }
         vertexOfface = this->faceTab[faceIndex].vertices();
        /* Point e1 = difference(this->vertexTab[vertexOfface[1]].point(), this->vertexTab[vertexOfface[0]].point());
         Point e2 = difference(this->vertexTab[vertexOfface[2]].point(), this->vertexTab[vertexOfface[0]].point());
@@ -238,14 +310,12 @@ void Mesh::insertion(Point p){
         double p1p = dotProduct(p, e1)/(e1.norm()*e1.norm());
         double p2p = dotProduct(p, e2)/(e2.norm()*e2.norm());
 */
-        std::array<double, 2> a = {vertexTab[vertexOfface[0]].point().x(), vertexTab[vertexOfface[0]].point().y()};
-        std::array<double, 2> b = {vertexTab[vertexOfface[1]].point().x(), vertexTab[vertexOfface[1]].point().y()};
-        std::array<double, 2> c = {vertexTab[vertexOfface[2]].point().x(), vertexTab[vertexOfface[2]].point().y()};
+        Point a = vertexTab[vertexOfface[0]].point();
+        Point b = vertexTab[vertexOfface[1]].point();
+        Point c = vertexTab[vertexOfface[2]].point();
 
-        std::array<std::array<double, 2>, 3> u = {a, b, c};
-
-        if(inTriangle(u, std::array<double, 2>{p.x(), p.y()}) > 0){
-            vertexTab.push_back(Vertex(p,0,vertexTab.size()));
+        if(isInTriangle(a, b, c, p) > 0){
+            vertexTab.push_back(Vertex(p, 0, vertexTab.size()));
             splitTriangle(this->vertexTab.size()-1, faceIndex);
             into=true;
         }
@@ -400,7 +470,7 @@ QueenMesh::QueenMesh() {
                                         faceTab[i].vertices()[(j + 2) % 3],
                                         -1}, // sommet fictif
                                         {-1, -1, i}));
-                faceTab[i].addAdjacentFace(faceTab.size() -1, j);
+                faceTab[i].setAdjacentFace(faceTab.size() -1, j);
             }
         }
     }
@@ -413,7 +483,7 @@ Parabola::Parabola(){
 
 
 
-
+    std::cout << "..." << std::endl;
 
 
     //Initialisation du maillage, on crée une grosse boite
@@ -485,11 +555,24 @@ Parabola::Parabola(){
             insertion(Point(x, y, z));
         }
     }
+    // insertion(Point(0, 0, 0));
 
-   // insertion(Point(0, 0, 0));
+     print();
+}
 
-    print();
-
+Mesh2D::Mesh2D() {
+    // Création des points
+    vertexTab.push_back(Vertex(Point(-0.5,-0.5,0), 0, 0));
+    vertexTab.push_back(Vertex(Point(0.5,-0.5,0), 0, 1));
+    vertexTab.push_back(Vertex(Point(-0.5,0.5,0), 0, 2));
+    vertexTab.push_back(Vertex(Point(0.5,0.5,0), 1, 3));
+    // Création des faces
+    faceTab.push_back(Face({0, 1, 2}, {1, 2, 3}));  // face 0
+    faceTab.push_back(Face({1, 3, 2}, {5, 0, 4}));  // face 1
+    faceTab.push_back(Face({0, 2, -1}, {5, 3, 0})); // face 2
+    faceTab.push_back(Face({0, -1, 1}, {4, 0, 2})); // face 3
+    faceTab.push_back(Face({1, -1, 3}, {5, 1, 3})); // face 4
+    faceTab.push_back(Face({2, 3, -1}, {4, 2, 1})); // face 5
 }
 
 
@@ -556,4 +639,25 @@ Circulator_on_vertices Mesh::neighbour_vertices(Vertex &v) {
 
     Circulator_on_vertices cov(sommets_voisins);
     return cov;
+}
+
+
+std::ostream& operator<<(std::ostream &strm, const Mesh &m) {
+    strm << "\nVertices:\n";
+    for (int i = 0; i < m.vertexTab.size(); ++i) {
+        strm << i << ": " << m.vertexTab[i].point().x() << " "
+                          << m.vertexTab[i].point().y() << " "
+                          << m.vertexTab[i].point().z() << std::endl;
+    }
+    strm << "Faces:\n";
+    for (int i = 0; i < m.faceTab.size(); ++i) {
+        strm << i << ":\n";
+        strm << "   v: " << m.faceTab[i].vertices()[0] << " "
+                        << m.faceTab[i].vertices()[1] << " "
+                        << m.faceTab[i].vertices()[2] << std::endl;
+        strm << "   a: " << m.faceTab[i].adjacentFaces()[0] << " "
+                        << m.faceTab[i].adjacentFaces()[1] << " "
+                        << m.faceTab[i].adjacentFaces()[2] << std::endl;
+    }
+    return strm;
 }

@@ -29,7 +29,7 @@
          <x>10</x>
          <y>10</y>
          <width>171</width>
-         <height>331</height>
+         <height>181</height>
         </rect>
        </property>
        <layout class="QVBoxLayout" name="verticalLayout">
@@ -41,7 +41,43 @@
          </widget>
         </item>
         <item>
+         <widget class="QComboBox" name="comboBoxTPswitch">
+          <item>
+           <property name="text">
+            <string>TP1 - mesh curves</string>
+           </property>
+          </item>
+          <item>
+           <property name="text">
+            <string>TP2 - Delaunay</string>
+           </property>
+          </item>
+         </widget>
+        </item>
+        <item>
+         <widget class="QPushButton" name="pushButtonExit">
+          <property name="text">
+           <string>Exit</string>
+          </property>
+         </widget>
+        </item>
+       </layout>
+      </widget>
+      <widget class="QWidget" name="verticalWidgetTP1" native="true">
+       <property name="geometry">
+        <rect>
+         <x>10</x>
+         <y>200</y>
+         <width>171</width>
+         <height>91</height>
+        </rect>
+       </property>
+       <layout class="QVBoxLayout" name="verticalLayoutTP1">
+        <item>
          <widget class="QComboBox" name="comboBoxMeshswitch">
+          <property name="enabled">
+           <bool>true</bool>
+          </property>
           <item>
            <property name="text">
             <string>Tetrahedron</string>
@@ -93,10 +129,29 @@
           </item>
          </widget>
         </item>
+       </layout>
+      </widget>
+      <widget class="QWidget" name="verticalWidgetTP2" native="true">
+       <property name="geometry">
+        <rect>
+         <x>10</x>
+         <y>290</y>
+         <width>191</width>
+         <height>101</height>
+        </rect>
+       </property>
+       <layout class="QVBoxLayout" name="verticalLayoutTP2">
         <item>
-         <widget class="QPushButton" name="pushButtonExit">
+         <widget class="QPushButton" name="pushButtonSplitTriangle">
           <property name="text">
-           <string>Exit</string>
+           <string>Split a random triangle</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QPushButton" name="pushButtonFlipEdge">
+          <property name="text">
+           <string>Flip a random edge</string>
           </property>
          </widget>
         </item>

@@ -36,9 +36,9 @@ int isInTriangle(const Point &a, const Point &b, const Point &c, const Point &d)
     int orientationABD = sign(testOrientation(a, b, d));
     int orientationCAD = sign(testOrientation(a, c, d));
     int orientationCBD = sign(testOrientation(c, b, d));
-    if (orientationABC != orientationABD ||
-        orientationABC != orientationCAD ||
-        orientationABC != orientationCBD) { // Orientation différente -> d en dehors
+    if (sign(orientationABC) != sign(orientationABD) ||
+        sign(orientationABC) != sign(orientationCAD) ||
+        sign(orientationABC) != sign(orientationCBD)) { // Orientation différente -> d en dehors
         return -1;
     } else if (orientationABD == 0 || orientationCAD == 0 || orientationCBD == 0) { // d sur une des arêtes
         return 0;

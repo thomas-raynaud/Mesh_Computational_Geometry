@@ -7,6 +7,7 @@ MainWindow::MainWindow(QWidget *parent) :
     ui(new Ui::MainWindow)
 {
     ui->setupUi(this);
+    ui->verticalWidgetTP2->hide();
 }
 
 MainWindow::~MainWindow()
@@ -28,4 +29,26 @@ void MainWindow::on_comboBoxMeshswitch_currentIndexChanged(int index) {
 
 void MainWindow::on_comboBoxColorswitch_currentIndexChanged(int index) {
     ui->widget->switchCurveAxis(index);
+}
+
+void MainWindow::on_comboBoxTPswitch_currentIndexChanged(int index)
+{
+    if (index == 0) {
+        ui->verticalWidgetTP1->show();
+        ui->verticalWidgetTP2->hide();
+    } else {
+        ui->verticalWidgetTP1->hide();
+        ui->verticalWidgetTP2->show();
+    }
+   ui->widget->switchTP(index);
+}
+
+void MainWindow::on_pushButtonFlipEdge_released()
+{
+    ui->widget->flipRandomEdge();
+}
+
+void MainWindow::on_pushButtonSplitTriangle_released()
+{
+    ui->widget->splitRandomTriangle();
 }

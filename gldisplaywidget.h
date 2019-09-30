@@ -31,6 +31,11 @@ public:
     */
     void switchCurveAxis(int index);
 
+    void switchTP(int index);
+
+    void flipRandomEdge();
+    void splitRandomTriangle();
+
 protected:
     // Mouse Management
     void mousePressEvent(QMouseEvent *event);
@@ -43,6 +48,7 @@ private:
     float _X, _Y ,_Z; // Translation
     float _angle; // Rotation
     int _curveAxis;
+    int _meshType;
     bool _wireframe_display;
 
     QPoint _lastPosMouse; // To keep the last position of the mouse
