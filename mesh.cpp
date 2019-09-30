@@ -46,13 +46,10 @@ std::vector<Point> Mesh::getLaplacians() {
             d = cvtemp->point();
 
             // cot alpha
-            opp = difference(a, c).norm();
-            adj = difference(a, b).norm();
-            cot_alpha = adj / opp;
+            cot_alpha = dotProduct(difference(a,b), difference(c,b)) / dotProduct(crossProduct(difference(c,b),difference(a,b)), Point(0,0,1));
 
             // cot beta
-            adj = difference(a, d).norm();
-            cot_beta = adj / opp;
+            cot_beta = dotProduct(difference(a,d), difference(c,d)) / dotProduct(crossProduct(difference(c,d),difference(a,d)), Point(0,0,1));
 
             // sommes
             angles = cot_alpha + cot_beta;
