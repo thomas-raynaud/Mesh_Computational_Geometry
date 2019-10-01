@@ -46,6 +46,39 @@ int isInTriangle(const Point &a, const Point &b, const Point &c, const Point &d)
     return 1; // d dans le triangle
 }
 
+Point phi(const Point &a){
+    return Point(a.x(), a.y(), a.x()*a.x()+a.y()*a.y());
+}
+
+int conflictTriangle(const Point &a, const Point &b, const Point &c, const Point &d){
+    Point ba = difference(phi(b), phi(a));
+    Point ca = difference(phi(c), phi(a));
+    Point da = difference(phi(d), phi(a));
+    //cross product
+    Point cp = crossProduct(ba, ca);
+    //dot product
+    double dp = dotProduct(cp, da);
+    if(dp > 0){
+        return -1;
+    }else if(dp < 0){
+        return 1;
+    }else{
+        return 0;
+    }
+}
+
+int localementDeDelaunay(const Point &a, const Point &b, const Point &c, const Point &d){
+    int testA = conflictTriangle(a, b, c, d);
+    int testB = conflictTriangle(c, b, d, a);
+    if((testA > 0) && (testB > 0)){
+        return 1;
+    }else if((testA <0) || (testB < 0)){
+        return -1;
+    }else{
+        return 0;
+    }
+}
+
 int sign(int val) {
     if (val >= 0) return 1;
     return -1;
