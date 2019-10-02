@@ -67,7 +67,7 @@ int conflictTriangle(const Point &a, const Point &b, const Point &c, const Point
     }
 }
 
-int localementDeDelaunay(const Point &a, const Point &b, const Point &c, const Point &d){
+int localementDeDelaunayUtil(const Point &a, const Point &b, const Point &c, const Point &d){
     int testA = conflictTriangle(a, b, c, d);
     int testB = conflictTriangle(c, b, d, a);
     if((testA > 0) && (testB > 0)){

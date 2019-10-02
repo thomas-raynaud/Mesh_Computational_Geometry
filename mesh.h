@@ -6,6 +6,7 @@
 #include <sstream>
 #include <unordered_map>
 #include <fstream>
+#include <queue>
 
 #include "point.h"
 #include "color.h"
@@ -39,14 +40,18 @@ class Face {
 
     std::array<int, 3> _vertices;       // Sommets de la face
     std::array<int, 3> _adjacentFaces;  // Faces adjacentes à la face.
-    std::array<double, 3> _rgb; // couleur de la face
+    std::array<double, 3> _rgb;         // couleur de la face
+    int _idx;                           // Indice de la face dans le mesh
     // 1e face = face opposée au 1er sommet, etc...
 
 public:
     Face(std::array<int, 3> vertices,
-         std::array<int, 3> adjacentFaces={-1,-1,-1}
-         ): _vertices(vertices), _adjacentFaces(adjacentFaces) {
+         std::array<int, 3> adjacentFaces={-1,-1,-1},
+         int idx = 0
+         ): _vertices(vertices), _adjacentFaces(adjacentFaces), _idx(idx) {
         setRandomColor();
+        this->_idx=idx;
+
     }
     Face() {
         setRandomColor();
@@ -56,6 +61,7 @@ public:
     const std::array<int, 3> vertices() const { return _vertices; }
     const std::array<int, 3> adjacentFaces() const { return _adjacentFaces; }
     std::array<double, 3> color() const { return _rgb; }
+    int idx(){ return _idx; }
 
     //Set
     void setVertices(std::array<int,3> vertices){_vertices=vertices; }
@@ -165,6 +171,9 @@ public:
     void flipRandomEdge();
     void splitRandomTriangle();
 
+
+    int localementDeDelaunay(int vertexIndex, Face face);
+    void defile(std::queue<std::array<int, 2>> *file);
     void insertion(Point p); // Prend un point et l'insert à la structure
 
     virtual void drawMesh();

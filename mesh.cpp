@@ -287,6 +287,54 @@ void Mesh2D::splitRandomTriangle() {
     splitTriangle(vertexTab.size() - 1, randomFace);
 }
 
+int Mesh2D::localementDeDelaunay(int vertexIndex,Face face){
+    //le vertex est toujours "a" dans localement de D
+    //Trouver b et c dans les figure de zone de conflit
+    std::array<int, 2> bEtc;
+    int bEtcIndex = 0;
+    int aLocalIndex;
+    for(int localVertexIndex = 0; localVertexIndex < 3; localVertexIndex++){
+        if(face.vertices()[localVertexIndex] != this->vertexTab[vertexIndex].idx()){
+            bEtc[bEtcIndex] = face.vertices()[localVertexIndex];
+            bEtcIndex++;
+        }else{
+            aLocalIndex = localVertexIndex;
+        }
+    }
+    //trouver d dans les figures de zone de conflit
+    int dIndex;
+    int FaceBIndex = face.adjacentFaces()[aLocalIndex];
+    for(int localVertexIndex = 0; localVertexIndex < 3; localVertexIndex++){
+        int tmpVertexIndex = this->faceTab[FaceBIndex].vertices()[localVertexIndex];
+        if((tmpVertexIndex != bEtc[0]) && (tmpVertexIndex != bEtc[1])){
+            dIndex = this->faceTab[FaceBIndex].vertices()[localVertexIndex];
+        }
+    }
+    //tester si l'arrête est localement de D
+    Point aLoc = this->vertexTab[vertexIndex].point();
+    Point bLoc = this->vertexTab[bEtc[0]].point();
+    Point cLoc = this->vertexTab[bEtc[1]].point();
+    Point dLoc = this->vertexTab[dIndex].point();
+    return localementDeDelaunayUtil(aLoc, bLoc, cLoc, dLoc);
+
+}
+
+void Mesh2D::defile(std::queue<std::array<int, 2>> *file){
+    while(file->size() > 0){
+        std::array<int, 2> tmpEdge = file->front();
+        file->pop();
+        if(localementDeDelaunay(tmpEdge[0], this->faceTab[tmpEdge[1]]) < 0){
+            int localVertexIndex;
+            for(int localVertexIndexTmp = 0; localVertexIndexTmp < 3; localVertexIndexTmp++){
+                if(this->faceTab[tmpEdge[1]].vertices()[localVertexIndexTmp] == tmpEdge[0]){
+                    localVertexIndex=localVertexIndexTmp;
+                }
+            }
+            flipEdge(tmpEdge[1], this->faceTab[tmpEdge[1]].adjacentFaces()[localVertexIndex]);
+        }
+    }
+}
+
 void Mesh2D::insertion(Point p){
 
     bool into = false;
@@ -312,9 +360,35 @@ void Mesh2D::insertion(Point p){
         Point c = vertexTab[vertexOfface[2]].point();
 
         if(isInTriangle(a, b, c, p) > 0){
-            vertexTab.push_back(Vertex(p, 0, vertexTab.size()));
-            splitTriangle(this->vertexTab.size()-1, faceIndex);
+            int vertexIndex = this->vertexTab.size();
+            this->vertexTab.push_back(Vertex(p, 0, vertexIndex));
+            splitTriangle(vertexIndex, faceIndex);
             into=true;
+
+            //Une fois que le point est inseré par split, il faut faire les flips (TP3)
+            std::queue<std::array<int, 2>> file;
+            bool ZoneDeConflitVide = false;
+
+            while(!ZoneDeConflitVide){
+                //On enfile la zone de conflit
+                Circulator_on_faces cf, cfbegin;
+                cfbegin = this->incident_faces(this->vertexTab[vertexIndex]);
+                cf = cfbegin;
+                do{
+                    int localementDeD = localementDeDelaunay(vertexIndex, *cf);
+                    if(localementDeD < 0){
+                        file.push(std::array<int,2> {cf->idx(), vertexIndex});
+                    }
+                    cf++;
+                }while(cf != cfbegin);
+
+                //On defile si necessaire
+                if(file.size() > 0){
+                    defile(&file);
+                }else{
+                    ZoneDeConflitVide = true;
+                }
+            }
         }
         faceIndex++;
     }
