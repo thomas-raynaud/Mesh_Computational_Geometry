@@ -185,10 +185,10 @@ public:
     void flipRandomEdge();
     void splitRandomTriangle();
 
-
-    int localementDeDelaunay(int vertexIndex, Face face);
-    void defile(std::queue<std::array<int, 2>> *file);
     void insertion(Point p); // Prend un point et l'insert à la structure
+    // Réarranger les triangles du maillage après insertion du sommet vertexId
+    // pour que la triangulation soit globalement de Delaunay
+    void rearrangeDelaunay(int vertexIdx);
 
     virtual void drawMesh();
     virtual void drawMeshWireFrame();

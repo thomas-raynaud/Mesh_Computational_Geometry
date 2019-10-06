@@ -146,54 +146,6 @@ void Mesh2D::splitRandomTriangle() {
     splitTriangle(vertexTab.size() - 1, randomFace);
 }
 
-int Mesh2D::localementDeDelaunay(int vertexIndex,Face face){
-    //le vertex est toujours "a" dans localement de D
-    //Trouver b et c dans les figure de zone de conflit
-    std::array<int, 2> bEtc;
-    int bEtcIndex = 0;
-    int aLocalIndex;
-    for(int localVertexIndex = 0; localVertexIndex < 3; localVertexIndex++){
-        if(face.vertices()[localVertexIndex] != this->vertexTab[vertexIndex].idx()){
-            bEtc[bEtcIndex] = face.vertices()[localVertexIndex];
-            bEtcIndex++;
-        }else{
-            aLocalIndex = localVertexIndex;
-        }
-    }
-    //trouver d dans les figures de zone de conflit
-    int dIndex;
-    int FaceBIndex = face.adjacentFaces()[aLocalIndex];
-    for(int localVertexIndex = 0; localVertexIndex < 3; localVertexIndex++){
-        int tmpVertexIndex = this->faceTab[FaceBIndex].vertices()[localVertexIndex];
-        if((tmpVertexIndex != bEtc[0]) && (tmpVertexIndex != bEtc[1])){
-            dIndex = this->faceTab[FaceBIndex].vertices()[localVertexIndex];
-        }
-    }
-    //tester si l'arrête est localement de D
-    Point aLoc = this->vertexTab[vertexIndex].point();
-    Point bLoc = this->vertexTab[bEtc[0]].point();
-    Point cLoc = this->vertexTab[bEtc[1]].point();
-    Point dLoc = this->vertexTab[dIndex].point();
-    return localementDeDelaunayUtil(aLoc, bLoc, cLoc, dLoc);
-
-}
-
-void Mesh2D::defile(std::queue<std::array<int, 2>> *file){
-    while(file->size() > 0){
-        std::array<int, 2> tmpEdge = file->front();
-        file->pop();
-        if(localementDeDelaunay(tmpEdge[0], this->faceTab[tmpEdge[1]]) < 0){
-            int localVertexIndex;
-            for(int localVertexIndexTmp = 0; localVertexIndexTmp < 3; localVertexIndexTmp++){
-                if(this->faceTab[tmpEdge[1]].vertices()[localVertexIndexTmp] == tmpEdge[0]){
-                    localVertexIndex=localVertexIndexTmp;
-                }
-            }
-            flipEdge(tmpEdge[1], this->faceTab[tmpEdge[1]].adjacentFaces()[localVertexIndex]);
-        }
-    }
-}
-
 void Mesh2D::insertion(Point p) {
     // Ajouter le point p dans le sac de sommets
     vertexTab.push_back(Vertex(p, -1, vertexTab.size()));
@@ -272,6 +224,7 @@ void Mesh2D::insertion(Point p) {
         }
         return;
     }
+
     // Le point est dans l'enveloppe convexe, trouver dans quelle face elle se
     // trouve
     for (QVector<Face>::iterator face_it = faceTab.begin(); face_it != faceTab.end(); ++face_it) {
@@ -280,61 +233,60 @@ void Mesh2D::insertion(Point p) {
         c = vertexTab[face_it->vertices()[2]].point();
         if (isInTriangle(a, b, c, p) && !isFaceFictive(face_it->idx())) {
             splitTriangle(vertexTab.size() - 1, face_it->idx());
+            rearrangeDelaunay(vertexTab.size() - 1);
             return;
         }
     }
-    /*if (splitFace != -1) {
-        splitTriangle(a, b, );
-    }*/
-    /*bool into = false;
-    int faceIndex = 0;*/
-    /*while(!into && (faceIndex < this->faceTab.size())){
-        //Projection du point sur le plan du triangle et changement de base
-        //Calcul des vecteurs directeurs du plan du triangle
-        std::array<int, 3> vertexOfface;
-        vertexOfface = this->faceTab[faceIndex].vertices();*/
-       /* Point e1 = difference(this->vertexTab[vertexOfface[1]].point(), this->vertexTab[vertexOfface[0]].point());
-        Point e2 = difference(this->vertexTab[vertexOfface[2]].point(), this->vertexTab[vertexOfface[0]].point());
+}
 
-        //Calcul des coordonnées du projeté de p sur le plan du triangle dans la base e1, e2
-        double p1p = dotProduct(p, e1)/(e1.norm()*e1.norm());
-        double p2p = dotProduct(p, e2)/(e2.norm()*e2.norm());
-*/
-        /*Point a = vertexTab[vertexOfface[0]].point();
-        Point b = vertexTab[vertexOfface[1]].point();
-        Point c = vertexTab[vertexOfface[2]].point();
+void Mesh2D::rearrangeDelaunay(int vertexIdx) {
+    // File contenant des indices de triangles. On retrouve l'arête à tester
+    // en prenant l'arête opposée dans le triangle à vertexIdx.
+    std::queue<int> file;
+    Point a, b, c, d;
+    int f1, f2;
+    Circulator_on_faces cfbegin = incident_faces(vertexTab[vertexIdx]), cf;
+    cf = cfbegin;
+    // Ajouter à la file les triangles autour de vertexIdx
+    do {
+        file.push(cf->idx());
+        ++cf;
+    } while(cf != cfbegin);
 
-        if(isInTriangle(a, b, c, p) > 0){
-            int vertexIndex = this->vertexTab.size();
-            this->vertexTab.push_back(Vertex(p, 0, vertexIndex));
-            splitTriangle(vertexIndex, faceIndex);
-            into=true;
+    while (!file.empty()) {
+        // On défile
+        f1 = file.front();
+        file.pop();
+        if (isFaceFictive(f1)) continue;
+        // Tester si localement de Delaunay : regarder si d dans le cercle du
+        // triangle abc (f1)
+        a = vertexTab[vertexIdx].point(); // a = nouveau sommet inséré
 
-            //Une fois que le point est inseré par split, il faut faire les flips (TP3)
-            std::queue<std::array<int, 2>> file;
-            bool ZoneDeConflitVide = false;
-
-            while(!ZoneDeConflitVide){
-                //On enfile la zone de conflit
-                Circulator_on_faces cf, cfbegin;
-                cfbegin = this->incident_faces(this->vertexTab[vertexIndex]);
-                cf = cfbegin;
-                do{
-                    int localementDeD = localementDeDelaunay(vertexIndex, *cf);
-                    if(localementDeD < 0){
-                        file.push(std::array<int,2> {cf->idx(), vertexIndex});
-                    }
-                    cf++;
-                }while(cf != cfbegin);
-
-                //On defile si necessaire
-                if(file.size() > 0){
-                    defile(&file);
-                }else{
-                    ZoneDeConflitVide = true;
-                }
+        for (int i = 0; i < 3; ++i) {
+            if (faceTab[f1].vertices()[i] == vertexIdx) {
+                // b,c = arête candidate pour le flip
+                b = vertexTab[faceTab[f1].vertices()[(i + 1) % 3]].point();
+                c = vertexTab[faceTab[f1].vertices()[(i + 2) % 3]].point();
+                // f2 = triangle opposé à a.
+                f2 = faceTab[f1].adjacentFaces()[i];
+                break;
             }
         }
-        faceIndex++;
-    }*/
+        if (isFaceFictive(f2)) continue;
+
+        // d = sommet opposé au triangle f1 dans f2.
+        for (int i = 0; i < 3; ++i) {
+            if (faceTab[f2].adjacentFaces()[i] == f1) {
+                d = vertexTab[faceTab[f2].vertices()[i]].point();
+                break;
+            }
+        }
+        if (etreDansCercle(a, b, c, d)) { // Triangle pas localement de Delaunay
+            // -> flip
+            flipEdge(f1, f2);
+            // Ajouter les deux nouvelles arêtes formées
+            file.push(f1);
+            file.push(f2);
+        }
+    }
 }

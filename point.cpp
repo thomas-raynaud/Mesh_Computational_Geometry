@@ -55,17 +55,6 @@ int etreDansCercle(const Point &a, const Point &b, const Point &c, const Point &
     Point r = difference(c, a);
     Point s = difference(d, a);
     // -signe(((PHI(q) - PHI(p)) X (PHI(q) - PHI(p))) . (PHI(s) - PHI(p)))
-    return -(dotProduct(crossProduct(difference(phi(q), phi(p)), difference(phi(r), phi(p))), difference(phi(s), phi(p))));
-}
-
-int localementDeDelaunayUtil(const Point &a, const Point &b, const Point &c, const Point &d){
-    int testA = etreDansCercle(a, b, c, d);
-    int testB = etreDansCercle(c, b, d, a);
-    if((testA > 0) && (testB > 0)){
-        return 1;
-    }else if((testA < 0) || (testB < 0)){
-        return -1;
-    }else{
-        return 0; // a, b, c et d co-cycliques
-    }
+    double res = -(dotProduct(crossProduct(difference(phi(q), phi(p)), difference(phi(r), phi(p))), difference(phi(s), phi(p))));
+    return res > 0;
 }
