@@ -34,7 +34,7 @@ public:
     void switchTP(int index);
 
     void flipRandomEdge();
-    void splitRandomTriangle();
+    void insertPoint();
 
 protected:
     // Mouse Management
@@ -46,7 +46,7 @@ private:
 
     QTimer _timer; // To update the scene
     float _X, _Y ,_Z; // Translation
-    float _angle; // Rotation
+    float _angleX, _angleY; // Rotation
     int _curveAxis;
     int _meshType;
     bool _wireframe_display;

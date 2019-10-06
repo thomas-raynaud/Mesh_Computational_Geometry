@@ -111,9 +111,9 @@
          </widget>
         </item>
         <item>
-         <widget class="QPushButton" name="pushButtonSplitTriangle">
+         <widget class="QPushButton" name="pushButtonInsertPoint">
           <property name="text">
-           <string>Split a random triangle</string>
+           <string>Insert a point</string>
           </property>
          </widget>
         </item>

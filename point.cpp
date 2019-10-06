@@ -23,7 +23,7 @@ Point scalarProduct(double t, Point x){
     return Point(t*x.x(), t*x.y(), t*x.z());
 }
 
-int testOrientation(const Point &a, const Point &b, const Point &c) {
+float testOrientation(const Point &a, const Point &b, const Point &c) {
     // On travaille en 2D -> Z à 0
     Point p(a.x(), a.y(), 0), q(b.x(), b.y(), 0), r(c.x(), c.y(), 0);
     Point pq(difference(p, q));
@@ -32,54 +32,40 @@ int testOrientation(const Point &a, const Point &b, const Point &c) {
 }
 
 int isInTriangle(const Point &a, const Point &b, const Point &c, const Point &d) {
-    int orientationABC = sign(testOrientation(a, b, c));
-    int orientationABD = sign(testOrientation(a, b, d));
-    int orientationCAD = sign(testOrientation(a, c, d));
-    int orientationCBD = sign(testOrientation(c, b, d));
-    if (sign(orientationABC) != sign(orientationABD) ||
-        sign(orientationABC) != sign(orientationCAD) ||
-        sign(orientationABC) != sign(orientationCBD)) { // Orientation différente -> d en dehors
-        return -1;
-    } else if (orientationABD == 0 || orientationCAD == 0 || orientationCBD == 0) { // d sur une des arêtes
+    float orientationABC = testOrientation(a, b, c);
+    float orientationABD = testOrientation(a, b, d);
+    float orientationCAD = testOrientation(c, a, d);
+    float orientationCDB = testOrientation(c, d, b);
+    if ((orientationABC > 0.f) != (orientationABD > 0.f) ||
+        (orientationABC > 0.f) != (orientationCAD > 0.f) ||
+        (orientationABC > 0.f) != (orientationCDB > 0.f)) { // Orientation différente -> d en dehors
         return 0;
     }
     return 1; // d dans le triangle
 }
 
-Point phi(const Point &a){
-    return Point(a.x(), a.y(), a.x()*a.x()+a.y()*a.y());
+Point phi(const Point &a) {
+    return Point(a.x(), a.y(), a.x() * a.x() + a.y() * a.y());
 }
 
-int conflictTriangle(const Point &a, const Point &b, const Point &c, const Point &d){
-    Point ba = difference(phi(b), phi(a));
-    Point ca = difference(phi(c), phi(a));
-    Point da = difference(phi(d), phi(a));
-    //cross product
-    Point cp = crossProduct(ba, ca);
-    //dot product
-    double dp = dotProduct(cp, da);
-    if(dp > 0){
-        return -1;
-    }else if(dp < 0){
-        return 1;
-    }else{
-        return 0;
-    }
+int etreDansCercle(const Point &a, const Point &b, const Point &c, const Point &d) {
+    // p, q, r, s correspondent aux points a, b, c, d avec p au milieu de la parabole phi
+    Point p = Point(0, 0, 0);
+    Point q = difference(b, a);
+    Point r = difference(c, a);
+    Point s = difference(d, a);
+    // -signe(((PHI(q) - PHI(p)) X (PHI(q) - PHI(p))) . (PHI(s) - PHI(p)))
+    return -(dotProduct(crossProduct(difference(phi(q), phi(p)), difference(phi(r), phi(p))), difference(phi(s), phi(p))));
 }
 
 int localementDeDelaunayUtil(const Point &a, const Point &b, const Point &c, const Point &d){
-    int testA = conflictTriangle(a, b, c, d);
-    int testB = conflictTriangle(c, b, d, a);
+    int testA = etreDansCercle(a, b, c, d);
+    int testB = etreDansCercle(c, b, d, a);
     if((testA > 0) && (testB > 0)){
         return 1;
-    }else if((testA <0) || (testB < 0)){
+    }else if((testA < 0) || (testB < 0)){
         return -1;
     }else{
-        return 0;
+        return 0; // a, b, c et d co-cycliques
     }
-}
-
-int sign(int val) {
-    if (val >= 0) return 1;
-    return -1;
 }

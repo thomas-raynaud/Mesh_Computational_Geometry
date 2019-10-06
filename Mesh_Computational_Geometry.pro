@@ -18,7 +18,9 @@ SOURCES += main.cpp\
     mesh.cpp \
     point.cpp \
     opengldisplaymesh.cpp \
-    color.cpp
+    color.cpp \
+    curvaturemesh.cpp \
+    delaunaymesh.cpp
 
 HEADERS  += mainwindow.h \
     gldisplaywidget.h \
