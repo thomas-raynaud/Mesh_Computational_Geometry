@@ -20,10 +20,11 @@ class Vertex {
     std::array<double, 3> _rgb; // couleur du sommet
     int _idx;                   // Indice du sommet dans le mesh
     bool _isFictive;            // true si sommet infini
+    bool _display;
 
 public:
     Vertex(Point p, int face, int idx, bool isFictive=false) : _point(p), _face(face), _idx(idx),
-        _isFictive(isFictive) {}
+        _isFictive(isFictive), _display(true) {}
     Vertex() {}
 
     // get
@@ -31,11 +32,13 @@ public:
     int face() const { return _face; }
     int idx() const { return _idx; }
     bool isFictive() const { return _isFictive; }
+    bool isVisible() const { return _display; }
     std::array<double, 3> color() const { return _rgb; }
     // set
     void setFace(int face) { _face = face; }
     void setColor(std::array<double, 3> rgb) { _rgb = rgb; }
     void setPoint(Point p) {_point = p; }
+    void setDisplay(bool display) {_display = display; }
 };
 
 
@@ -115,6 +118,13 @@ public:
         return vertexTab[faceVertices[0]].isFictive() ||
                 vertexTab[faceVertices[1]].isFictive() ||
                 vertexTab[faceVertices[2]].isFictive();
+    }
+
+    bool isFaceVisible(int face) {
+        std::array<int, 3> faceVertices = faceTab[face].vertices();
+        return vertexTab[faceVertices[0]].isFictive() || !vertexTab[faceVertices[0]].isVisible() ||
+                vertexTab[faceVertices[1]].isFictive() || !vertexTab[faceVertices[1]].isVisible() ||
+                vertexTab[faceVertices[2]].isFictive() || !vertexTab[faceVertices[2]].isVisible();
     }
 
 
@@ -198,6 +208,7 @@ public:
 class Parabola : public Mesh2D { // Mesh construit à partir de (x,y) |--> (x^2+y^2)
 public: Parabola();
     virtual ~Parabola() {}
+    void drawMesh();
 };
 
 

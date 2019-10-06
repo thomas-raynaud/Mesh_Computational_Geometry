@@ -12,10 +12,13 @@ std::vector<Point> Mesh::getLaplacians() {
 
     // Parcours de tous les sommets du mesh
     for (it_v = this->vertices_begin(); it_v !=this->vertices_past_the_end(); ++it_v) {
-
+        if (it_v->isFictive()) continue;
+        //std::cout << "begin loop v" << std::endl;
         // Calcul de de l'aire
         // On parcourt toutes les faces qui ont le sommet it_v
+        //std::cout << "if begin" << std::endl;
         cfbegin = this->incident_faces(*it_v);
+        //std::cout << "if end" << std::endl;
         cf = cfbegin;
         A = 0;
 

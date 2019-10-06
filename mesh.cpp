@@ -162,15 +162,15 @@ Mesh2D::Mesh2D() {
 }
 
 Parabola::Parabola() : Mesh2D() {
-
     // Changement de profondeur des sommets existants
-    /*for (QVector<Vertex>::iterator vertex_it = vertexTab.begin(); vertex_it != vertexTab.end(); ++vertex_it) {
+    for (QVector<Vertex>::iterator vertex_it = vertexTab.begin(); vertex_it != vertexTab.end(); ++vertex_it) {
         if (vertex_it->isFictive()) continue;
         vertex_it->setPoint(phi(vertex_it->point()));
-    }*/
+        vertex_it->setDisplay(false);
+    }
 
     //On simule la fonction
-    /*double n=10; //precision du maillage
+    double n=15; //precision du maillage
     for(int xIndex = 0; xIndex < n; xIndex++){
         for(int yIndex = 0; yIndex < n; yIndex++){
             double x;
@@ -187,10 +187,20 @@ Parabola::Parabola() : Mesh2D() {
             //Ajout du point
             insertion(Point(x, y, z));
         }
-    }*/
-    // insertion(Point(0, 0, 0));
-
-     //print();
+    }
+    // Attribution des couleurs
+    // trouver zmin et zmax
+    double zmin = DBL_MAX, zmax = 0.0, hue;
+    for (QVector<Vertex>::iterator vertex_it = vertexTab.begin(); vertex_it != vertexTab.end(); ++vertex_it) {
+        if (vertex_it->isFictive() || !vertex_it->isVisible()) continue;
+        zmin = std::min(zmin, vertex_it->point().z());
+        zmax = std::max(zmax, vertex_it->point().z());
+    }
+    for (QVector<Vertex>::iterator vertex_it = vertexTab.begin(); vertex_it != vertexTab.end(); ++vertex_it) {
+        // Courbure faible : vert, à courbure forte : rouge
+        hue = ((vertex_it->point().z() - zmin) / zmax) * 270.0 + 90.0;
+        vertex_it->setColor(hsv2rgb(hue, 1.0, 1.0));
+    }
 }
 
 
@@ -218,6 +228,7 @@ Circulator_on_faces Mesh::incident_faces(Vertex &v) {
     do { // Tant qu'on n'a pas faire le tour du sommet v, on accumule les faces incidentes.
         // Trouver l'indice de v dans la face actuelle.
         for (int i = 0; i < 3; ++i) {
+            //std::cout << face_actuelle << std::endl;
             if (faceTab[face_actuelle].vertices()[i] == v.idx()) {
                 id_v_oppose = (i + 1) % 3;
             }

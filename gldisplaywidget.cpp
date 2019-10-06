@@ -100,6 +100,7 @@ void GLDisplayWidget::switchTP(int index) {
     } else {
         delete _mesh;
         _mesh = new Parabola();
+        //_mesh = new Mesh2D();
     }
 }
 

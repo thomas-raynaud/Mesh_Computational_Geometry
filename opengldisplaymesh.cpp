@@ -17,7 +17,7 @@ void Mesh::drawMesh() {
         Vertex a, b, c;
         std::array<int, 3> faceVertices = face_it->vertices();
         // Ne pas afficher les faces ayant un point fictif
-        if (isFaceFictive(face_it->idx())) continue;
+        if (isFaceVisible(face_it->idx())) continue;
 
         a = vertexTab[faceVertices[0]];
         b = vertexTab[faceVertices[1]];
@@ -41,7 +41,7 @@ void Mesh::drawMeshWireFrame() {
         Vertex a, b, c;
         std::array<int, 3> faceVertices = face_it->vertices();
         // Ne pas afficher les faces ayant un point fictif
-        if (isFaceFictive(face_it->idx())) continue;
+        if (isFaceVisible(face_it->idx())) continue;
 
         a = vertexTab[faceVertices[0]];
         b = vertexTab[faceVertices[1]];
@@ -76,7 +76,7 @@ void Mesh2D::drawMesh() {
         Vertex a, b, c;
         std::array<int, 3> faceVertices = face_it->vertices();
         // Ne pas afficher les faces ayant un point fictif
-        //if (isFaceFictive(face_it->idx())) continue;
+        if (isFaceVisible(face_it->idx())) continue;
 
         a = vertexTab[faceVertices[0]];
         b = vertexTab[faceVertices[1]];
@@ -92,13 +92,17 @@ void Mesh2D::drawMesh() {
     }
 }
 
+void Parabola::drawMesh() {
+    Mesh::drawMesh();
+}
+
 // Draw the wireframe of the mesh
 void Mesh2D::drawMeshWireFrame() {
     for (QVector<Face>::iterator face_it = faceTab.begin() ; face_it != faceTab.end(); ++face_it) {
         Vertex a, b, c;
         std::array<int, 3> faceVertices = face_it->vertices();
         // Ne pas afficher les faces ayant un point fictif
-        if (isFaceFictive(face_it->idx())) continue;
+        if (isFaceVisible(face_it->idx())) continue;
 
         a = vertexTab[faceVertices[0]];
         b = vertexTab[faceVertices[1]];

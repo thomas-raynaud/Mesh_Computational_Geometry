@@ -237,6 +237,7 @@ void Mesh2D::insertion(Point p) {
             return;
         }
     }
+    vertexTab.pop_back(); // ERROR, TODO: check
 }
 
 void Mesh2D::rearrangeDelaunay(int vertexIdx) {
