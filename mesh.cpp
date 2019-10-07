@@ -147,9 +147,9 @@ QueenMesh::QueenMesh() {
 
 Mesh2D::Mesh2D() {
     // Création des points
-    vertexTab.push_back(Vertex(Point(-1,  0, 0), 0, 0));
-    vertexTab.push_back(Vertex(Point( 1, -1, 0), 0, 1));
-    vertexTab.push_back(Vertex(Point( 1,  1, 0), 0, 2));
+    vertexTab.push_back(Vertex(Point(-100,  0, 0), 0, 0));
+    vertexTab.push_back(Vertex(Point( 100, -100, 0), 0, 1));
+    vertexTab.push_back(Vertex(Point( 100,  100, 0), 0, 2));
 
     vertexTab.push_back(Vertex(Point(0, 0, -1), 1, 3, true)); // Sommet infini
     _inf_v = 3;
@@ -169,10 +169,18 @@ Parabola::Parabola() : Mesh2D() {
         vertex_it->setDisplay(false);
     }
 
+    double x, y, z;
+
     //On simule la fonction
-    double n=15; //precision du maillage
-    for(int xIndex = 0; xIndex < n; xIndex++){
-        for(int yIndex = 0; yIndex < n; yIndex++){
+    double n = 2000; //precision du maillage
+    for(int i = 0; i < n; i++){
+        x = -0.5 + (((float) rand()) / (float) RAND_MAX) * 1.0;
+        y = -0.5 + (((float) rand()) / (float) RAND_MAX) * 1.0;
+
+        z = pow(x, 2) + pow(y, 2);
+        //if (z > 0.5) z = z / 2500.0;
+        insertion(Point(x, y, z));
+        /*for(int yIndex = 0; yIndex < n; yIndex++){
             double x;
             double y;
             double z;
@@ -186,7 +194,7 @@ Parabola::Parabola() : Mesh2D() {
 
             //Ajout du point
             insertion(Point(x, y, z));
-        }
+        }*/
     }
     // Attribution des couleurs
     // trouver zmin et zmax
