@@ -306,15 +306,21 @@ int Mesh2D::localementDeDelaunay(int vertexIndex,Face face){
     int FaceBIndex = face.adjacentFaces()[aLocalIndex];
     for(int localVertexIndex = 0; localVertexIndex < 3; localVertexIndex++){
         int tmpVertexIndex = this->faceTab[FaceBIndex].vertices()[localVertexIndex];
+        std::cout<<tmpVertexIndex<<std::endl;
         if((tmpVertexIndex != bEtc[0]) && (tmpVertexIndex != bEtc[1])){
             dIndex = this->faceTab[FaceBIndex].vertices()[localVertexIndex];
         }
     }
+
     //tester si l'arrête est localement de D
     Point aLoc = this->vertexTab[vertexIndex].point();
     Point bLoc = this->vertexTab[bEtc[0]].point();
     Point cLoc = this->vertexTab[bEtc[1]].point();
-    Point dLoc = this->vertexTab[dIndex].point();
+    if(dIndex == -1){
+        return 1;
+    }
+    Point dLoc = this->vertexTab[dIndex].point();//------ERREUR
+
     return localementDeDelaunayUtil(aLoc, bLoc, cLoc, dLoc);
 
 }
@@ -375,7 +381,7 @@ void Mesh2D::insertion(Point p){
                 cfbegin = this->incident_faces(this->vertexTab[vertexIndex]);
                 cf = cfbegin;
                 do{
-                    int localementDeD = localementDeDelaunay(vertexIndex, *cf);
+                    int localementDeD = localementDeDelaunay(vertexIndex, *cf); //------ERREUR
                     if(localementDeD < 0){
                         file.push(std::array<int,2> {cf->idx(), vertexIndex});
                     }
