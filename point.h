@@ -34,10 +34,11 @@ public:
 };
 
 Point difference(Point, Point);
+Point somme(Point, Point);
 Point crossProduct(Point, Point);
 double dotProduct(Point a, Point);
 Point scalarProduct(double, Point);
-
+double tan(Point, Point, Point);
 /* Prédicats géométriques*/
 // Retourne une valeur > à 0 si abc est orienté dans le sens trigonométrique
 float testOrientation(const Point &a, const Point &b, const Point &c);

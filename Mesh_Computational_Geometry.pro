@@ -20,7 +20,8 @@ SOURCES += main.cpp\
     opengldisplaymesh.cpp \
     color.cpp \
     curvaturemesh.cpp \
-    delaunaymesh.cpp
+    delaunaymesh.cpp \
+    voronoi.cpp
 
 HEADERS  += mainwindow.h \
     gldisplaywidget.h \

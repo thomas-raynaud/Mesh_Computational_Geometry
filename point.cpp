@@ -7,6 +7,10 @@ double Point::norm() {
 Point difference(const Point a, const Point b) {
     return Point(a.x() - b.x(), a.y() - b.y(), a.z() - b.z());
 }
+Point somme(const Point a, const Point b) {
+    return Point(a.x() + b.x(), a.y() + b.y(), a.z() + b.z());
+}
+
 
 Point crossProduct(Point u, Point v) {
     double w1 = u.y() * v.z() - u.z() * v.y();
@@ -57,4 +61,15 @@ int etreDansCercle(const Point &a, const Point &b, const Point &c, const Point &
     // -signe(((PHI(q) - PHI(p)) X (PHI(q) - PHI(p))) . (PHI(s) - PHI(p)))
     double res = -(dotProduct(crossProduct(difference(phi(q), phi(p)), difference(phi(r), phi(p))), difference(phi(s), phi(p))));
     return res > 0;
+}
+double tan(Point a, Point b, Point c){
+    //Tangente d'un angle ABC
+    Point BA;
+    Point BC;
+    BA = difference(a, b);
+    BC = difference(c, b);
+    double num = dotProduct(crossProduct(BA, BC), Point(0,0,1));
+    double den = dotProduct(BA, BC);
+    return num / den;
+
 }
