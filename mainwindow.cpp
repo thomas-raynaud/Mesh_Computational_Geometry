@@ -7,7 +7,8 @@ MainWindow::MainWindow(QWidget *parent) :
     ui(new Ui::MainWindow)
 {
     ui->setupUi(this);
-    ui->verticalWidgetTP2->hide();
+    ui->pushButtonFlipEdge->hide();
+    ui->pushButtonInsertPoint->hide();
 }
 
 MainWindow::~MainWindow()
@@ -34,11 +35,15 @@ void MainWindow::on_comboBoxColorswitch_currentIndexChanged(int index) {
 void MainWindow::on_comboBoxTPswitch_currentIndexChanged(int index)
 {
     if (index == 0) {
-        ui->verticalWidgetTP1->show();
-        ui->verticalWidgetTP2->hide();
+        ui->pushButtonFlipEdge->hide();
+        ui->pushButtonInsertPoint->hide();
+        ui->comboBoxColorswitch->show();
+        ui->comboBoxMeshswitch->show();
     } else {
-        ui->verticalWidgetTP1->hide();
-        ui->verticalWidgetTP2->show();
+        ui->pushButtonFlipEdge->show();
+        ui->pushButtonInsertPoint->show();
+        ui->comboBoxColorswitch->hide();
+        ui->comboBoxMeshswitch->hide();
     }
    ui->widget->switchTP(index);
 }
@@ -48,7 +53,7 @@ void MainWindow::on_pushButtonFlipEdge_released()
     ui->widget->flipRandomEdge();
 }
 
-void MainWindow::on_pushButtonSplitTriangle_released()
+void MainWindow::on_pushButtonInsertPoint_released()
 {
-    ui->widget->splitRandomTriangle();
+    ui->widget->insertPoint();
 }

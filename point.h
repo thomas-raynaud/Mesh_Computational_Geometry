@@ -38,17 +38,15 @@ Point crossProduct(Point, Point);
 double dotProduct(Point a, Point);
 Point scalarProduct(double, Point);
 
-// Prédicats géométriques
-int testOrientation(const Point &a, const Point &b, const Point &c);
+/* Prédicats géométriques*/
+// Retourne une valeur > à 0 si abc est orienté dans le sens trigonométrique
+float testOrientation(const Point &a, const Point &b, const Point &c);
 int isInTriangle(const Point &a, const Point &b, const Point &c, const Point &d);
-//d est dans le cercle circonscrit à (a,b,c) ?
-int conflictTriangle(const Point &a, const Point &b, const Point &c, const Point &d);
-//On part du tgl (a,b,c), on rajoute le point d, on regarde si l'arret ORRIENTE bc est localement de D
-int localementDeDelaunayUtil(const Point &a, const Point &b, const Point &c, const Point &d);
+// d est dans le cercle circonscrit au triangle (a,b,c) ? (a,b,c) orienté dans le sens trigonométrique
+int etreDansCercle(const Point &a, const Point &b, const Point &c, const Point &d);
 
 
-int sign(int val);
-//La parabole usuelle
+//La parabole x*x + y*y
 Point phi(const Point &a);
 
 #endif // MATH_UTIL_H

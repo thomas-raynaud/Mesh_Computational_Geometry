@@ -49,7 +49,8 @@ void GLDisplayWidget::paintGL(){
     glTranslated(_X, _Y, _Z);
 
     // Rotation
-    glRotatef(_angle, 1.0f, 1.0f, 0.0f);
+    glRotatef(_angleY, 1.0, 0.0, 0.0f);
+    glRotatef(_angleX, 0.0, 1.0, 0.0f);
 
     // Color for your mesh
     glColor3f(0, 1 ,0);
@@ -99,6 +100,7 @@ void GLDisplayWidget::switchTP(int index) {
     } else {
         delete _mesh;
         _mesh = new Parabola();
+        //_mesh = new Mesh2D();
     }
 }
 
@@ -106,8 +108,10 @@ void GLDisplayWidget::flipRandomEdge() {
     ((Mesh2D*)_mesh)->flipRandomEdge();
 }
 
-void GLDisplayWidget::splitRandomTriangle() {
-    ((Mesh2D*)_mesh)->splitRandomTriangle();
+void GLDisplayWidget::insertPoint() {
+    double rand_x = -2.0 + (((float) rand()) / (float) RAND_MAX) * 4.0;
+    double rand_y = -2.0 + (((float) rand()) / (float) RAND_MAX) * 4.0;
+    ((Mesh2D*)_mesh)->insertion(Point(rand_x, rand_y, 0));
 }
 
 // - - - - - - - - - - - - Mouse Management  - - - - - - - - - - - - - - - -
@@ -122,11 +126,12 @@ void GLDisplayWidget::mousePressEvent(QMouseEvent *event)
 void GLDisplayWidget::mouseMoveEvent(QMouseEvent *event)
 {
     int dx = event->x() - _lastPosMouse.x();
-    // int dy = event->y() - lastPosMouse.y();
+    int dy = event->y() - _lastPosMouse.y();
 
     if( event != NULL )
     {
-        _angle += dx;
+        _angleX += dx;
+        _angleY += dy;
         _lastPosMouse = event->pos();
 
         updateGL();

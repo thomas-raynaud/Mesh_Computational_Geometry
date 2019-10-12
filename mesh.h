@@ -19,19 +19,26 @@ class Vertex {
     int _face;                  // Face incidente au sommet
     std::array<double, 3> _rgb; // couleur du sommet
     int _idx;                   // Indice du sommet dans le mesh
+    bool _isFictive;            // true si sommet infini
+    bool _display;
 
 public:
-    Vertex(Point p, int face, int idx) : _point(p), _face(face), _idx(idx) {}
+    Vertex(Point p, int face, int idx, bool isFictive=false) : _point(p), _face(face), _idx(idx),
+        _isFictive(isFictive), _display(true) {}
     Vertex() {}
 
     // get
     Point point() const { return _point; }
     int face() const { return _face; }
     int idx() const { return _idx; }
+    bool isFictive() const { return _isFictive; }
+    bool isVisible() const { return _display; }
     std::array<double, 3> color() const { return _rgb; }
     // set
     void setFace(int face) { _face = face; }
     void setColor(std::array<double, 3> rgb) { _rgb = rgb; }
+    void setPoint(Point p) {_point = p; }
+    void setDisplay(bool display) {_display = display; }
 };
 
 
@@ -72,9 +79,6 @@ public:
 
     // Ajouter la face adjacente faceIndex opposée au sommet numéro pos
     void setAdjacentFace(int faceIndex, int pos) { _adjacentFaces[pos] = faceIndex; }
-    bool isFictive() {
-        return _vertices[0] == -1 || _vertices[1] == -1 || _vertices[2] == -1;
-    }
 };
 
 
@@ -109,6 +113,20 @@ public:
     // Calculer la couleur des sommets en fonction de la courbure moyenne
     void computeColors(int curveAxis);
 
+    bool isFaceFictive(int face) {
+        std::array<int, 3> faceVertices = faceTab[face].vertices();
+        return vertexTab[faceVertices[0]].isFictive() ||
+                vertexTab[faceVertices[1]].isFictive() ||
+                vertexTab[faceVertices[2]].isFictive();
+    }
+
+    bool isFaceVisible(int face) {
+        std::array<int, 3> faceVertices = faceTab[face].vertices();
+        return vertexTab[faceVertices[0]].isFictive() || !vertexTab[faceVertices[0]].isVisible() ||
+                vertexTab[faceVertices[1]].isFictive() || !vertexTab[faceVertices[1]].isVisible() ||
+                vertexTab[faceVertices[2]].isFictive() || !vertexTab[faceVertices[2]].isVisible();
+    }
+
 
     friend class Iterator_on_faces;
     Iterator_on_faces faces_begin();
@@ -120,6 +138,8 @@ public:
 
     friend class Circulator_on_faces;
     Circulator_on_faces incident_faces(Vertex &);
+    // Get circulator starting at face face_start
+    Circulator_on_faces incident_faces(Vertex &, int face_start);
 
     friend class Circulator_on_vertices;
     Circulator_on_vertices neighbour_vertices(Vertex &);
@@ -161,6 +181,10 @@ public:
 
 
 class Mesh2D : public Mesh { // Mesh sur une surface 2D (TP2)
+
+protected:
+    int _inf_v; // Indice du sommet infini
+
 public:
     Mesh2D();
     virtual ~Mesh2D() {}
@@ -171,10 +195,10 @@ public:
     void flipRandomEdge();
     void splitRandomTriangle();
 
-
-    int localementDeDelaunay(int vertexIndex, Face face);
-    void defile(std::queue<std::array<int, 2>> *file);
     void insertion(Point p); // Prend un point et l'insert à la structure
+    // Réarranger les triangles du maillage après insertion du sommet vertexId
+    // pour que la triangulation soit globalement de Delaunay
+    void rearrangeDelaunay(int vertexIdx);
 
     virtual void drawMesh();
     virtual void drawMeshWireFrame();
@@ -184,6 +208,7 @@ public:
 class Parabola : public Mesh2D { // Mesh construit à partir de (x,y) |--> (x^2+y^2)
 public: Parabola();
     virtual ~Parabola() {}
+    void drawMesh();
 };
 
 
@@ -254,6 +279,14 @@ public:
 
     Circulator_on_faces& operator++() {
         idx = (idx + 1) % incidentFaces.size();
+        return *this;
+    }
+    Circulator_on_faces& operator--() {
+        idx--;
+        if (idx < 0) {
+            if (incidentFaces.size() == 0) idx = 0;
+            else idx = incidentFaces.size() - 1;
+        }
         return *this;
     }
     Circulator_on_faces operator++(int) {

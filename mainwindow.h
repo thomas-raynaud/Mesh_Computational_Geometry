@@ -26,7 +26,7 @@ private slots:
 
     void on_pushButtonFlipEdge_released();
 
-    void on_pushButtonSplitTriangle_released();
+    void on_pushButtonInsertPoint_released();
 
 private:
     Ui::MainWindow *ui;
