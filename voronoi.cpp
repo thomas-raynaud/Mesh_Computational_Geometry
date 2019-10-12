@@ -26,6 +26,6 @@ void Mesh2D::buildVoronoi(){
        Q = somme(somme(scalarProduct(coefA, A), scalarProduct(coefB, B)), scalarProduct(coefC, C));
 
        //Ajout de Q
-       this->vVertices().push_back(Q);
+       this->vVertices().push_back(Vertex(Q, 1, 1));
    }
 }
