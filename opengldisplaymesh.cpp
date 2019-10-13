@@ -94,21 +94,30 @@ void Mesh2D::drawMesh() {
 
 void Mesh2D::drawVoronoiWireFrame(){
     for(int vertexIndex = 0; vertexIndex < this->vertexTab.size(); vertexIndex++){
-       Circulator_on_faces cf, cfbegin;
-       cfbegin = this->incident_faces(this->vertexTab[vertexIndex]);
-       cf = cfbegin;
-       Vertex a, b;
-       do {
-           a = this->vVertices()[cf->idx()];
-           cf++;
-           b = this->vVertices()[cf->idx()];
+        if(!(this->vertexTab[vertexIndex].isFictive())){
+            Circulator_on_faces cf, cfbegin;
+            cfbegin = this->incident_faces(this->vertexTab[vertexIndex]);
+            cf = cfbegin;
+            Vertex a, b;
+            do {
+                a = this->vVertices()[cf->idx()];
+                cf++;
+                b = this->vVertices()[cf->idx()];
+                //std::cout<<cf->idx()<<std::endl;
+                std::cout<<this->vertexTab[vertexIndex].face()<<std::endl;
 
-           glColor3d(1, 0, 0);
-           glBegin(GL_LINE_STRIP);
-           glVertexDraw(a);
-           glVertexDraw(b);
-       }while(cf != cfbegin);
+                if(a.point().z()<0.0001 & b.point().z()<0.0001){
+                    std::cout<<a.point().x()<<" "<<b.point().x()<<std::endl;
+                    glColor3d(1, 0, 0);
+                    glBegin(GL_LINE_STRIP);
+                    glVertexDraw(a);
+                    glVertexDraw(b);
+                    glEnd();
+                }
+            }while(cf != cfbegin);
+        }
     }
+
 }
 
 void Parabola::drawMesh() {
@@ -143,6 +152,8 @@ void Mesh2D::drawMeshWireFrame() {
         glVertexDraw(a);
         glEnd();
     }
+
+    this->drawVoronoiWireFrame();
 }
 
 #endif // OPENGLDISPLAYMESH_H

@@ -240,6 +240,7 @@ void Mesh2D::insertion(Point p) {
     vertexTab.pop_back(); // ERROR, TODO: check
 }
 
+
 void Mesh2D::rearrangeDelaunay(int vertexIdx) {
     // File contenant des indices de triangles. On retrouve l'arête à tester
     // en prenant l'arête opposée dans le triangle à vertexIdx.

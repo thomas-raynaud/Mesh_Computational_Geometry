@@ -99,8 +99,8 @@ void GLDisplayWidget::switchTP(int index) {
         switchCurveAxis(_curveAxis);
     } else {
         delete _mesh;
-        _mesh = new Parabola();
-        //_mesh = new Mesh2D();
+        //_mesh = new Parabola();
+        _mesh = new Mesh2D();
     }
 }
 
@@ -112,6 +112,7 @@ void GLDisplayWidget::insertPoint() {
     double rand_x = -2.0 + (((float) rand()) / (float) RAND_MAX) * 4.0;
     double rand_y = -2.0 + (((float) rand()) / (float) RAND_MAX) * 4.0;
     ((Mesh2D*)_mesh)->insertion(Point(rand_x, rand_y, 0));
+    ((Mesh2D*)_mesh)->buildVoronoi();
 }
 
 // - - - - - - - - - - - - Mouse Management  - - - - - - - - - - - - - - - -

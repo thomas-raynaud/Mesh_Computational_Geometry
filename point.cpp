@@ -68,8 +68,9 @@ double tan(Point a, Point b, Point c){
     Point BC;
     BA = difference(a, b);
     BC = difference(c, b);
-    double num = dotProduct(crossProduct(BA, BC), Point(0,0,1));
+    double num = dotProduct(crossProduct(BC, BA), Point(0,0,1));
     double den = dotProduct(BA, BC);
+
     return num / den;
 
 }

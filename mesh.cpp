@@ -159,6 +159,8 @@ Mesh2D::Mesh2D() {
     faceTab.push_back(Face({1, 3, 2}, {2, 0, 3}, 1));  // face 1
     faceTab.push_back(Face({0, 2, 3}, {1, 3, 0}, 2));  // face 2
     faceTab.push_back(Face({0, 3, 1}, {1, 0, 2}, 3));  // face 3
+
+    this->buildVoronoi();
 }
 
 Parabola::Parabola() : Mesh2D() {
