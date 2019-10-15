@@ -238,7 +238,6 @@ Circulator_on_faces Mesh::incident_faces(Vertex &v) {
     do { // Tant qu'on n'a pas faire le tour du sommet v, on accumule les faces incidentes.
         // Trouver l'indice de v dans la face actuelle.
         for (int i = 0; i < 3; ++i) {
-            //std::cout << face_actuelle << std::endl;
             if (faceTab[face_actuelle].vertices()[i] == v.idx()) {
                 id_v_oppose = (i + 1) % 3;
             }

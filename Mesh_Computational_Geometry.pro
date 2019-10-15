@@ -21,7 +21,8 @@ SOURCES += main.cpp\
     color.cpp \
     curvaturemesh.cpp \
     delaunaymesh.cpp \
-    voronoi.cpp
+    voronoi.cpp \
+    visibilitymarch.cpp
 
 HEADERS  += mainwindow.h \
     gldisplaywidget.h \

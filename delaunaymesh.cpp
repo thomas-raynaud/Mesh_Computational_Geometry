@@ -227,17 +227,18 @@ void Mesh2D::insertion(Point p) {
 
     // Le point est dans l'enveloppe convexe, trouver dans quelle face elle se
     // trouve
-    for (QVector<Face>::iterator face_it = faceTab.begin(); face_it != faceTab.end(); ++face_it) {
-        a = vertexTab[face_it->vertices()[0]].point();
-        b = vertexTab[face_it->vertices()[1]].point();
-        c = vertexTab[face_it->vertices()[2]].point();
-        if (isInTriangle(a, b, c, p) && !isFaceFictive(face_it->idx())) {
-            splitTriangle(vertexTab.size() - 1, face_it->idx());
-            rearrangeDelaunay(vertexTab.size() - 1);
-            return;
-        }
-    }
-    vertexTab.pop_back(); // ERROR, TODO: check
+
+    // Marche de visibilité
+    // On part d'une face aléatoire
+    int faceIdx = rand() % faceTab.size();
+    while (isFaceFictive(faceIdx)) faceIdx = (faceIdx + 1) % faceTab.size();
+    int prevFaceIdx = faceIdx;
+    do {
+        prevFaceIdx = faceIdx;
+        faceIdx = takeStepVisibilityMarch(faceIdx, vertexTab.size() - 1);
+    } while (faceIdx != -1); // On est arrivé dans le bon triangle
+    splitTriangle(vertexTab.size() - 1, prevFaceIdx);
+    rearrangeDelaunay(vertexTab.size() - 1);
 }
 
 

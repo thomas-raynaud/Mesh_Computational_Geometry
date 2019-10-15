@@ -104,10 +104,10 @@ void Mesh2D::drawVoronoiWireFrame(){
                 cf++;
                 b = this->vVertices()[cf->idx()];
                 //std::cout<<cf->idx()<<std::endl;
-                std::cout<<this->vertexTab[vertexIndex].face()<<std::endl;
+                //std::cout<<this->vertexTab[vertexIndex].face()<<std::endl;
 
                 if(a.point().z()<0.0001 & b.point().z()<0.0001){
-                    std::cout<<a.point().x()<<" "<<b.point().x()<<std::endl;
+                    //std::cout<<a.point().x()<<" "<<b.point().x()<<std::endl;
                     glColor3d(1, 0, 0);
                     glBegin(GL_LINE_STRIP);
                     glVertexDraw(a);
