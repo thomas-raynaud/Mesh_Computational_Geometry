@@ -22,8 +22,8 @@ void Mesh2D::buildVoronoi(){
            coefA = 0.5*(tanC + tanB);
            coefB = 0.5*(tanC + tanA);
            coefC = 0.5*(tanA + tanB);
-           //double sum = 1 / (coefA + coefB + coefC);
-           double sum = 1;
+           double sum = 1 / (coefA + coefB + coefC);
+           //double sum = 1;
            coefA = coefA * sum;
            coefB = coefB * sum;
 
