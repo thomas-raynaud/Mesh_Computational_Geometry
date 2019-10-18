@@ -29,22 +29,35 @@ public:
           }
         return _x;
     }
+    Point operator* (int v) {
+        return Point(_x * v, _y * v, _z * v);
+    }
+    Point operator+ (Point p) {
+        return Point(_x + p._x, _y + p._y, _z + p._z);
+    }
     // Opérations sur des points/vectors
     double norm();
+
+    friend Point operator*(const double& v, const Point& p);
+    friend Point operator+(const Point& p1, const Point& p2);
 };
 
 Point difference(Point, Point);
 Point somme(Point, Point);
 Point crossProduct(Point, Point);
-double dotProduct(Point a, Point);
-Point scalarProduct(double, Point);
-double tan(Point, Point, Point);
+double dotProduct(Point, Point);
+double tangente(Point, Point, Point);
+Point operator*(const double& v, const Point& p);
+Point operator+(const Point& p1, const Point& p2);
+
 /* Prédicats géométriques*/
 // Retourne une valeur > à 0 si abc est orienté dans le sens trigonométrique
 float testOrientation(const Point &a, const Point &b, const Point &c);
 int isInTriangle(const Point &a, const Point &b, const Point &c, const Point &d);
 // d est dans le cercle circonscrit au triangle (a,b,c) ? (a,b,c) orienté dans le sens trigonométrique
 int etreDansCercle(const Point &a, const Point &b, const Point &c, const Point &d);
+
+double sign(double v);
 
 
 //La parabole x*x + y*y

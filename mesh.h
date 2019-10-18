@@ -122,9 +122,9 @@ public:
 
     bool isFaceVisible(int face) {
         std::array<int, 3> faceVertices = faceTab[face].vertices();
-        return vertexTab[faceVertices[0]].isFictive() || !vertexTab[faceVertices[0]].isVisible() ||
-                vertexTab[faceVertices[1]].isFictive() || !vertexTab[faceVertices[1]].isVisible() ||
-                vertexTab[faceVertices[2]].isFictive() || !vertexTab[faceVertices[2]].isVisible();
+        return !vertexTab[faceVertices[0]].isFictive() && vertexTab[faceVertices[0]].isVisible() &&
+                !vertexTab[faceVertices[1]].isFictive() && vertexTab[faceVertices[1]].isVisible() &&
+                !vertexTab[faceVertices[2]].isFictive() && vertexTab[faceVertices[2]].isVisible();
     }
 
 

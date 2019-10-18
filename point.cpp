@@ -23,8 +23,11 @@ double dotProduct(Point a, Point b) {
     return a.x() * b.x() + a.y() * b.y() + a.z() * b.z();
 }
 
-Point scalarProduct(double t, Point x){
-    return Point(t*x.x(), t*x.y(), t*x.z());
+Point operator*(const double& v, const Point& p) {
+    return Point(v * p._x, v * p._y, v * p._z);
+}
+Point operator+(const Point& p1, const Point& p2) {
+    return Point(p1._x + p2._x, p1._y + p2._y, p1._z + p2._z);
 }
 
 float testOrientation(const Point &a, const Point &b, const Point &c) {
@@ -62,15 +65,17 @@ int etreDansCercle(const Point &a, const Point &b, const Point &c, const Point &
     double res = -(dotProduct(crossProduct(difference(phi(q), phi(p)), difference(phi(r), phi(p))), difference(phi(s), phi(p))));
     return res > 0;
 }
-double tan(Point a, Point b, Point c){
-    //Tangente d'un angle ABC
-    Point BA;
-    Point BC;
-    BA = difference(a, b);
-    BC = difference(c, b);
-    double num = dotProduct(crossProduct(BC, BA), Point(0,0,1));
-    double den = dotProduct(BA, BC);
+double tangente(Point a, Point b, Point c){
+    //Tangente de l'angle ABC
+    Point BA = difference(a, b);
+    Point BC = difference(c, b);
+    Point k(0, 0, 1);
+    Point BCxBA = crossProduct(BC, BA);
+    return sign(dotProduct(BCxBA, k)) * BCxBA.norm() / dotProduct(BA, BC);
+}
 
-    return num / den;
-
+double sign(double v) {
+    if (v > 0) return 1.0;
+    else if (v < 0) return -1.0;
+    else return 0.0;
 }

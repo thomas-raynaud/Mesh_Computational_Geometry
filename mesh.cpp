@@ -147,9 +147,9 @@ QueenMesh::QueenMesh() {
 
 Mesh2D::Mesh2D() {
     // Création des points
-    vertexTab.push_back(Vertex(Point(-100,  0, 0), 0, 0));
-    vertexTab.push_back(Vertex(Point( 100, -100, 0), 0, 1));
-    vertexTab.push_back(Vertex(Point( 100,  100, 0), 0, 2));
+    vertexTab.push_back(Vertex(Point(-20,  0, 0), 0, 0));
+    vertexTab.push_back(Vertex(Point( 20, -20, 0), 0, 1));
+    vertexTab.push_back(Vertex(Point( 20,  20, 0), 0, 2));
 
     vertexTab.push_back(Vertex(Point(0, 0, -1), 1, 3, true)); // Sommet infini
     _inf_v = 3;

@@ -17,7 +17,7 @@ void Mesh::drawMesh() {
         Vertex a, b, c;
         std::array<int, 3> faceVertices = face_it->vertices();
         // Ne pas afficher les faces ayant un point fictif
-        if (isFaceVisible(face_it->idx())) continue;
+        if (!isFaceVisible(face_it->idx())) continue;
 
         a = vertexTab[faceVertices[0]];
         b = vertexTab[faceVertices[1]];
@@ -41,7 +41,7 @@ void Mesh::drawMeshWireFrame() {
         Vertex a, b, c;
         std::array<int, 3> faceVertices = face_it->vertices();
         // Ne pas afficher les faces ayant un point fictif
-        if (isFaceVisible(face_it->idx())) continue;
+        if (!isFaceVisible(face_it->idx())) continue;
 
         a = vertexTab[faceVertices[0]];
         b = vertexTab[faceVertices[1]];
@@ -92,29 +92,25 @@ void Mesh2D::drawMesh() {
     }
 }
 
-void Mesh2D::drawVoronoiWireFrame(){
-    for(int vertexIndex = 0; vertexIndex < this->vertexTab.size(); vertexIndex++){
-        if(!(this->vertexTab[vertexIndex].isFictive())){
-            Circulator_on_faces cf, cfbegin;
-            cfbegin = this->incident_faces(this->vertexTab[vertexIndex]);
-            cf = cfbegin;
-            Vertex a, b;
-            do {
-                a = this->vVertices()[cf->idx()];
-                cf++;
-                b = this->vVertices()[cf->idx()];
-                //std::cout<<cf->idx()<<std::endl;
-                //std::cout<<this->vertexTab[vertexIndex].face()<<std::endl;
+void Mesh2D::drawVoronoiWireFrame() {
+    Circulator_on_faces cf, cfbegin;
+    int f1, f2;
+    glColor3d(1, 0, 0);
+    for (QVector<Vertex>::iterator vertex_it = vertexTab.begin(); vertex_it != vertexTab.end(); ++vertex_it){
+        if (!vertex_it->isFictive()) {
 
-                if(a.point().z()<0.0001 & b.point().z()<0.0001){
-                    //std::cout<<a.point().x()<<" "<<b.point().x()<<std::endl;
-                    glColor3d(1, 0, 0);
-                    glBegin(GL_LINE_STRIP);
-                    glVertexDraw(a);
-                    glVertexDraw(b);
-                    glEnd();
-                }
-            }while(cf != cfbegin);
+            cfbegin = incident_faces(*vertex_it);
+            cf = cfbegin;
+            do {
+                f1 = cf->idx();
+                cf++;
+                f2 = cf->idx();
+                if (!isFaceVisible(f1) || !isFaceVisible(f2)) continue;
+                glBegin(GL_LINE_STRIP);
+                glVertexDraw(_vVertices[f1]);
+                glVertexDraw(_vVertices[f2]);
+                glEnd();
+            } while (cf != cfbegin);
         }
     }
 
@@ -130,7 +126,7 @@ void Mesh2D::drawMeshWireFrame() {
         Vertex a, b, c;
         std::array<int, 3> faceVertices = face_it->vertices();
         // Ne pas afficher les faces ayant un point fictif
-        if (isFaceVisible(face_it->idx())) continue;
+        if (!isFaceVisible(face_it->idx())) continue;
 
         a = vertexTab[faceVertices[0]];
         b = vertexTab[faceVertices[1]];
