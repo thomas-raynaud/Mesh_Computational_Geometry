@@ -24,9 +24,13 @@ private slots:
 
     void on_comboBoxTPswitch_currentIndexChanged(int index);
 
-    void on_pushButtonFlipEdge_released();
+    void on_pushButtonInsertNPoints_released();
 
     void on_pushButtonInsertPoint_released();
+
+    void on_pushButtonxxyy_released();
+
+    void on_pushButtonRosenbrock_released();
 
 private:
     Ui::MainWindow *ui;

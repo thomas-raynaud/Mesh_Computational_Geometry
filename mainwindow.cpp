@@ -7,8 +7,10 @@ MainWindow::MainWindow(QWidget *parent) :
     ui(new Ui::MainWindow)
 {
     ui->setupUi(this);
-    ui->pushButtonFlipEdge->hide();
+    ui->pushButtonInsertNPoints->hide();
     ui->pushButtonInsertPoint->hide();
+    ui->pushButtonxxyy->hide();
+    ui->pushButtonRosenbrock->hide();
 }
 
 MainWindow::~MainWindow()
@@ -35,25 +37,46 @@ void MainWindow::on_comboBoxColorswitch_currentIndexChanged(int index) {
 void MainWindow::on_comboBoxTPswitch_currentIndexChanged(int index)
 {
     if (index == 0) {
-        ui->pushButtonFlipEdge->hide();
+        ui->pushButtonInsertNPoints->hide();
         ui->pushButtonInsertPoint->hide();
+        ui->pushButtonxxyy->hide();
+        ui->pushButtonRosenbrock->hide();
         ui->comboBoxColorswitch->show();
         ui->comboBoxMeshswitch->show();
-    } else {
-        ui->pushButtonFlipEdge->show();
+    } else if (index == 1) {
+        ui->pushButtonInsertNPoints->show();
         ui->pushButtonInsertPoint->show();
+        ui->pushButtonxxyy->hide();
+        ui->pushButtonRosenbrock->hide();
+        ui->comboBoxColorswitch->hide();
+        ui->comboBoxMeshswitch->hide();
+    } else {
+        ui->pushButtonInsertNPoints->hide();
+        ui->pushButtonInsertPoint->hide();
+        ui->pushButtonxxyy->show();
+        ui->pushButtonRosenbrock->show();
         ui->comboBoxColorswitch->hide();
         ui->comboBoxMeshswitch->hide();
     }
    ui->widget->switchTP(index);
 }
 
-void MainWindow::on_pushButtonFlipEdge_released()
+void MainWindow::on_pushButtonInsertNPoints_released()
 {
-    ui->widget->flipRandomEdge();
+    ui->widget->insertNPoints(100);
 }
 
 void MainWindow::on_pushButtonInsertPoint_released()
 {
-    ui->widget->insertPoint();
+    ui->widget->insertNPoints(1);
+}
+
+void MainWindow::on_pushButtonxxyy_released()
+{
+    ui->widget->switchParabolaType(0);
+}
+
+void MainWindow::on_pushButtonRosenbrock_released()
+{
+    ui->widget->switchParabolaType(1);
 }

@@ -1,4 +1,31 @@
-#include "mesh.h"
+#include "meshdelaunay.h"
+
+Mesh2D::Mesh2D() {
+    // Création des points
+    vertexTab.push_back(Vertex(Point(-20,  0, 0), 0, 0));
+    vertexTab.push_back(Vertex(Point( 20, -20, 0), 0, 1));
+    vertexTab.push_back(Vertex(Point( 20,  20, 0), 0, 2));
+
+    vertexTab[0].setDisplay(false);
+    vertexTab[1].setDisplay(false);
+    vertexTab[2].setDisplay(false);
+
+    vertexTab.push_back(Vertex(Point(0, 0, -1), 1, 3, true)); // Sommet infini
+    _inf_v = 3;
+
+    // Création des faces
+    faceTab.push_back(Face({0, 1, 2}, {1, 2, 3}, 0));  // face 0
+    faceTab.push_back(Face({1, 3, 2}, {2, 0, 3}, 1));  // face 1
+    faceTab.push_back(Face({0, 2, 3}, {1, 3, 0}, 2));  // face 2
+    faceTab.push_back(Face({0, 3, 1}, {1, 0, 2}, 3));  // face 3
+
+    // Départ : insérer 3 points
+    insertion(Point(-1, -1, 0));
+    insertion(Point(1, -1, 0));
+    insertion(Point(0, 1, 0));
+
+    this->buildVoronoi();
+}
 
 void Mesh2D::flipEdge(const int &f1, const int &f2) {
     int v00, v01; // Sommets de f1 tel que v00 opposé à f2
@@ -35,45 +62,6 @@ void Mesh2D::flipEdge(const int &f1, const int &f2) {
     // Changer les faces adjacentes des faces adjacentes (f02 et f12)
     for (int i = 0; i < 3; ++i) if (faceTab[f02].adjacentFaces()[i] == f1) faceTab[f02].setAdjacentFace(f2, i);
     for (int i = 0; i < 3; ++i) if (faceTab[f12].adjacentFaces()[i] == f2) faceTab[f12].setAdjacentFace(f1, i);
-}
-
-void Mesh2D::flipRandomEdge() {
-    // Take 2 adjacent nonfictive faces and flip the edge between them.
-    int randomFace = rand() % faceTab.size();
-    int f2;
-    bool foundEdge = false;
-    Point a, b, c, d; // Points de deux triangle adjacents pour tester leur concavité
-    Point ba, bd, ca, cd;
-    for(int i = 0; i < faceTab.size(); ++i) {
-        randomFace = (randomFace + 1) % faceTab.size();
-        if (isFaceFictive(randomFace)) continue;
-        for (int j = 0; j < 3; ++j) { // Trouver une face adjacente
-            f2 = faceTab[randomFace].adjacentFaces()[j];
-            if (isFaceFictive(f2)) continue;
-            // Vérifier que les deux triangles ne forment pas un angle concave
-            a = vertexTab[faceTab[randomFace].vertices()[j]].point();
-            b = vertexTab[faceTab[randomFace].vertices()[(j + 1) % 3]].point();
-            c = vertexTab[faceTab[randomFace].vertices()[(j + 2) % 3]].point();
-            for (int k = 0; k < 3; ++k) {
-                if (faceTab[f2].adjacentFaces()[k] == randomFace) {
-                    d = vertexTab[faceTab[f2].vertices()[k]].point();
-                    break;
-                }
-            }
-            // Tester les angles ABD et ACD
-            ba = difference(b, a);
-            bd = difference(b, d);
-            ca = difference(c, a);
-            cd = difference(c, d);
-            if (crossProduct(ba, bd).z() < 0 && crossProduct(cd, ca).z() < 0) {
-                foundEdge = true;
-                break;
-            }
-        }
-        if (foundEdge == true) break;
-    }
-    if (foundEdge == false) return;
-    flipEdge(randomFace, f2);
 }
 
 void Mesh2D::splitTriangle(int vertexIndex, int faceIndex){
@@ -131,19 +119,6 @@ void Mesh2D::splitTriangle(int vertexIndex, int faceIndex){
     this->vertexTab[verticesOfFace[1]].setFace(faceBIndex);
     this->vertexTab[verticesOfFace[2]].setFace(faceIndex);
     this->vertexTab[vertexIndex].setFace(faceAIndex);
-}
-
-void Mesh2D::splitRandomTriangle() {
-    // Take 2 adjacent nonfictive faces and flip the edge between them.
-    int randomFace = rand() % faceTab.size();
-    // Générer le point au milieu de la face
-    std::array<int, 3> vs = faceTab[randomFace].vertices();
-    Point a = vertexTab[vs[0]].point();
-    Point b = vertexTab[vs[1]].point();
-    Point c = vertexTab[vs[2]].point();
-    Point p((a.x() + b.x() + c.x()) / 3, (a.y() + b.y() + c.y()) / 3, a.z());
-    vertexTab.push_back(Vertex(p, -1, vertexTab.size())); // Ajouter le point en tant que sommet
-    splitTriangle(vertexTab.size() - 1, randomFace);
 }
 
 void Mesh2D::insertion(Point p) {

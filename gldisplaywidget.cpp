@@ -82,7 +82,6 @@ void GLDisplayWidget::switchMesh(int index) {
         case 1:     _mesh = new Pyramid(); break;
         case 2:     _mesh = new BoundingBox2D(); break;
         case 3:     _mesh = new QueenMesh(); break;
-        case 4:		_mesh = new Parabola(); break;
         default:    _mesh = new Tetrahedron(); break;
     }
     _mesh->computeColors(_curveAxis);
@@ -97,21 +96,27 @@ void GLDisplayWidget::switchTP(int index) {
     if (index == 0) {
         switchMesh(_meshType);
         switchCurveAxis(_curveAxis);
+    } else if (index == 1) {
+        delete _mesh;
+        _mesh = new Mesh2D();
     } else {
         delete _mesh;
-        //_mesh = new Parabola();
-        _mesh = new Mesh2D();
+        _mesh = new Parabola();
     }
 }
 
-void GLDisplayWidget::flipRandomEdge() {
-    ((Mesh2D*)_mesh)->flipRandomEdge();
+void GLDisplayWidget::switchParabolaType(int type) {
+    delete _mesh;
+    _mesh = new Parabola(type);
 }
 
-void GLDisplayWidget::insertPoint() {
-    double rand_x = -2.0 + (((float) rand()) / (float) RAND_MAX) * 4.0;
-    double rand_y = -2.0 + (((float) rand()) / (float) RAND_MAX) * 4.0;
-    ((Mesh2D*)_mesh)->insertion(Point(rand_x, rand_y, 0));
+void GLDisplayWidget::insertNPoints(int n) {
+    double rand_x, rand_y;
+    for (int i = 0; i < n; ++i) {
+        rand_x = -2.0 + (((float) rand()) / (float) RAND_MAX) * 4.0;
+        rand_y = -2.0 + (((float) rand()) / (float) RAND_MAX) * 4.0;
+        ((Mesh2D*)_mesh)->insertion(Point(rand_x, rand_y, 0));
+    }
     ((Mesh2D*)_mesh)->buildVoronoi();
 }
 

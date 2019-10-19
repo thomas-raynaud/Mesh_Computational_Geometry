@@ -18,20 +18,33 @@ SOURCES += main.cpp\
     mesh.cpp \
     point.cpp \
     opengldisplaymesh.cpp \
-    color.cpp \
-    curvaturemesh.cpp \
-    delaunaymesh.cpp \
     voronoi.cpp \
-    visibilitymarch.cpp
+    visibilitymarch.cpp \
+    mesh3d.cpp \
+    color.cpp \
+    meshcurvature.cpp \
+    meshdelaunay.cpp \
+    meshparabola.cpp \
+    predicate.cpp
 
 HEADERS  += mainwindow.h \
     gldisplaywidget.h \
     mesh.h \
     point.h \
-    color.h
+    color.h \
+    mesh3d.h \
+    meshdelaunay.h \
+    meshparabola.h \
+    predicate.h
 
 FORMS    += mainwindow.ui
 
 #---- Comment the following line on MacOS
 LIBS = -lGLU
 
+# Add the queen.off file
+copydata.commands = $(COPY_DIR) $$PWD/queen.off $$OUT_PWD
+first.depends = $(first) copydata
+export(first.depends)
+export(copydata.commands)
+QMAKE_EXTRA_TARGETS += first copydata

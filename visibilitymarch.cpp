@@ -1,4 +1,4 @@
-#include "mesh.h"
+#include "meshdelaunay.h"
 
 int Mesh2D::takeStepVisibilityMarch(const int& faceIdx, const int& vertexIdx) {
     Point a, b;

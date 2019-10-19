@@ -2,6 +2,8 @@
 #define OPENGLDISPLAYMESH_H
 
 #include "mesh.h"
+#include "meshdelaunay.h"
+#include "meshparabola.h"
 
 
 // Draw a vertex
@@ -76,7 +78,7 @@ void Mesh2D::drawMesh() {
         Vertex a, b, c;
         std::array<int, 3> faceVertices = face_it->vertices();
         // Ne pas afficher les faces ayant un point fictif
-        if (isFaceFictive(face_it->idx())) continue;
+        if (!isFaceVisible(face_it->idx())) continue;
 
         a = vertexTab[faceVertices[0]];
         b = vertexTab[faceVertices[1]];
@@ -90,34 +92,6 @@ void Mesh2D::drawMesh() {
         glVertexDraw(c); // 3e point de la face
         glEnd();
     }
-}
-
-void Mesh2D::drawVoronoiWireFrame() {
-    Circulator_on_faces cf, cfbegin;
-    int f1, f2;
-    glColor3d(1, 0, 0);
-    for (QVector<Vertex>::iterator vertex_it = vertexTab.begin(); vertex_it != vertexTab.end(); ++vertex_it){
-        if (!vertex_it->isFictive()) {
-
-            cfbegin = incident_faces(*vertex_it);
-            cf = cfbegin;
-            do {
-                f1 = cf->idx();
-                cf++;
-                f2 = cf->idx();
-                if (!isFaceVisible(f1) || !isFaceVisible(f2)) continue;
-                glBegin(GL_LINE_STRIP);
-                glVertexDraw(_vVertices[f1]);
-                glVertexDraw(_vVertices[f2]);
-                glEnd();
-            } while (cf != cfbegin);
-        }
-    }
-
-}
-
-void Parabola::drawMesh() {
-    Mesh::drawMesh();
 }
 
 // Draw the wireframe of the mesh
@@ -150,6 +124,38 @@ void Mesh2D::drawMeshWireFrame() {
     }
 
     this->drawVoronoiWireFrame();
+}
+
+void Mesh2D::drawVoronoiWireFrame() {
+    Circulator_on_faces cf, cfbegin;
+    int f1, f2;
+    glColor3d(1, 0, 0);
+    for (QVector<Vertex>::iterator vertex_it = vertexTab.begin(); vertex_it != vertexTab.end(); ++vertex_it){
+        if (!vertex_it->isFictive()) {
+
+            cfbegin = incident_faces(*vertex_it);
+            cf = cfbegin;
+            do {
+                f1 = cf->idx();
+                cf++;
+                f2 = cf->idx();
+                if (!isFaceVisible(f1) || !isFaceVisible(f2)) continue;
+                glBegin(GL_LINE_STRIP);
+                glVertexDraw(_vVertices[f1]);
+                glVertexDraw(_vVertices[f2]);
+                glEnd();
+            } while (cf != cfbegin);
+        }
+    }
+
+}
+
+void Parabola::drawMeshWireFrame() {
+    Mesh::drawMeshWireFrame();
+}
+
+void Parabola::drawMesh() {
+    Mesh::drawMesh();
 }
 
 #endif // OPENGLDISPLAYMESH_H

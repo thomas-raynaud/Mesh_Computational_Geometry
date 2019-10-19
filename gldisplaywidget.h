@@ -5,6 +5,9 @@
 #include <QtWidgets>
 #include <QTimer>
 #include "mesh.h"
+#include "mesh3d.h"
+#include "meshdelaunay.h"
+#include "meshparabola.h"
 
 #include <iostream>
 
@@ -31,10 +34,9 @@ public:
     */
     void switchCurveAxis(int index);
 
+    void switchParabolaType(int type);
     void switchTP(int index);
-
-    void flipRandomEdge();
-    void insertPoint();
+    void insertNPoints(int n);
 
 protected:
     // Mouse Management
