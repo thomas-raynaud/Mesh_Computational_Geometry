@@ -34,6 +34,6 @@ on utilise cet algorithme (implémenté dans *visibilitymarch.cpp*) pour trouver
 
 # Paraboles
 
-Les paraboles (*meshparabola.cpp*) sont des maillages 2D au départ, mais on a modifié leur composante z en fonction de la valeur de x et y. Deux paraboles peuvent être affichées : x\*x + y\*y et la parabole de Rosenbrock qui possède une propriété intéressante : c'est une fonction non-convexe.
+Les paraboles (*meshparabola.cpp*) sont des maillages 2D au départ, mais on a modifié leur composante z en fonction de la valeur de x et y. Deux fonctions peuvent être affichées : z=x\*x + y\*y et la fonction de Rosenbrock qui possède une propriété intéressante : c'est une fonction non-convexe.
 
-Nous avons utilisé ces paraboles pour tester si notre application génère bien des triangulations de Delaunay. On insère 2000 points à des endroits aléatoires dans le maillage, et nous donnons à chaque point une couleur en fonction de la valeur de la composante z.
+Nous avons utilisé ces fonctions pour tester si notre application génère bien des triangulations de Delaunay. On insère 2000 points à des endroits aléatoires dans le maillage, et nous donnons à chaque point une couleur en fonction de la valeur de la composante z.
