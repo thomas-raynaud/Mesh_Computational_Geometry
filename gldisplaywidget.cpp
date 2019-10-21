@@ -99,9 +99,11 @@ void GLDisplayWidget::switchTP(int index) {
     } else if (index == 1) {
         delete _mesh;
         _mesh = new Mesh2D();
-    } else {
+    } else if(index == 2){
         delete _mesh;
         _mesh = new Parabola();
+    } else {
+        _mesh = new Crust();
     }
 }
 

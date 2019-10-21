@@ -4,6 +4,7 @@
 #include "mesh.h"
 #include "meshdelaunay.h"
 #include "meshparabola.h"
+#include "meshcrust.h"
 
 
 // Draw a vertex
@@ -150,6 +151,40 @@ void Mesh2D::drawVoronoiWireFrame() {
 
 }
 
+void Crust::drawMeshWireFrame(){
+    for (QVector<Face>::iterator face_it = faceTab.begin() ; face_it != faceTab.end(); ++face_it) {
+        Vertex a, b, c;
+        std::array<int, 3> faceVertices = face_it->vertices();
+        // Ne pas afficher les faces ayant un point fictif
+        if (!isFaceVisible(face_it->idx())) continue;
+
+        a = vertexTab[faceVertices[0]];
+        b = vertexTab[faceVertices[1]];
+        c = vertexTab[faceVertices[2]];
+
+        glColor3d(0, 1, 0);
+        if(a.idx() < this->_firstVoronoiIndex && b.idx() < this->_firstVoronoiIndex){
+            glBegin(GL_LINE_STRIP);
+            glVertexDraw(a);
+            glVertexDraw(b);
+            glEnd();
+        }
+
+        if(c.idx() < this->_firstVoronoiIndex && b.idx() < this->_firstVoronoiIndex){
+            glBegin(GL_LINE_STRIP);
+            glVertexDraw(b);
+            glVertexDraw(c);
+            glEnd();
+        }
+
+        if(a.idx() < this->_firstVoronoiIndex && c.idx() < this->_firstVoronoiIndex){
+            glBegin(GL_LINE_STRIP);
+            glVertexDraw(c);
+            glVertexDraw(a);
+            glEnd();
+        }
+    }
+}
 void Parabola::drawMeshWireFrame() {
     Mesh::drawMeshWireFrame();
 }

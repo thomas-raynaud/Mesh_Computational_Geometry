@@ -16,6 +16,7 @@ SOURCES += main.cpp\
         mainwindow.cpp \
     gldisplaywidget.cpp \
     mesh.cpp \
+    meshcrust.cpp \
     point.cpp \
     opengldisplaymesh.cpp \
     voronoi.cpp \
@@ -30,6 +31,7 @@ SOURCES += main.cpp\
 HEADERS  += mainwindow.h \
     gldisplaywidget.h \
     mesh.h \
+    meshcrust.h \
     point.h \
     color.h \
     mesh3d.h \
