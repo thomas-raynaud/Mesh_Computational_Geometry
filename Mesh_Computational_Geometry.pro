@@ -49,4 +49,12 @@ copydata.commands = $(COPY_DIR) $$PWD/queen.off $$OUT_PWD
 first.depends = $(first) copydata
 export(first.depends)
 export(copydata.commands)
+
+# Add the points_courbe.txt file
+copydatacourbe.commands = $(COPY_DIR) $$PWD/points_courbe.txt $$OUT_PWD
+first.depends = $(first) copydatacourbe
+export(first.depends)
+export(copydata.commands)
+
 QMAKE_EXTRA_TARGETS += first copydata
+QMAKE_EXTRA_TARGETS += first copydatacourbe
