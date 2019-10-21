@@ -50,6 +50,11 @@
             <string>Parabola</string>
            </property>
           </item>
+          <item>
+           <property name="text">
+            <string>Crust</string>
+           </property>
+          </item>
          </widget>
         </item>
         <item>
