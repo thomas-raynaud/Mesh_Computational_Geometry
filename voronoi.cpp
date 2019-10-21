@@ -1,23 +1,33 @@
 #include "meshdelaunay.h"
 
 void Mesh2D::buildVoronoi(){
-    int i =4;
+    int i = 0;
     _vVertices = QVector<Vertex>();
-   for (QVector<Face>::iterator face_it = faceTab.begin(); face_it != faceTab.end(); ++face_it){
+    for (QVector<Face>::iterator face_it = faceTab.begin(); face_it != faceTab.end(); ++face_it){
        Point A, B, C;
        A = vertexTab[face_it->vertices()[0]].point();
        B = vertexTab[face_it->vertices()[1]].point();
        C = vertexTab[face_it->vertices()[2]].point();
 
        //Calcul de Q
-       double tanA, tanB, tanC, coefA, coefB, coefC;
-       tanA = tangente(C, A, B);
-       tanB = tangente(A, B, C);
-       tanC = tangente(B, C, A);
+       double ptanA, ptanB, ptanC, coefA, coefB, coefC;
 
-       coefA = (tanC + tanB);
-       coefB = (tanC + tanA);
-       coefC = (tanA + tanB);
+       Point AC, AB, BA, BC, CB, CA;
+       Point k(0, 0, 1);
+       AC = difference(A, C);
+       AB = difference(A, B);
+       BA = difference(B, A);
+       BC = difference(B, C);
+       CB = difference(C, B);
+       CA = difference(C, A);
+
+       ptanA = dotProduct(crossProduct(AC, AB), k) * dotProduct(CB, CA) * dotProduct(BA, BC);
+       ptanB = dotProduct(crossProduct(BA, BC), k) * dotProduct(CB, CA) * dotProduct(AC, AB);
+       ptanC = dotProduct(crossProduct(CB, CA), k) * dotProduct(AB, AC) * dotProduct(BA, BC);
+
+       coefA = (ptanC + ptanB);
+       coefB = (ptanC + ptanA);
+       coefC = (ptanA + ptanB);
 
        double sum = 1.0 / (coefA + coefB + coefC);
 
@@ -30,5 +40,5 @@ void Mesh2D::buildVoronoi(){
        //Ajout de Q
        _vVertices.push_back(Vertex(Q, 0, i));
        i++;
-   }
+    }
 }
