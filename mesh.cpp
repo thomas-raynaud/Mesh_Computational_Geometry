@@ -126,3 +126,75 @@ std::ostream& operator<<(std::ostream &strm, const Mesh &m) {
     }
     return strm;
 }
+
+std::vector<int> Mesh::edgeCollapse(int v_oppose, int f) {
+    int fc1, fc2;
+    int v1 = -1, v2 = -1; // sommets à fusionner
+    // Récupérer les deux faces communes aux deux sommets, et les sommets à fusionner.
+    fc1 = f;
+    for (int i = 0; i < 3; ++i) {
+        if (faceTab[f].vertices()[i] == v_oppose) {
+            fc2 = faceTab[f].adjacentFaces()[i];
+        } else {
+            if (v1 == -1)
+                v1 = i;
+            else
+                v2 = i;
+        }
+    }
+    // Fusion
+    Circulator_on_faces cf;
+
+    fc2 = adjacentFaces();
+    cf = incident_faces(v1, fc1);
+    cf++;
+    // Mettre à jour les faces adjacentes de la 1ere face
+    std::array<int, 3> adjacent_faces;
+    for (int i = 0; i < 3; ++i) {
+        if (faceTab[cf->idx()].vertices()[i] == v1) {
+            //trouver lindice local de v1 dans fc1
+            for (int j = 0; j < 3; ++j) {
+                if (faceTab[fc1].vertices()[j] == v1) {
+                    adjacent_faces[(i-1)%3] = faceTab[fc1].adjacentFaces()[j];
+                }
+            }
+
+        } else {
+            adjacent_faces[i] = faceTab[cf->idx()].adjacentFaces()[i];
+        }
+    }
+    faceTab[cf->idx()].setAdjacentFaces(adjacent_faces);
+
+    // Mettre à jour les sommets des faces
+    std::array<int, 3> idx_sommets_face;
+    while (cf->idx() != fc2) {
+        for (int i = 0; i < 3; ++i) {
+            if (faceTab[cf->idx()].vertices()[i] == v1) {
+                idx_sommets_face[i] = v2;
+            } else {
+                idx_sommets_face[i] = faceTab[cf->idx()].vertices()[i];
+            }
+        }
+        faceTab[cf->idx()].setVertices(idx_sommets_face);
+        cf++;
+    }
+
+    cf--;
+    // Mettre à jour les faces adjacentes de la dernière face
+    for (int i = 0; i < 3; ++i) {
+        if (faceTab[cf->idx()].vertices()[i] == v1) {
+            //trouver lindice local de v1 dans fc1
+            for (int j = 0; j < 3; ++j) {
+                if (faceTab[fc2].vertices()[j] == v1) {
+                    adjacent_faces[(i-1)%3] = faceTab[fc2].adjacentFaces()[j];
+                }
+            }
+
+        } else {
+            adjacent_faces[i] = faceTab[cf->idx()].adjacentFaces()[i];
+        }
+    }
+    faceTab[cf->idx()].setAdjacentFaces(adjacent_faces);
+
+    return {fc1, fc2};
+}
