@@ -49,8 +49,11 @@ void GLDisplayWidget::paintGL(){
     glTranslated(_X, _Y, _Z);
 
     // Rotation
-    glRotatef(_angleY, 1.0, 0.0, 0.0f);
-    glRotatef(_angleX, 0.0, 1.0, 0.0f);
+    //glRotatef(_angleY, 1.0, 0.0, 0.0f);
+    //glRotatef(_angleX, 0.0, 1.0, 0.0f);
+    // Rotation
+    glRotatef(0.0,0.0, 0.0, 0.0f);
+    //glRotatef(0, 0.0, 1.0, 0.0f);
 
     // Color for your mesh
     glColor3f(0, 1 ,0);

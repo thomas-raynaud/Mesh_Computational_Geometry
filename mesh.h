@@ -122,6 +122,8 @@ public:
                 !vertexTab[faceVertices[2]].isFictive() && vertexTab[faceVertices[2]].isVisible();
     }
 
+    std::array<int,2> edgeCollapse(int, int);
+
 
     friend class Iterator_on_faces;
     Iterator_on_faces faces_begin();
