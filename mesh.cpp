@@ -36,6 +36,7 @@ void Mesh::connectAdjacentFaces() {
 }
 
 
+
 Iterator_on_faces Mesh::faces_begin() {
     return Iterator_on_faces(faceTab.begin());
 }

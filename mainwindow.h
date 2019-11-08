@@ -32,6 +32,8 @@ private slots:
 
     void on_pushButtonRosenbrock_released();
 
+    void on_pushButtonSimplifyMesh_clicked();
+
 private:
     Ui::MainWindow *ui;
 };

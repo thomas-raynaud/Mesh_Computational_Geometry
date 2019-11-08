@@ -125,6 +125,10 @@ void GLDisplayWidget::insertNPoints(int n) {
     ((Mesh2D*)_mesh)->buildVoronoi();
 }
 
+void GLDisplayWidget::simplifyMesh(int n){
+    ((Mesh2D*)_mesh)->simplify(n);
+}
+
 // - - - - - - - - - - - - Mouse Management  - - - - - - - - - - - - - - - -
 // When you click, the position of your mouse is saved
 void GLDisplayWidget::mousePressEvent(QMouseEvent *event)

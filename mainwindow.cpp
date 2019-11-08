@@ -80,3 +80,8 @@ void MainWindow::on_pushButtonRosenbrock_released()
 {
     ui->widget->switchParabolaType(1);
 }
+
+void MainWindow::on_pushButtonSimplifyMesh_clicked()
+{
+   ui->widget->simplifyMesh(1);
+}

@@ -19,6 +19,7 @@ Mesh2D::Mesh2D() {
     faceTab.push_back(Face({0, 2, 3}, {1, 3, 0}, 2));  // face 2
     faceTab.push_back(Face({0, 3, 1}, {1, 0, 2}, 3));  // face 3
 
+
     // Départ : insérer 3 points
     insertion(Point(-1, -1, 0));
     insertion(Point(1, -1, 0));
@@ -214,6 +215,7 @@ void Mesh2D::insertion(Point p) {
     } while (faceIdx != -1); // On est arrivé dans le bon triangle
     splitTriangle(vertexTab.size() - 1, prevFaceIdx);
     rearrangeDelaunay(vertexTab.size() - 1);
+
 }
 
 
