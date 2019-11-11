@@ -38,6 +38,7 @@ public:
     void switchParabolaType(int type);
     void switchTP(int index);
     void insertNPoints(int n);
+    void simplifyMesh(int n);
 
 protected:
     // Mouse Management

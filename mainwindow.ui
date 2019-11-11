@@ -130,6 +130,13 @@
          </widget>
         </item>
         <item>
+         <widget class="QPushButton" name="pushButtonSimplifyMesh">
+          <property name="text">
+           <string>Simplify mesh</string>
+          </property>
+         </widget>
+        </item>
+        <item>
          <widget class="QPushButton" name="pushButtonxxyy">
           <property name="text">
            <string>x * x + y * y</string>

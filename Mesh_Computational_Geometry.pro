@@ -19,6 +19,7 @@ SOURCES += main.cpp\
     meshcrust.cpp \
     point.cpp \
     opengldisplaymesh.cpp \
+    simplify.cpp \
     voronoi.cpp \
     visibilitymarch.cpp \
     mesh3d.cpp \

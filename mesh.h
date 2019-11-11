@@ -68,6 +68,7 @@ public:
     int idx(){ return _idx; }
 
     //Set
+    void setIdx(int i){_idx=i;}
     void setVertices(std::array<int,3> vertices){_vertices=vertices; }
     void setAdjacentFaces(std::array<int,3> adjacentFaces){_adjacentFaces=adjacentFaces; }
     void setRandomColor() {
@@ -76,6 +77,8 @@ public:
 
     // Ajouter la face adjacente faceIndex opposée au sommet numéro pos
     void setAdjacentFace(int faceIndex, int pos) { _adjacentFaces[pos] = faceIndex; }
+    void setVertice(int vIndex, int pos){_vertices[pos]=vIndex; }
+
 };
 
 
@@ -122,6 +125,16 @@ public:
                 !vertexTab[faceVertices[2]].isFictive() && vertexTab[faceVertices[2]].isVisible();
     }
 
+    std::array<int,3> edgeCollapse(int, int);
+    void simplify(int);
+    void edgeExtend(int, int, int);
+    void vertexPop(int n){vertexTab.erase(vertexTab.begin()+n);}
+    void facePop(int n){
+                        for(int i = n; i < faceTab.size(); i++){
+                            faceTab[i].setIdx(faceTab[i].idx()-1);
+                        }
+                        faceTab.erase(faceTab.begin()+n);
+                       }
 
     friend class Iterator_on_faces;
     Iterator_on_faces faces_begin();
