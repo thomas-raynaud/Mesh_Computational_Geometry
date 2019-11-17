@@ -114,7 +114,16 @@ void GLDisplayWidget::switchTP(int index) {
             break;
         case 4:
             _mesh = new Mesh2D();
-            insertNPoints(3);
+            ((Mesh2D*)_mesh)->insertion(Point(-2.1, 1, 0));
+            ((Mesh2D*)_mesh)->insertion(Point(2.1, 1, 0));
+            ((Mesh2D*)_mesh)->insertion(Point(0, -3, 0));
+            ((Mesh2D*)_mesh)->insertion(Point(-2.1, -3, 0));
+            ((Mesh2D*)_mesh)->insertion(Point(2.1, -3, 0));
+            ((Mesh2D*)_mesh)->insertion(Point(-4, -1, 0));
+            ((Mesh2D*)_mesh)->insertion(Point(4, -1, 0));
+            //insertNPoints(50);
+            //_mesh = new QueenMesh();
+            //((QueenMesh*)_mesh)->computeColors(0);
             break;
     }
 }

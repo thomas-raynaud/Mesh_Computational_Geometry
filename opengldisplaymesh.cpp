@@ -79,7 +79,8 @@ void Mesh2D::drawMesh() {
         Vertex a, b, c;
         std::array<int, 3> faceVertices = face_it->vertices();
         // Ne pas afficher les faces ayant un point fictif
-        if (!isFaceVisible(face_it->idx())) continue;
+        //if (!isFaceVisible(face_it->idx())) continue;
+        if (isFaceFictive(face_it->idx())) continue;
 
         a = vertexTab[faceVertices[0]];
         b = vertexTab[faceVertices[1]];

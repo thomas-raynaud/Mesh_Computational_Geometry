@@ -123,7 +123,8 @@ std::ostream& operator<<(std::ostream &strm, const Mesh &m) {
         strm << m.vertexTab[i].idx() << ": "
                           << m.vertexTab[i].point().x() << " "
                           << m.vertexTab[i].point().y() << " "
-                          << m.vertexTab[i].point().z() << type << std::endl;
+                          << m.vertexTab[i].point().z() << type << " - f="
+                          << m.vertexTab[i].face() << std::endl;
     }
     strm << "Faces:\n";
     for (int i = 0; i < m.faceTab.size(); ++i) {
@@ -148,17 +149,17 @@ std::ostream& operator<<(std::ostream &strm, const Mesh &m) {
 void Mesh::facePop(int fIdx) {
     faceTab.remove(fIdx);
     for (int j = 0; j < faceTab.size(); ++j) {
-        if (j >= fIdx)
+        if (j >= fIdx) {
             faceTab[j].setIdx(j);
+            for (int k = 0; k < 3; ++k) {
+                vertexTab[faceTab[j].vertices()[k]].setFace(j);
+            }
+        }
         for (int k = 0; k < 3; ++k) {
             if (faceTab[j].adjacentFaces()[k] >= fIdx)
                 faceTab[j].setAdjacentFace(faceTab[j].adjacentFaces()[k] - 1, k);
         }
 
-    }
-    for (int j = 0; j < vertexTab.size(); ++j) {
-        if (vertexTab[j].face() > fIdx)
-            vertexTab[j].setFace(vertexTab[j].face() + 1);
     }
 }
 
@@ -170,7 +171,7 @@ void Mesh::vertexPop(int vIdx) {
     }
     for (int j = 0; j < faceTab.size(); ++j) {
         for (int k = 0; k < 3; ++k) {
-            if (faceTab[j].vertices()[k] > vIdx)
+            if (faceTab[j].vertices()[k] >= vIdx)
                 faceTab[j].setVertice(faceTab[j].vertices()[k] - 1, k);
         }
     }
