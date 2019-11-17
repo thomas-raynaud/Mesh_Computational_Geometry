@@ -29,12 +29,6 @@ public:
           }
         return _x;
     }
-    Point operator* (int v) {
-        return Point(_x * v, _y * v, _z * v);
-    }
-    Point operator+ (Point p) {
-        return Point(_x + p._x, _y + p._y, _z + p._z);
-    }
     // Opérations sur des points/vectors
     double norm();
 

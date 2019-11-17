@@ -55,6 +55,11 @@
             <string>Crust</string>
            </property>
           </item>
+          <item>
+           <property name="text">
+            <string>Simplification</string>
+           </property>
+          </item>
          </widget>
         </item>
         <item>

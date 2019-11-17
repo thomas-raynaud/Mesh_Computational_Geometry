@@ -11,6 +11,7 @@ MainWindow::MainWindow(QWidget *parent) :
     ui->pushButtonInsertPoint->hide();
     ui->pushButtonxxyy->hide();
     ui->pushButtonRosenbrock->hide();
+    ui->pushButtonSimplifyMesh->hide();
 }
 
 MainWindow::~MainWindow()
@@ -36,29 +37,60 @@ void MainWindow::on_comboBoxColorswitch_currentIndexChanged(int index) {
 
 void MainWindow::on_comboBoxTPswitch_currentIndexChanged(int index)
 {
-    if (index == 0) {
-        ui->pushButtonInsertNPoints->hide();
-        ui->pushButtonInsertPoint->hide();
-        ui->pushButtonxxyy->hide();
-        ui->pushButtonRosenbrock->hide();
-        ui->comboBoxColorswitch->show();
-        ui->comboBoxMeshswitch->show();
-    } else if (index == 1) {
-        ui->pushButtonInsertNPoints->show();
-        ui->pushButtonInsertPoint->show();
-        ui->pushButtonxxyy->hide();
-        ui->pushButtonRosenbrock->hide();
-        ui->comboBoxColorswitch->hide();
-        ui->comboBoxMeshswitch->hide();
-    } else {
-        ui->pushButtonInsertNPoints->hide();
-        ui->pushButtonInsertPoint->hide();
-        ui->pushButtonxxyy->show();
-        ui->pushButtonRosenbrock->show();
-        ui->comboBoxColorswitch->hide();
-        ui->comboBoxMeshswitch->hide();
+    ui->pushButtonxxyy->setEnabled(true);
+    ui->pushButtonRosenbrock->setEnabled(true);
+    switch (index) {
+        case 0:
+            ui->pushButtonInsertNPoints->hide();
+            ui->pushButtonInsertPoint->hide();
+            ui->pushButtonxxyy->hide();
+            ui->pushButtonRosenbrock->hide();
+            ui->comboBoxColorswitch->show();
+            ui->comboBoxMeshswitch->show();
+            ui->pushButtonSimplifyMesh->hide();
+            break;
+        case 1:
+            ui->pushButtonInsertNPoints->show();
+            ui->pushButtonInsertPoint->show();
+            ui->pushButtonxxyy->hide();
+            ui->pushButtonRosenbrock->hide();
+            ui->comboBoxColorswitch->hide();
+            ui->comboBoxMeshswitch->hide();
+            ui->pushButtonSimplifyMesh->hide();
+            break;
+        case 2:
+            ui->pushButtonInsertNPoints->hide();
+            ui->pushButtonInsertPoint->hide();
+            ui->pushButtonxxyy->show();
+            ui->pushButtonRosenbrock->show();
+            ui->comboBoxColorswitch->hide();
+            ui->comboBoxMeshswitch->hide();
+            ui->pushButtonSimplifyMesh->hide();
+            break;
+        case 3:
+            ui->pushButtonInsertNPoints->hide();
+            ui->pushButtonInsertPoint->hide();
+            ui->pushButtonxxyy->show();
+            ui->pushButtonRosenbrock->show();
+            ui->comboBoxColorswitch->hide();
+            ui->comboBoxMeshswitch->hide();
+            ui->pushButtonSimplifyMesh->hide();
+            ui->pushButtonxxyy->setEnabled(false);
+            ui->pushButtonRosenbrock->setEnabled(false);
+            break;
+        case 4:
+            ui->pushButtonInsertNPoints->hide();
+            ui->pushButtonInsertPoint->hide();
+            ui->pushButtonxxyy->hide();
+            ui->pushButtonRosenbrock->hide();
+
+            ui->comboBoxColorswitch->hide();
+            ui->comboBoxMeshswitch->show();
+            ui->pushButtonSimplifyMesh->show();
+            break;
     }
-   ui->widget->switchTP(index);
+
+    ui->widget->switchTP(index);
 }
 
 void MainWindow::on_pushButtonInsertNPoints_released()
@@ -83,5 +115,5 @@ void MainWindow::on_pushButtonRosenbrock_released()
 
 void MainWindow::on_pushButtonSimplifyMesh_clicked()
 {
-   ui->widget->simplifyMesh(1);
+   ui->widget->simplifyMesh();
 }

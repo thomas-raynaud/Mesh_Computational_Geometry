@@ -4,6 +4,8 @@
 #include <QGLWidget>
 #include <unordered_map>
 #include <cfloat>
+#include <sstream>
+#include <functional>
 
 #include "point.h"
 #include "color.h"
@@ -32,6 +34,7 @@ public:
     bool isVisible() const { return _display; }
     std::array<double, 3> color() const { return _rgb; }
     // set
+    void setIdx(int idx) { _idx = idx; }
     void setFace(int face) { _face = face; }
     void setColor(std::array<double, 3> rgb) { _rgb = rgb; }
     void setPoint(Point p) {_point = p; }
@@ -65,7 +68,7 @@ public:
     const std::array<int, 3> vertices() const { return _vertices; }
     const std::array<int, 3> adjacentFaces() const { return _adjacentFaces; }
     std::array<double, 3> color() const { return _rgb; }
-    int idx(){ return _idx; }
+    int idx() const { return _idx; }
 
     //Set
     void setIdx(int i){_idx=i;}
@@ -81,6 +84,10 @@ public:
 
 };
 
+
+struct Edge {
+    int ve, fe, v1, v2;
+};
 
 
 class Iterator_on_faces;      // Itérer sur les faces du mesh
@@ -111,30 +118,29 @@ public:
     // Calculer la couleur des sommets en fonction de la courbure moyenne
     void computeColors(int curveAxis);
 
-    bool isFaceFictive(int face) {
+    bool isFaceFictive(const int face) const {
         std::array<int, 3> faceVertices = faceTab[face].vertices();
         return vertexTab[faceVertices[0]].isFictive() ||
                 vertexTab[faceVertices[1]].isFictive() ||
                 vertexTab[faceVertices[2]].isFictive();
     }
 
-    bool isFaceVisible(int face) {
+    bool isFaceVisible(const int face) const {
         std::array<int, 3> faceVertices = faceTab[face].vertices();
         return !vertexTab[faceVertices[0]].isFictive() && vertexTab[faceVertices[0]].isVisible() &&
                 !vertexTab[faceVertices[1]].isFictive() && vertexTab[faceVertices[1]].isVisible() &&
                 !vertexTab[faceVertices[2]].isFictive() && vertexTab[faceVertices[2]].isVisible();
     }
 
+    int getNbVertices() { return vertexTab.size(); }
+
+    double getEdgeLength(Edge e);
+
     std::array<int,3> edgeCollapse(int, int);
     void simplify(int);
     void edgeExtend(int, int, int);
-    void vertexPop(int n){vertexTab.erase(vertexTab.begin()+n);}
-    void facePop(int n){
-                        for(int i = n; i < faceTab.size(); i++){
-                            faceTab[i].setIdx(faceTab[i].idx()-1);
-                        }
-                        faceTab.erase(faceTab.begin()+n);
-                       }
+    void vertexPop(int vIdx);
+    void facePop(int fIdx);
 
     friend class Iterator_on_faces;
     Iterator_on_faces faces_begin();

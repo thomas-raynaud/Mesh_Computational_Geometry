@@ -49,11 +49,11 @@ void GLDisplayWidget::paintGL(){
     glTranslated(_X, _Y, _Z);
 
     // Rotation
-    //glRotatef(_angleY, 1.0, 0.0, 0.0f);
-    //glRotatef(_angleX, 0.0, 1.0, 0.0f);
-    // Rotation
-    glRotatef(0.0,0.0, 0.0, 0.0f);
-    //glRotatef(0, 0.0, 1.0, 0.0f);
+    glRotatef(_angleY, 1.0, 0.0, 0.0f);
+    glRotatef(_angleX, 0.0, 1.0, 0.0f);
+
+    //glRotatef(0.0,0.0, 0.0, 0.0f);
+    glRotatef(0, 0.0, 1.0, 0.0f);
 
     // Color for your mesh
     glColor3f(0, 1 ,0);
@@ -96,17 +96,26 @@ void GLDisplayWidget::switchCurveAxis(int index) {
 }
 
 void GLDisplayWidget::switchTP(int index) {
-    if (index == 0) {
-        switchMesh(_meshType);
-        switchCurveAxis(_curveAxis);
-    } else if (index == 1) {
-        delete _mesh;
-        _mesh = new Mesh2D();
-    } else if(index == 2){
-        delete _mesh;
-        _mesh = new Parabola();
-    } else {
-        _mesh = new Crust();
+    switch (index) {
+        case 0:
+            switchMesh(_meshType);
+            switchCurveAxis(_curveAxis);
+            break;
+        case 1:
+            delete _mesh;
+            _mesh = new Mesh2D();
+            break;
+        case 2:
+            delete _mesh;
+            _mesh = new Parabola();
+            break;
+        case 3:
+            _mesh = new Crust();
+            break;
+        case 4:
+            _mesh = new Mesh2D();
+            insertNPoints(3);
+            break;
     }
 }
 
@@ -125,8 +134,8 @@ void GLDisplayWidget::insertNPoints(int n) {
     ((Mesh2D*)_mesh)->buildVoronoi();
 }
 
-void GLDisplayWidget::simplifyMesh(int n){
-    ((Mesh2D*)_mesh)->simplify(n);
+void GLDisplayWidget::simplifyMesh(){
+    _mesh->simplify(_mesh->getNbVertices() / 2);
 }
 
 // - - - - - - - - - - - - Mouse Management  - - - - - - - - - - - - - - - -

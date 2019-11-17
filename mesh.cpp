@@ -109,15 +109,31 @@ Circulator_on_vertices Mesh::neighbour_vertices(Vertex &v) {
 
 
 std::ostream& operator<<(std::ostream &strm, const Mesh &m) {
+    strm << "===============" << std::endl;
+    strm << "Mesh: " << m.vertexTab.size() << " vertices, " << m.faceTab.size() << " faces" << std::endl;
     strm << "\nVertices:\n";
+    std::string type;
     for (int i = 0; i < m.vertexTab.size(); ++i) {
-        strm << i << ": " << m.vertexTab[i].point().x() << " "
+        if (m.vertexTab[i].isFictive())
+            type = " (fictive)";
+        else if (!m.vertexTab[i].isVisible())
+            type = " (hidden)";
+        else
+            type = "";
+        strm << m.vertexTab[i].idx() << ": "
+                          << m.vertexTab[i].point().x() << " "
                           << m.vertexTab[i].point().y() << " "
-                          << m.vertexTab[i].point().z() << std::endl;
+                          << m.vertexTab[i].point().z() << type << std::endl;
     }
     strm << "Faces:\n";
     for (int i = 0; i < m.faceTab.size(); ++i) {
-        strm << i << ":\n";
+        if (m.isFaceFictive(m.faceTab[i].idx()))
+            type = " (fictive)";
+        else if (!m.isFaceVisible(m.faceTab[i].idx()))
+            type = " (hidden)";
+        else
+            type = "";
+        strm << m.faceTab[i].idx() << type << ":\n";
         strm << "   v: " << m.faceTab[i].vertices()[0] << " "
                         << m.faceTab[i].vertices()[1] << " "
                         << m.faceTab[i].vertices()[2] << std::endl;
@@ -125,5 +141,37 @@ std::ostream& operator<<(std::ostream &strm, const Mesh &m) {
                         << m.faceTab[i].adjacentFaces()[1] << " "
                         << m.faceTab[i].adjacentFaces()[2] << std::endl;
     }
+    strm << "===============" << std::endl;
     return strm;
+}
+
+void Mesh::facePop(int fIdx) {
+    faceTab.remove(fIdx);
+    for (int j = 0; j < faceTab.size(); ++j) {
+        if (j >= fIdx)
+            faceTab[j].setIdx(j);
+        for (int k = 0; k < 3; ++k) {
+            if (faceTab[j].adjacentFaces()[k] >= fIdx)
+                faceTab[j].setAdjacentFace(faceTab[j].adjacentFaces()[k] - 1, k);
+        }
+
+    }
+    for (int j = 0; j < vertexTab.size(); ++j) {
+        if (vertexTab[j].face() > fIdx)
+            vertexTab[j].setFace(vertexTab[j].face() + 1);
+    }
+}
+
+
+void Mesh::vertexPop(int vIdx) {
+    vertexTab.remove(vIdx);
+    for (int j = vIdx; j < vertexTab.size(); ++j) {
+        vertexTab[j].setIdx(j);
+    }
+    for (int j = 0; j < faceTab.size(); ++j) {
+        for (int k = 0; k < 3; ++k) {
+            if (faceTab[j].vertices()[k] > vIdx)
+                faceTab[j].setVertice(faceTab[j].vertices()[k] - 1, k);
+        }
+    }
 }
