@@ -18,7 +18,12 @@ GLDisplayWidget::GLDisplayWidget(QWidget *parent) : QGLWidget(parent) {
     _wireframe_display = false;
     _curveAxis = 0;
     _meshType = 0;
-}
+
+    _X = 0.f;
+    _Y = 0.f;
+    _Z = 0.f;
+    _angleX = 0.f;
+    _angleY = 0.f;}
 
 void GLDisplayWidget::initializeGL()
 {
@@ -114,14 +119,14 @@ void GLDisplayWidget::switchTP(int index) {
             break;
         case 4:
             _mesh = new Mesh2D();
-            ((Mesh2D*)_mesh)->insertion(Point(-2.1, 1, 0));
+            /*((Mesh2D*)_mesh)->insertion(Point(-2.1, 1, 0));
             ((Mesh2D*)_mesh)->insertion(Point(2.1, 1, 0));
             ((Mesh2D*)_mesh)->insertion(Point(0, -3, 0));
             ((Mesh2D*)_mesh)->insertion(Point(-2.1, -3, 0));
             ((Mesh2D*)_mesh)->insertion(Point(2.1, -3, 0));
             ((Mesh2D*)_mesh)->insertion(Point(-4, -1, 0));
-            ((Mesh2D*)_mesh)->insertion(Point(4, -1, 0));
-            //insertNPoints(50);
+            ((Mesh2D*)_mesh)->insertion(Point(4, -1, 0));*/
+            insertNPoints(50);
             //_mesh = new QueenMesh();
             //((QueenMesh*)_mesh)->computeColors(0);
             break;
@@ -145,6 +150,7 @@ void GLDisplayWidget::insertNPoints(int n) {
 
 void GLDisplayWidget::simplifyMesh(){
     _mesh->simplify(_mesh->getNbVertices() / 2);
+    ((Mesh2D*)_mesh)->buildVoronoi();
 }
 
 // - - - - - - - - - - - - Mouse Management  - - - - - - - - - - - - - - - -
