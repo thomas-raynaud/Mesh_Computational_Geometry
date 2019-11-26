@@ -5,6 +5,7 @@
 #include "meshdelaunay.h"
 #include "meshparabola.h"
 #include "meshcrust.h"
+#include "meshruppert.h"
 
 
 // Draw a vertex
@@ -193,5 +194,64 @@ void Parabola::drawMeshWireFrame() {
 void Parabola::drawMesh() {
     Mesh::drawMesh();
 }
+void MeshRuppert::drawMesh() {
+    for (QVector<Face>::iterator face_it = faceTab.begin() ; face_it != faceTab.end(); ++face_it) {
+        Vertex a, b, c;
+        std::array<int, 3> faceVertices = face_it->vertices();
+        // Ne pas afficher les faces ayant un point fictif
+        if (!isFaceVisible(face_it->idx())) continue;
 
+        a = vertexTab[faceVertices[0]];
+        b = vertexTab[faceVertices[1]];
+        c = vertexTab[faceVertices[2]];
+        int r = 0;
+        int g = 1;
+        if(isConstraint(a.idx(), b.idx())){
+            r = 1;
+            g = 0;
+        }
+        glBegin(GL_LINE_STRIP);
+        glColor3d(r, g, 0);
+        glVertexDraw(a);
+        glVertexDraw(b);
+        glEnd();
+
+        r = 0;
+        g = 1;
+        if(isConstraint(b.idx(), c.idx())){
+            r = 1;
+            g = 0;
+        }
+        glBegin(GL_LINE_STRIP);
+        glColor3d(r, g, 0);
+        glVertexDraw(b);
+        glVertexDraw(c);
+        glEnd();
+
+        r = 0;
+        g = 1;
+        if(isConstraint(c.idx(), a.idx())){
+            r = 1;
+            g = 0;
+        }
+        glBegin(GL_LINE_STRIP);
+        glColor3d(r, g, 0);
+        glVertexDraw(c);
+        glVertexDraw(a);
+        glEnd();
+    }
+
+    for (int i = 0; i < constraint().size(); i++){
+        std::array<int, 2> edge = constraint()[i];
+        Vertex a, b;
+        a = vertexTab[edge[0]];
+        b = vertexTab[edge[1]];
+        glBegin(GL_LINE_STRIP);
+        glColor3d(1.0, 0, 0);
+        glVertexDraw(a);
+        glColor3d(1.0, 0, 0);
+        glVertexDraw(b);
+        glEnd();
+    }
+}
 #endif // OPENGLDISPLAYMESH_H

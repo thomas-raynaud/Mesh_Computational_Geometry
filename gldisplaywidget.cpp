@@ -130,6 +130,10 @@ void GLDisplayWidget::switchTP(int index) {
             //_mesh = new QueenMesh();
             //((QueenMesh*)_mesh)->computeColors(0);
             break;
+
+        case 5:
+            _mesh = new MeshRuppert();
+            break;
     }
 }
 

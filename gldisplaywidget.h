@@ -9,6 +9,7 @@
 #include "meshdelaunay.h"
 #include "meshparabola.h"
 #include "meshcrust.h"
+#include "meshruppert.h"
 
 #include <iostream>
 
