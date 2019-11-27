@@ -13,6 +13,10 @@ public:
 
     virtual void drawMesh();
     bool isConstraint(int a, int b);
+
+    void priority();
+    QVector<int> edgeNotInDel();
+
 };
 
 #endif // MESH_RUPPERT_H
