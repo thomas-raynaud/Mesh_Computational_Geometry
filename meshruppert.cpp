@@ -120,36 +120,8 @@ void MeshRuppert::raffinement(){
            B = vertexTab[face.vertices()[1]].point();
            C = vertexTab[face.vertices()[2]].point();
 
-           //Calcul de Q
-           double ptanA, ptanB, ptanC, coefA, coefB, coefC;
-
-           Point AC, AB, BA, BC, CB, CA;
-           Point k(0, 0, 1);
-           AC = difference(A, C);
-           AB = difference(A, B);
-           BA = difference(B, A);
-           BC = difference(B, C);
-           CB = difference(C, B);
-           CA = difference(C, A);
-
-           ptanA = dotProduct(crossProduct(AC, AB), k) * dotProduct(CB, CA) * dotProduct(BA, BC);
-           ptanB = dotProduct(crossProduct(BA, BC), k) * dotProduct(CB, CA) * dotProduct(AC, AB);
-           ptanC = dotProduct(crossProduct(CB, CA), k) * dotProduct(AB, AC) * dotProduct(BA, BC);
-
-           coefA = (ptanC + ptanB);
-           coefB = (ptanC + ptanA);
-           coefC = (ptanA + ptanB);
-
-           double sum = 1.0 / (coefA + coefB + coefC);
-
-           coefA = coefA * sum;
-           coefB = coefB * sum;
-           coefC = coefC * sum;
-
-           Point Q = coefA * A + coefB * B + coefC * C;
-
            //insertion du centre de voronoi dans le maillage test
-           testMesh.insertion(Q);
+           testMesh.insertion(computeCenter(A, B, C));
 
            //Recuperation des arrêtes accroché
            QVector<int> edge = edgeNotInDel();
