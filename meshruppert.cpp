@@ -3,21 +3,23 @@
 MeshRuppert::MeshRuppert(){
     Mesh2D();// Donne deja les point 0,1,..,6 cf Mesh2D
 
-    insertion(Point(-2, 1, 0)); //7
-    insertion(Point(0, 4, 0)); //8
-    insertion(Point(0, 3, 0)); //9
-    insertion(Point(1, 3, 0)); //10
-    insertion(Point(2, 4, 0)); //11
-    insertion(Point(4, 1, 0)); //12
-    insertion(Point(5, 0, 0)); //13
-    insertion(Point(4, 0, 0)); //14
+    insertion(Point(-5, -4, 0)); //7
+    insertion(Point(-8, -2, 0)); //8
+    insertion(Point(-6, 6, 0)); //9
+    insertion(Point(-2, 6, 0)); //10
+    insertion(Point(1, 10, 0)); //11
+    insertion(Point(5, 4, 0)); //12
+    insertion(Point(1, 3, 0)); //13
+    insertion(Point(-6, -8, 0)); //14
 
     //_constraint = {{4,5}, {7,8}, {8,9}, {9,10}, {10,11}, {12,13}, {13,14}, {14,12}};
-    _constraint = {{14,9}, {9,11}, {11,10}, {8,4}};
+   // _constraint = {  {11,12}, {12,13}, {13,5}, {5,6}, {6,4}};
+    _constraint = {{4,7}, {7,14}, {14,8}, {8,9}, {9,10}, {10,11}, {11,12}, {12,13}, {13,5}, {5,6}, {6,4}};
+ //   _constraint = {{13,5}, {5,6}, {6,4}};
 
     priority();
 
-
+    //raffinement();
 }
 
 bool MeshRuppert::isConstraint(int a, int b){
@@ -59,4 +61,96 @@ void MeshRuppert::priority(){
         _constraint.push_back({edge[0], idx});
         _constraint.push_back({idx, edge[1]});
     }
+}
+
+double MeshRuppert::cos(Point a, Point b, Point c){
+    Point ba = difference(a, b);
+    Point bc = difference(c, b);
+    return dotProduct(ba, bc)/(ba.norm()*bc.norm());
+}
+
+int MeshRuppert::findWorstTriangle(int alpha){
+    int answ = -1;
+    double angl_max = -1;
+    Iterator_on_faces itf;
+    for(itf = this->faces_begin(); itf != this->faces_end(); ++itf){
+        int a_index = itf->vertices()[0];
+        int b_index = itf->vertices()[1];
+        int c_index = itf->vertices()[2];
+        Point a = vertexTab[a_index].point();
+        Point b = vertexTab[b_index].point();
+        Point c = vertexTab[c_index].point();
+
+        //Calcul des angles
+        std::array<double, 3> angl = {cos(b, a, c), cos(a, b, c), cos(b, c, a)};
+        double angl_tmp;
+        if(angl[0]>angl[1]){
+            if(angl[0]>angl[2]){
+                angl_tmp = angl[0];
+            }else{
+                angl_tmp = angl[2];
+            }
+        }else{
+            if(a[1]>a[2]){
+                angl_tmp = angl[1];
+            }else{
+                angl_tmp= angl[2];
+            }
+        }
+        if(angl_tmp > alpha){
+            if(angl_tmp > angl_max){
+                angl_max = angl_tmp;
+                answ = itf->idx();
+            }
+        }
+    }
+    return answ;
+}
+
+void MeshRuppert::raffinement(){
+       int fidx = findWorstTriangle(0.9);
+       while(fidx != -1){
+           Face face = faceTab[fidx];
+           MeshRuppert testMesh = *this;
+           //Caclul du centre du certcle circonscrit
+           Point A, B, C;
+           A = vertexTab[face.vertices()[0]].point();
+           B = vertexTab[face.vertices()[1]].point();
+           C = vertexTab[face.vertices()[2]].point();
+
+           //Calcul de Q
+           double ptanA, ptanB, ptanC, coefA, coefB, coefC;
+
+           Point AC, AB, BA, BC, CB, CA;
+           Point k(0, 0, 1);
+           AC = difference(A, C);
+           AB = difference(A, B);
+           BA = difference(B, A);
+           BC = difference(B, C);
+           CB = difference(C, B);
+           CA = difference(C, A);
+
+           ptanA = dotProduct(crossProduct(AC, AB), k) * dotProduct(CB, CA) * dotProduct(BA, BC);
+           ptanB = dotProduct(crossProduct(BA, BC), k) * dotProduct(CB, CA) * dotProduct(AC, AB);
+           ptanC = dotProduct(crossProduct(CB, CA), k) * dotProduct(AB, AC) * dotProduct(BA, BC);
+
+           coefA = (ptanC + ptanB);
+           coefB = (ptanC + ptanA);
+           coefC = (ptanA + ptanB);
+
+           double sum = 1.0 / (coefA + coefB + coefC);
+
+           coefA = coefA * sum;
+           coefB = coefB * sum;
+           coefC = coefC * sum;
+
+           Point Q = coefA * A + coefB * B + coefC * C;
+
+           //insertion du centre de voronoi dans le maillage test
+           testMesh.insertion(Q);
+
+           //Recuperation des arrêtes accroché
+           QVector<int> edge = edgeNotInDel();
+
+       }
 }

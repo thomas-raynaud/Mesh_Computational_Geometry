@@ -1,6 +1,7 @@
 #ifndef MESH_RUPPERT_H
 #define MESH_RUPPERT_H
 #include "meshdelaunay.h"
+#include <queue>
 
 class MeshRuppert : public Mesh2D{
 protected:
@@ -16,6 +17,11 @@ public:
 
     void priority();
     QVector<int> edgeNotInDel();
+
+    double cos(Point a, Point b, Point c);
+    int findWorstTriangle(int alpha);
+
+    void raffinement();
 
 };
 
