@@ -15,7 +15,7 @@ public:
     virtual void drawMesh();
     bool isConstraint(int a, int b);
 
-    void splitEdge(std::array<int, 2>);
+    void splitEdge(int);
 
     void priority();
     QVector<int> edgeNotInDel();

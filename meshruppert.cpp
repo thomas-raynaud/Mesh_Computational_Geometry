@@ -3,23 +3,20 @@
 MeshRuppert::MeshRuppert(){
     Mesh2D();// Donne deja les point 0,1,..,6 cf Mesh2D
 
-    insertion(Point(-5, -4, 0)); //7
-    insertion(Point(-8, -2, 0)); //8
-    insertion(Point(-6, 6, 0)); //9
-    insertion(Point(-2, 6, 0)); //10
-    insertion(Point(1, 10, 0)); //11
-    insertion(Point(5, 4, 0)); //12
-    insertion(Point(1, 3, 0)); //13
-    insertion(Point(-6, -8, 0)); //14
+    insertion(Point(3, 4, 0)); //7
+    insertion(Point(-2, 4, 0)); //8
+    insertion(Point(1, 8, 0)); //9
+    insertion(Point(-1, 9, 0)); //10
+    insertion(Point(-7, 12, 0)); //11
+    insertion(Point(-12, 7, 0)); //12
+    insertion(Point(-3, 3, 0)); //13
+    insertion(Point(-3, 2, 0)); //14
+    insertion(Point(-5, 1, 0)); //15
+    insertion(Point(-3, -1, 0)); //16
 
-    //_constraint = {{4,5}, {7,8}, {8,9}, {9,10}, {10,11}, {12,13}, {13,14}, {14,12}};
-   // _constraint = {  {11,12}, {12,13}, {13,5}, {5,6}, {6,4}};
-    _constraint = {{4,7}, {7,14}, {14,8}, {8,9}, {9,10}, {10,11}, {11,12}, {12,13}, {13,5}, {5,6}, {6,4}};
- //   _constraint = {{13,5}, {5,6}, {6,4}};
+    _constraint = {{7,6}, {6,8}, {8,9}, {9,10}, {10,11}, {11,12}, {12,13}, {13,14}, {14,15}, {15,16}, {16,4}, {4,5}, {5,7}};
 
-    priority();
 
-   //raffinement(0.9);
 }
 
 bool MeshRuppert::isConstraint(int a, int b){
@@ -49,26 +46,30 @@ QVector<int> MeshRuppert::edgeNotInDel(){
     }
     return answ;
 }
-void MeshRuppert::splitEdge(std::array<int, 2> edge){
+void MeshRuppert::splitEdge(int edge_index){
+        std::array<int, 2> edge = _constraint[edge_index];
         int idx = vertexTab.size();
         Point a = vertexTab[edge[0]].point();
         Point b = vertexTab[edge[1]].point();
         insertion(Point((a.x()+b.x())*0.5, (a.y()+b.y())*0.5, 0));
-        _constraint.remove(edgeNotInDel()[0]);
+        _constraint.remove(edge_index);
         _constraint.push_back({edge[0], idx});
         _constraint.push_back({idx, edge[1]});
 }
 void MeshRuppert::priority(){
    while(edgeNotInDel().size()){
-        std::array<int,2> edge = constraint()[edgeNotInDel()[0]];
-        splitEdge(edge);
+        splitEdge(edgeNotInDel()[0]);
     }
 }
 
 double MeshRuppert::cos(Point a, Point b, Point c){
     Point ba = difference(a, b);
     Point bc = difference(c, b);
-    return dotProduct(ba, bc)/(ba.norm()*bc.norm());
+    if(dotProduct(ba, bc) > ba.norm()*bc.norm()){
+        return -1;
+    }else{
+        return dotProduct(ba, bc)/(ba.norm()*bc.norm());
+    }
 }
 
 int MeshRuppert::findWorstTriangle(int alpha){
@@ -87,18 +88,12 @@ int MeshRuppert::findWorstTriangle(int alpha){
             //Calcul des angles
             std::array<double, 3> angl = {cos(b, a, c), cos(a, b, c), cos(b, c, a)};
             double angl_tmp;
-            if(angl[0]>angl[1]){
-                if(angl[0]>angl[2]){
-                    angl_tmp = angl[0];
-                }else{
-                    angl_tmp = angl[2];
-                }
+            if(angl[0] > angl[1] && angl[0] > angl[2]){
+                angl_tmp = a[0];
+            }else if(angl[1] > angl[0] && angl[1] > angl[2]){
+                angl_tmp = angl[1];
             }else{
-                if(a[1]>a[2]){
-                    angl_tmp = angl[1];
-                }else{
-                    angl_tmp= angl[2];
-                }
+                angl_tmp = angl[2];
             }
             if(angl_tmp > alpha){
                 if(angl_tmp > angl_max){
@@ -108,12 +103,18 @@ int MeshRuppert::findWorstTriangle(int alpha){
             }
         }
     }
-    return answ;
+    if(abs(angl_max - 1) < 0.00001){
+        return -1 ;
+
+    }else{
+        return answ;
+    }
 }
 
 void MeshRuppert::raffinement(double alpha){
+    priority();
     int fidx = findWorstTriangle(alpha);
-    //while(fidx != -1){
+    while(fidx != -1){
         Face face = faceTab[fidx];
         //Caclul du centre du certcle circonscrit
         Point A, B, C;
@@ -123,9 +124,65 @@ void MeshRuppert::raffinement(double alpha){
 
         //insertion du centre de voronoi dans le maillage test
         Point Q = computeCenter(A, B, C);
-        insertion(Q);
+        MeshRuppert mesh_test = *this;
+        mesh_test.insertion(Q);
+        QVector<int> edges = mesh_test.edgeNotInDel();
+        if(edges.size() == 0){
+            insertion(Q);
+        }else{
 
-        //Recuperation des arrêtes accroché
+            //Quand une arrête est accroché je les split et je cherche les pire triangle crée.
+            //Les triangles crées sont ceux incidents au sommet crée
+            double angl_max = -1;
+            int worst_face = -1;
+            int offset = 0;
+            for( int edge_index = 0; edge_index < edges.size(); edge_index++){
+                splitEdge(edges[edge_index] - offset);
+                offset++;
+                int vidx = this->vertexTab.size() - 1;
+                Circulator_on_faces cf;
+                cf = incident_faces(vertexTab[vidx]);
+                do{
+                    if(isFaceVisible(cf->idx())){
+                        int a_index = cf->vertices()[0];
+                        int b_index = cf->vertices()[1];
+                        int c_index = cf->vertices()[2];
+                        Point a = vertexTab[a_index].point();
+                        Point b = vertexTab[b_index].point();
+                        Point c = vertexTab[c_index].point();
+
+                        //Calcul des angles
+                        std::array<double, 3> angl = {cos(b, a, c), cos(a, b, c), cos(b, c, a)};
+                        double angl_tmp;
+                        if(angl[0] > angl[1] && angl[0] > angl[2]){
+                            angl_tmp = a[0];
+                        }else if(angl[1] > angl[0] && angl[1] > angl[2]){
+                            angl_tmp = angl[1];
+                        }else{
+                            angl_tmp = angl[2];
+                        }
+                        if(angl_tmp > alpha && angl_tmp < 1){
+                            if(angl_tmp > angl_max){
+                                angl_max = angl_tmp;
+                                worst_face = cf->idx();
+                            }
+                        }
+                    }
+                        ++cf;
+                }while(cf != incident_faces(vertexTab[vidx]));
+            }
+            //Ajout du pire centre de cercle circonscrit
+            if(worst_face != -1){
+                Point A, B, C;
+                A = vertexTab[faceTab[worst_face].vertices()[0]].point();
+                B = vertexTab[faceTab[worst_face].vertices()[1]].point();
+                C = vertexTab[faceTab[worst_face].vertices()[2]].point();
+
+                Q = computeCenter(A, B, C);
+                insertion(Q);
+            }
+        }//FIn cas d'accroche
+
         fidx = findWorstTriangle(alpha);
-    //}
+    }
 }
