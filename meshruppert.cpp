@@ -49,10 +49,7 @@ QVector<int> MeshRuppert::edgeNotInDel(){
     }
     return answ;
 }
-
-void MeshRuppert::priority(){
-   while(edgeNotInDel().size()){
-        std::array<int,2> edge = constraint()[edgeNotInDel()[0]];
+void MeshRuppert::splitEdge(std::array<int, 2> edge){
         int idx = vertexTab.size();
         Point a = vertexTab[edge[0]].point();
         Point b = vertexTab[edge[1]].point();
@@ -60,6 +57,11 @@ void MeshRuppert::priority(){
         _constraint.remove(edgeNotInDel()[0]);
         _constraint.push_back({edge[0], idx});
         _constraint.push_back({idx, edge[1]});
+}
+void MeshRuppert::priority(){
+   while(edgeNotInDel().size()){
+        std::array<int,2> edge = constraint()[edgeNotInDel()[0]];
+        splitEdge(edge);
     }
 }
 
