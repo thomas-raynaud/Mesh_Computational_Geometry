@@ -40,6 +40,7 @@ public:
     void switchTP(int index);
     void insertNPoints(int n);
     void simplifyMesh();
+    void raffine(double alpha);
 
 protected:
     // Mouse Management

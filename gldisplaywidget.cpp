@@ -157,6 +157,10 @@ void GLDisplayWidget::simplifyMesh(){
     ((Mesh2D*)_mesh)->buildVoronoi();
 }
 
+void GLDisplayWidget::raffine(double alpha){
+    ((MeshRuppert*)_mesh)->raffinement(alpha);
+}
+
 // - - - - - - - - - - - - Mouse Management  - - - - - - - - - - - - - - - -
 // When you click, the position of your mouse is saved
 void GLDisplayWidget::mousePressEvent(QMouseEvent *event)

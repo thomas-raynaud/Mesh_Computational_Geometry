@@ -19,7 +19,7 @@ MeshRuppert::MeshRuppert(){
 
     priority();
 
-    //raffinement();
+   //raffinement(0.9);
 }
 
 bool MeshRuppert::isConstraint(int a, int b){
@@ -76,55 +76,56 @@ int MeshRuppert::findWorstTriangle(int alpha){
     double angl_max = -1;
     Iterator_on_faces itf;
     for(itf = this->faces_begin(); itf != this->faces_end(); ++itf){
-        int a_index = itf->vertices()[0];
-        int b_index = itf->vertices()[1];
-        int c_index = itf->vertices()[2];
-        Point a = vertexTab[a_index].point();
-        Point b = vertexTab[b_index].point();
-        Point c = vertexTab[c_index].point();
+        if(isFaceVisible(itf->idx())){
+            int a_index = itf->vertices()[0];
+            int b_index = itf->vertices()[1];
+            int c_index = itf->vertices()[2];
+            Point a = vertexTab[a_index].point();
+            Point b = vertexTab[b_index].point();
+            Point c = vertexTab[c_index].point();
 
-        //Calcul des angles
-        std::array<double, 3> angl = {cos(b, a, c), cos(a, b, c), cos(b, c, a)};
-        double angl_tmp;
-        if(angl[0]>angl[1]){
-            if(angl[0]>angl[2]){
-                angl_tmp = angl[0];
+            //Calcul des angles
+            std::array<double, 3> angl = {cos(b, a, c), cos(a, b, c), cos(b, c, a)};
+            double angl_tmp;
+            if(angl[0]>angl[1]){
+                if(angl[0]>angl[2]){
+                    angl_tmp = angl[0];
+                }else{
+                    angl_tmp = angl[2];
+                }
             }else{
-                angl_tmp = angl[2];
+                if(a[1]>a[2]){
+                    angl_tmp = angl[1];
+                }else{
+                    angl_tmp= angl[2];
+                }
             }
-        }else{
-            if(a[1]>a[2]){
-                angl_tmp = angl[1];
-            }else{
-                angl_tmp= angl[2];
-            }
-        }
-        if(angl_tmp > alpha){
-            if(angl_tmp > angl_max){
-                angl_max = angl_tmp;
-                answ = itf->idx();
+            if(angl_tmp > alpha){
+                if(angl_tmp > angl_max){
+                    angl_max = angl_tmp;
+                    answ = itf->idx();
+                }
             }
         }
     }
     return answ;
 }
 
-void MeshRuppert::raffinement(){
-       int fidx = findWorstTriangle(0.9);
-       while(fidx != -1){
-           Face face = faceTab[fidx];
-           MeshRuppert testMesh = *this;
-           //Caclul du centre du certcle circonscrit
-           Point A, B, C;
-           A = vertexTab[face.vertices()[0]].point();
-           B = vertexTab[face.vertices()[1]].point();
-           C = vertexTab[face.vertices()[2]].point();
+void MeshRuppert::raffinement(double alpha){
+    int fidx = findWorstTriangle(alpha);
+    //while(fidx != -1){
+        Face face = faceTab[fidx];
+        //Caclul du centre du certcle circonscrit
+        Point A, B, C;
+        A = vertexTab[face.vertices()[0]].point();
+        B = vertexTab[face.vertices()[1]].point();
+        C = vertexTab[face.vertices()[2]].point();
 
-           //insertion du centre de voronoi dans le maillage test
-           testMesh.insertion(computeCenter(A, B, C));
+        //insertion du centre de voronoi dans le maillage test
+        Point Q = computeCenter(A, B, C);
+        insertion(Q);
 
-           //Recuperation des arrêtes accroché
-           QVector<int> edge = edgeNotInDel();
-
-       }
+        //Recuperation des arrêtes accroché
+        fidx = findWorstTriangle(alpha);
+    //}
 }

@@ -23,7 +23,7 @@ public:
     double cos(Point a, Point b, Point c);
     int findWorstTriangle(int alpha);
 
-    void raffinement();
+    void raffinement(double alpha);
 
 };
 

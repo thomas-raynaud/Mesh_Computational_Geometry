@@ -34,6 +34,8 @@ private slots:
 
     void on_pushButtonSimplifyMesh_clicked();
 
+    void on_pushButtonRaffine_clicked();
+
 private:
     Ui::MainWindow *ui;
 };

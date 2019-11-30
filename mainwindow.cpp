@@ -117,3 +117,9 @@ void MainWindow::on_pushButtonSimplifyMesh_clicked()
 {
    ui->widget->simplifyMesh();
 }
+
+void MainWindow::on_pushButtonRaffine_clicked()
+{
+    ui->widget->raffine(0.9);
+
+}
