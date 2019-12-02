@@ -3,18 +3,19 @@
 MeshRuppert::MeshRuppert(){
     Mesh2D();// Donne deja les point 0,1,..,6 cf Mesh2D
 
-    insertion(Point(3, 4, 0)); //7
+    insertion(Point(3, 3, 0)); //7
     insertion(Point(-2, 4, 0)); //8
     insertion(Point(1, 8, 0)); //9
     insertion(Point(-1, 9, 0)); //10
     insertion(Point(-7, 12, 0)); //11
-    insertion(Point(-12, 7, 0)); //12
-    insertion(Point(-3, 3, 0)); //13
-    insertion(Point(-3, 2, 0)); //14
-    insertion(Point(-5, 1, 0)); //15
+    insertion(Point(-10, 5, 0)); //12
+    insertion(Point(-4, 3, 0)); //13
+    insertion(Point(-4, 2, 0)); //14
+    insertion(Point(-7, 1, 0)); //15
     insertion(Point(-3, -1, 0)); //16
+    insertion(Point(2, 7, 0)); //17
 
-    _constraint = {{7,6}, {6,8}, {8,9}, {9,10}, {10,11}, {11,12}, {12,13}, {13,14}, {14,15}, {15,16}, {16,4}, {4,5}, {5,7}};
+    _constraint = {{7,17}, {17,6}, {6,8}, {8,9}, {9,10}, {10,11}, {11,12}, {12,13}, {13,14}, {14,15}, {15,16}, {16,4}, {4,5}, {5,7}};
 
 
 }
@@ -72,7 +73,7 @@ double MeshRuppert::cos(Point a, Point b, Point c){
     }
 }
 
-int MeshRuppert::findWorstTriangle(int alpha){
+int MeshRuppert::findWorstTriangle(double alpha){
     int answ = -1;
     double angl_max = -1;
     Iterator_on_faces itf;
@@ -103,15 +104,11 @@ int MeshRuppert::findWorstTriangle(int alpha){
             }
         }
     }
-    if(abs(angl_max - 1) < 0.00001){
-        return -1 ;
-
-    }else{
-        return answ;
-    }
+    return answ;
 }
 
 void MeshRuppert::raffinement(double alpha){
+
     priority();
     int fidx = findWorstTriangle(alpha);
     while(fidx != -1){
