@@ -5,7 +5,6 @@
 // VE : sommet opposé à l'arête à supprimer dans la face FE
 // FE : face qui a une de ses arêtes à supprimer, et a pour sommet FE.
 std::array<int, 3> Mesh::edgeCollapse(int VE, int FE) {
-    std::cout << "edge collapse " << VE << " " << FE << std::endl;
     int V1, V2; // Sommets de l'arête à supprimer. V1, V2 et VE forment FE.
     int FE_Opp; // Face opposée à VE depuis la face FE
     int FA1, FA2; // Faces adjacentes à FE. -> FA1 et FA2 != FE_Opp
@@ -191,22 +190,17 @@ void Mesh::simplify (int n) {
         edges.erase(edges.begin());
     }
 
-    std::cout << "Nettoyage" << std::endl;
 
     // Nettoyer le maillage
     std::sort(deletedVertices.begin(), deletedVertices.end(), std::greater<int>());
     std::sort(deletedFaces.begin(), deletedFaces.end(), std::greater<int>());
 
-    std::cout << "Faces" << std::endl;
-
     // Faces
     for (uint i = 0; i < deletedFaces.size(); ++i) {
         facePop(deletedFaces[i]);
     }
-    std::cout << "Sommets" << std::endl;
     // Sommets
     for (uint i = 0; i < deletedVertices.size(); ++i) {
         vertexPop(deletedVertices[i]);
     }
-    std::cout << "end" << std::endl;
 }

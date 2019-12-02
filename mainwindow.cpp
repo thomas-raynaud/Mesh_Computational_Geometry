@@ -12,6 +12,7 @@ MainWindow::MainWindow(QWidget *parent) :
     ui->pushButtonxxyy->hide();
     ui->pushButtonRosenbrock->hide();
     ui->pushButtonSimplifyMesh->hide();
+    ui->pushButtonRaffine->hide();
 }
 
 MainWindow::~MainWindow()
@@ -49,6 +50,7 @@ void MainWindow::on_comboBoxTPswitch_currentIndexChanged(int index)
             ui->comboBoxColorswitch->show();
             ui->comboBoxMeshswitch->show();
             ui->pushButtonSimplifyMesh->hide();
+            ui->pushButtonRaffine->hide();
             break;
         case 1:
             ui->pushButtonInsertNPoints->show();
@@ -58,6 +60,7 @@ void MainWindow::on_comboBoxTPswitch_currentIndexChanged(int index)
             ui->comboBoxColorswitch->hide();
             ui->comboBoxMeshswitch->hide();
             ui->pushButtonSimplifyMesh->hide();
+            ui->pushButtonRaffine->hide();
             break;
         case 2:
             ui->pushButtonInsertNPoints->hide();
@@ -67,6 +70,7 @@ void MainWindow::on_comboBoxTPswitch_currentIndexChanged(int index)
             ui->comboBoxColorswitch->hide();
             ui->comboBoxMeshswitch->hide();
             ui->pushButtonSimplifyMesh->hide();
+            ui->pushButtonRaffine->hide();
             break;
         case 3:
             ui->pushButtonInsertNPoints->hide();
@@ -78,6 +82,7 @@ void MainWindow::on_comboBoxTPswitch_currentIndexChanged(int index)
             ui->pushButtonSimplifyMesh->hide();
             ui->pushButtonxxyy->setEnabled(false);
             ui->pushButtonRosenbrock->setEnabled(false);
+            ui->pushButtonRaffine->hide();
             break;
         case 4:
             ui->pushButtonInsertNPoints->hide();
@@ -88,7 +93,21 @@ void MainWindow::on_comboBoxTPswitch_currentIndexChanged(int index)
             ui->comboBoxMeshswitch->show();
             ui->pushButtonSimplifyMesh->show();
             ui->pushButtonDisplayType->setEnabled(false);
+            ui->pushButtonSimplifyMesh->setEnabled(true);
             //ui->comboBoxMeshswitch->setEnabled(false);
+            ui->pushButtonRaffine->hide();
+            break;
+        case 5:
+            ui->pushButtonInsertNPoints->hide();
+            ui->pushButtonInsertPoint->hide();
+            ui->pushButtonxxyy->hide();
+            ui->pushButtonRosenbrock->hide();
+            ui->comboBoxColorswitch->hide();
+            ui->comboBoxMeshswitch->hide();
+            ui->pushButtonSimplifyMesh->show();
+            ui->pushButtonDisplayType->setEnabled(false);
+            ui->pushButtonSimplifyMesh->setEnabled(false);
+            ui->pushButtonRaffine->show();
             break;
     }
 

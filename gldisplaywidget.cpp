@@ -21,8 +21,10 @@ GLDisplayWidget::GLDisplayWidget(QWidget *parent) : QGLWidget(parent) {
 
     _X = 0.f;
     _Y = 0.f;
-    _Z = 4.f;
-    _angleX = -65.f;
+    //_Z = 4.f;
+    _Z = 0.f;
+    //_angleX = -65.f;
+    _angleX = 0.f;
     _angleY = 0.f;}
 
 void GLDisplayWidget::initializeGL()
