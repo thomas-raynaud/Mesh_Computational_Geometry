@@ -68,6 +68,7 @@ QueenMesh::QueenMesh() {
         delimiterPos3 = line.find(" ", delimiterPos2 + 1);
         z = atof(line.substr(delimiterPos2, delimiterPos3 ).c_str()); // z
         vertexTab.push_back(Vertex(Point(x, y, z), -1, i));
+        vertexTab[vertexTab.size() - 1].setIdx(i);
     }
 
     /**** Création des faces ****/
@@ -86,6 +87,7 @@ QueenMesh::QueenMesh() {
         if (vertexTab[v2].face() == -1) vertexTab[v2].setFace(i);
         if (vertexTab[v3].face() == -1) vertexTab[v3].setFace(i);
         faceTab.push_back(Face(ind_vertices, ind_faces));
+        faceTab[faceTab.size() - 1].setIdx(i);
     }
 
     // Connecter les faces adjacentes

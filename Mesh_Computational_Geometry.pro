@@ -27,7 +27,8 @@ SOURCES += main.cpp\
     meshcurvature.cpp \
     meshdelaunay.cpp \
     meshparabola.cpp \
-    predicate.cpp
+    predicate.cpp \
+    mesh_refined_delaunay.cpp
 
 HEADERS  += mainwindow.h \
     gldisplaywidget.h \
@@ -38,7 +39,8 @@ HEADERS  += mainwindow.h \
     mesh3d.h \
     meshdelaunay.h \
     meshparabola.h \
-    predicate.h
+    predicate.h \
+    mesh_refined_delaunay.h
 
 FORMS    += mainwindow.ui
 

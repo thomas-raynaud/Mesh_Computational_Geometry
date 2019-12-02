@@ -39,6 +39,7 @@ void MainWindow::on_comboBoxTPswitch_currentIndexChanged(int index)
 {
     ui->pushButtonxxyy->setEnabled(true);
     ui->pushButtonRosenbrock->setEnabled(true);
+    ui->pushButtonDisplayType->setEnabled(true);
     switch (index) {
         case 0:
             ui->pushButtonInsertNPoints->hide();
@@ -83,10 +84,11 @@ void MainWindow::on_comboBoxTPswitch_currentIndexChanged(int index)
             ui->pushButtonInsertPoint->hide();
             ui->pushButtonxxyy->hide();
             ui->pushButtonRosenbrock->hide();
-
             ui->comboBoxColorswitch->hide();
             ui->comboBoxMeshswitch->show();
             ui->pushButtonSimplifyMesh->show();
+            ui->pushButtonDisplayType->setEnabled(false);
+            //ui->comboBoxMeshswitch->setEnabled(false);
             break;
     }
 

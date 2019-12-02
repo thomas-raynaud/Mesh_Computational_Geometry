@@ -21,8 +21,8 @@ GLDisplayWidget::GLDisplayWidget(QWidget *parent) : QGLWidget(parent) {
 
     _X = 0.f;
     _Y = 0.f;
-    _Z = 0.f;
-    _angleX = 0.f;
+    _Z = 4.f;
+    _angleX = -65.f;
     _angleY = 0.f;}
 
 void GLDisplayWidget::initializeGL()
@@ -150,7 +150,6 @@ void GLDisplayWidget::insertNPoints(int n) {
 
 void GLDisplayWidget::simplifyMesh(){
     _mesh->simplify(_mesh->getNbVertices() / 2);
-    ((Mesh2D*)_mesh)->buildVoronoi();
 }
 
 // - - - - - - - - - - - - Mouse Management  - - - - - - - - - - - - - - - -
