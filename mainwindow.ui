@@ -29,7 +29,7 @@
          <x>10</x>
          <y>10</y>
          <width>171</width>
-         <height>351</height>
+         <height>391</height>
         </rect>
        </property>
        <layout class="QVBoxLayout" name="verticalLayout">
@@ -58,6 +58,11 @@
           <item>
            <property name="text">
             <string>Simplification</string>
+           </property>
+          </item>
+          <item>
+           <property name="text">
+            <string>Ruppert</string>
            </property>
           </item>
          </widget>
@@ -152,6 +157,13 @@
          <widget class="QPushButton" name="pushButtonRosenbrock">
           <property name="text">
            <string>Rosenbrock</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QPushButton" name="pushButtonRaffine">
+          <property name="text">
+           <string>Raffine</string>
           </property>
          </widget>
         </item>

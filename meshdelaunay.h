@@ -29,6 +29,8 @@ public:
     // pour que la triangulation soit globalement de Delaunay
     void rearrangeDelaunay(int vertexIdx);
 
+    Point computeCenter(Point, Point, Point);
+
     virtual void drawMesh();
     virtual void drawMeshWireFrame();
     virtual void drawVoronoiWireFrame();

@@ -130,6 +130,10 @@ void GLDisplayWidget::switchTP(int index) {
             //_mesh = new QueenMesh();
             //((QueenMesh*)_mesh)->computeColors(0);
             break;
+
+        case 5:
+            _mesh = new MeshRuppert();
+            break;
     }
 }
 
@@ -150,6 +154,10 @@ void GLDisplayWidget::insertNPoints(int n) {
 
 void GLDisplayWidget::simplifyMesh(){
     _mesh->simplify(_mesh->getNbVertices() / 2);
+}
+
+void GLDisplayWidget::raffine(double alpha){
+    ((MeshRuppert*)_mesh)->raffinement(alpha);
 }
 
 // - - - - - - - - - - - - Mouse Management  - - - - - - - - - - - - - - - -

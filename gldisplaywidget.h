@@ -9,6 +9,7 @@
 #include "meshdelaunay.h"
 #include "meshparabola.h"
 #include "meshcrust.h"
+#include "meshruppert.h"
 
 #include <iostream>
 
@@ -39,6 +40,7 @@ public:
     void switchTP(int index);
     void insertNPoints(int n);
     void simplifyMesh();
+    void raffine(double alpha);
 
 protected:
     // Mouse Management

@@ -17,6 +17,7 @@ SOURCES += main.cpp\
     gldisplaywidget.cpp \
     mesh.cpp \
     meshcrust.cpp \
+    meshruppert.cpp \
     point.cpp \
     opengldisplaymesh.cpp \
     simplify.cpp \
@@ -34,6 +35,7 @@ HEADERS  += mainwindow.h \
     gldisplaywidget.h \
     mesh.h \
     meshcrust.h \
+    meshruppert.h \
     point.h \
     color.h \
     mesh3d.h \
