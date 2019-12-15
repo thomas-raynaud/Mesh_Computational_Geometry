@@ -48,7 +48,7 @@ BoundingBox2D::BoundingBox2D() {
 QueenMesh::QueenMesh() {
 
     /**** Lecture du fichier ****/
-    std::ifstream offFile("queen.off");
+    std::ifstream offFile("resources/queen.off");
     if (!offFile) { return; } // le fichier ne peut pas s'ouvrir
     std::string line;
     int nbVertices, nbFaces;

@@ -1,7 +1,7 @@
 #ifndef MESH_REFINED_DELAUNAY_H
 #define MESH_REFINED_DELAUNAY_H
 
-#include "meshdelaunay.h".h"
+#include "meshdelaunay.h"
 
 class Mesh_Constrained : public Mesh2D {
 public:

@@ -2,7 +2,6 @@
 
 Mesh_Constrained::Mesh_Constrained() {
     Mesh2D();
-    int s = vertexTab.size();
     insertion(Point(-2, 1, 0));
     insertion(Point(0, 4, 0));
     insertion(Point(0, 3, 0));

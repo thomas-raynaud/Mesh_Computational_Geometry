@@ -46,20 +46,17 @@ HEADERS  += mainwindow.h \
 
 FORMS    += mainwindow.ui
 
+DISTFILES += \
+    resources/queen.off \
+    resources/points_courbe.txt
+
 #---- Comment the following line on MacOS
 LIBS = -lGLU
 
-# Add the queen.off file
-copydata.commands = $(COPY_DIR) $$PWD/queen.off $$OUT_PWD
+# Add the queen.off + points_courbe.txt file
+copydata.commands = $(COPY_DIR) $$PWD/resources $$OUT_PWD
 first.depends = $(first) copydata
 export(first.depends)
 export(copydata.commands)
 
-# Add the points_courbe.txt file
-copydatacourbe.commands = $(COPY_DIR) $$PWD/points_courbe.txt $$OUT_PWD
-first.depends = $(first) copydatacourbe
-export(first.depends)
-export(copydata.commands)
-
 QMAKE_EXTRA_TARGETS += first copydata
-QMAKE_EXTRA_TARGETS += first copydatacourbe

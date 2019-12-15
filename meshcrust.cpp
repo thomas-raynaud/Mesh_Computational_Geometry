@@ -3,7 +3,7 @@
 
 Crust::Crust(){
     // Insertion des points du fichier
-    std::ifstream file("points_courbe.txt");
+    std::ifstream file("resources/points_courbe.txt");
     if(!file){ return; } // le fichier ne peut pas s'ouvrir
     std::string line;
     double x, y;
