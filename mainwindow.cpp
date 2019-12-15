@@ -141,6 +141,6 @@ void MainWindow::on_pushButtonSimplifyMesh_clicked()
 
 void MainWindow::on_pushButtonRaffine_clicked()
 {
-    ui->widget->raffine(0.9);
+    ui->widget->raffine(0.85);
 
 }

@@ -21,7 +21,7 @@ public:
     QVector<int> edgeNotInDel();
 
     double cos(Point a, Point b, Point c);
-    int findWorstTriangle(int alpha);
+    int findWorstTriangle(double alpha);
 
     void raffinement(double alpha);
 
