@@ -48,8 +48,12 @@ BoundingBox2D::BoundingBox2D() {
 QueenMesh::QueenMesh() {
 
     /**** Lecture du fichier ****/
+    std::setlocale(LC_NUMERIC, "C");
     std::ifstream offFile("resources/queen.off");
-    if (!offFile) { return; } // le fichier ne peut pas s'ouvrir
+    if (!offFile) {
+        std::cerr << "Cannot open queen.off file." << std::endl;
+        return;
+    }
     std::string line;
     int nbVertices, nbFaces;
     std::getline(offFile, line);

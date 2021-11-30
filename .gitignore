@@ -2,3 +2,6 @@
 Mesh_Computational_Geometry.pro.user*
 *.o
 .qmake.stash
+*.code-workspace
+build
+.vscode
