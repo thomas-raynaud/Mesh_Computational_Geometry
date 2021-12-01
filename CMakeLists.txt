@@ -34,33 +34,26 @@ set(SOURCES
     ${CMAKE_SOURCE_DIR}/mesh_refined_delaunay.cpp
 )
 
-set(RESOURCES
-    ${CMAKE_SOURCE_DIR}/resources/points_courbe.txt
-    ${CMAKE_SOURCE_DIR}/resources/queen.off
+# Add resource files
+file(
+    COPY "${CMAKE_CURRENT_SOURCE_DIR}/resources"
+    DESTINATION ${CMAKE_CURRENT_BINARY_DIR}
 )
 
 include_directories(${CMAKE_SOURCE_DIR})
 
-add_executable(${PROJECT_NAME} ${SOURCES} ${RESOURCES})
-
 # Configure OpenGL
-
 set(OpenGL_COMPONENT
     EGL
     GLX
     OpenGL
 )
-
 find_package(OpenGL COMPONENTS ${OpenGL_COMPONENT} REQUIRED)
-foreach(_comp ${OpenGL_COMPONENT})
-    target_link_libraries(${PROJECT_NAME} PRIVATE OpenGL::${_comp})
-endforeach()
 
-find_package(GLU REQUIRED)
-target_link_libraries(${PROJECT_NAME} PRIVATE GLU)
+# Configure GLM
+find_package(glm REQUIRED)
 
 # Configure Qt
-
 set(QT_VERSION 5.12.8)
 set(QT_COMPONENT
     Core
@@ -68,12 +61,18 @@ set(QT_COMPONENT
     Widgets
     OpenGL
 )
-
 find_package(Qt5 ${QT_VERSION} COMPONENTS ${QT_COMPONENT} REQUIRED)
-foreach(_comp ${QT_COMPONENT})
-    target_link_libraries(${PROJECT_NAME} PRIVATE Qt5::${_comp} )
+
+
+add_executable(${PROJECT_NAME} ${SOURCES})
+
+
+foreach(_comp ${OpenGL_COMPONENT})
+    target_link_libraries(${PROJECT_NAME} PRIVATE OpenGL::${_comp})
 endforeach()
 
-foreach(_ressource ${RESOURCES})
-    qt5_add_resources(${_ressource} )
+target_link_libraries(${PROJECT_NAME} PRIVATE glm::glm)
+
+foreach(_comp ${QT_COMPONENT})
+    target_link_libraries(${PROJECT_NAME} PRIVATE Qt5::${_comp} )
 endforeach()

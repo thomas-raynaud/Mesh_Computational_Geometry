@@ -1,9 +1,5 @@
 #include "gldisplaywidget.h"
-#ifdef __APPLE__
-#include <glu.h>
-#else
-    #include <GL/glu.h>
-#endif
+#include <glm/gtc/matrix_transform.hpp>
 
 #include "QDebug"
 
@@ -50,7 +46,7 @@ void GLDisplayWidget::paintGL(){
     // Center the camera
     glMatrixMode(GL_MODELVIEW);
     glLoadIdentity();
-    gluLookAt(0,0,5,  0,0,0,   0,1,0);
+    glm::lookAt(glm::vec3(0,0,5), glm::vec3(0,0,0), glm::vec3(0,1,0));
 
     // Translation
     glTranslated(_X, _Y, _Z);
@@ -75,7 +71,7 @@ void GLDisplayWidget::resizeGL(int width, int height){
     glViewport(0, 0, width, height);
     glMatrixMode(GL_PROJECTION);
     glLoadIdentity();
-    gluPerspective(45.0f, (GLfloat)width/(GLfloat)height, 0.1f, 100.0f);
+    glm::perspective(glm::radians(45.0f), (GLfloat)width/(GLfloat)height, 0.1f, 100.0f);
 
     updateGL();
 }
