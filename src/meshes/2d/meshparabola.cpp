@@ -5,10 +5,10 @@
 
 Parabola::Parabola(int type) : Mesh2D(), _parabola_type(type) {
     // Changement de profondeur des sommets existants
-    for (QVector<Vertex>::iterator vertex_it = vertexTab.begin(); vertex_it != vertexTab.end(); ++vertex_it) {
-        if (vertex_it->isFictive()) continue;
-        vertex_it->setPoint(phi(vertex_it->point()));
-        vertex_it->setDisplay(false);
+    for (QVector<Vertex*>::iterator vertex_it = m_vertices.begin(); vertex_it != m_vertices.end(); ++vertex_it) {
+        if ((*vertex_it)->isFictive()) continue;
+        (*vertex_it)->setPoint(phi((*vertex_it)->point()));
+        (*vertex_it)->setDisplay(false);
     }
 
     double x, y, z;
@@ -32,14 +32,14 @@ Parabola::Parabola(int type) : Mesh2D(), _parabola_type(type) {
     // Attribution des couleurs
     // trouver zmin et zmax
     double zmin = DBL_MAX, zmax = 0.0, hue;
-    for (QVector<Vertex>::iterator vertex_it = vertexTab.begin(); vertex_it != vertexTab.end(); ++vertex_it) {
-        if (vertex_it->isFictive() || !vertex_it->isVisible()) continue;
-        zmin = std::min(zmin, vertex_it->point().z());
-        zmax = std::max(zmax, vertex_it->point().z());
+    for (QVector<Vertex*>::iterator vertex_it = m_vertices.begin(); vertex_it != m_vertices.end(); ++vertex_it) {
+        if ((*vertex_it)->isFictive() || !(*vertex_it)->isVisible()) continue;
+        zmin = std::min(zmin, (*vertex_it)->point().z());
+        zmax = std::max(zmax, (*vertex_it)->point().z());
     }
-    for (QVector<Vertex>::iterator vertex_it = vertexTab.begin(); vertex_it != vertexTab.end(); ++vertex_it) {
+    for (QVector<Vertex*>::iterator vertex_it = m_vertices.begin(); vertex_it != m_vertices.end(); ++vertex_it) {
         // Courbure faible : vert, à courbure forte : rouge
-        hue = ((vertex_it->point().z() - zmin) / zmax) * 270.0 + 90.0;
-        vertex_it->setColor(hsv2rgb(hue, 1.0, 1.0));
+        hue = (((*vertex_it)->point().z() - zmin) / zmax) * 270.0 + 90.0;
+        (*vertex_it)->setColor(hsv2rgb(hue, 1.0, 1.0));
     }
 }

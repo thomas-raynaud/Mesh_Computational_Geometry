@@ -1,7 +1,7 @@
 #ifndef MESHCRUST_H
 #define MESHCRUST_H
 
-#include "meshdelaunay.h"
+#include "mesh2d.h"
 
 
 class Crust : public Mesh2D{

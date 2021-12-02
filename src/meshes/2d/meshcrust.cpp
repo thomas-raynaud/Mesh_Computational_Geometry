@@ -23,7 +23,7 @@ Crust::Crust(){
     // Voronoi
     this->buildVoronoi();
 
-    this->_firstVoronoiIndex = this->vertexTab.size();
+    this->_firstVoronoiIndex = this->m_vertices.size();
 
     // Insérer les centres de Voronoi
     for(int vIndex = 0; vIndex < this->vVertices().size(); vIndex++){

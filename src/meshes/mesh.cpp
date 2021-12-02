@@ -1,7 +1,15 @@
 #include "mesh.h"
 
+
 Mesh::Mesh() {}
-Mesh::~Mesh() {}
+
+
+Mesh::~Mesh() {
+    for (QVector<Vertex*>::iterator vertex_it = m_vertices.begin(); vertex_it != m_vertices.end(); ++vertex_it) {
+        delete *vertex_it;
+    }
+}
+
 
 void Mesh::connectAdjacentFaces() {
     std::unordered_map<std::string, int> edges; // map des arêtes du mesh
@@ -46,11 +54,11 @@ Iterator_on_faces Mesh::faces_end() {
 }
 
 Iterator_on_vertices Mesh::vertices_begin() {
-    return Iterator_on_vertices(vertexTab.begin());
+    return Iterator_on_vertices(m_vertices.begin());
 }
 
 Iterator_on_vertices Mesh::vertices_past_the_end() {
-    return Iterator_on_vertices(vertexTab.end());
+    return Iterator_on_vertices(m_vertices.end());
 }
 
 Circulator_on_faces Mesh::incident_faces(Vertex &v) {
@@ -98,7 +106,7 @@ Circulator_on_vertices Mesh::neighbour_vertices(Vertex &v) {
                 break;
             }
         }
-        sommets_voisins.push_back(&(vertexTab[faceTab[face_actuelle].vertices()[id_v_oppose]]));
+        sommets_voisins.push_back(m_vertices[faceTab[face_actuelle].vertices()[id_v_oppose]]);
         face_actuelle = faceTab[face_actuelle].adjacentFaces()[id_v_oppose];
     }
     while(face_actuelle != first_face);
@@ -110,21 +118,21 @@ Circulator_on_vertices Mesh::neighbour_vertices(Vertex &v) {
 
 std::ostream& operator<<(std::ostream &strm, const Mesh &m) {
     strm << "===============" << std::endl;
-    strm << "Mesh: " << m.vertexTab.size() << " vertices, " << m.faceTab.size() << " faces" << std::endl;
+    strm << "Mesh: " << m.m_vertices.size() << " vertices, " << m.faceTab.size() << " faces" << std::endl;
     strm << "\nVertices:\n";
     std::string type;
-    for (int i = 0; i < m.vertexTab.size(); ++i) {
-        if (m.vertexTab[i].isFictive())
+    for (int i = 0; i < m.m_vertices.size(); ++i) {
+        if (m.m_vertices[i]->isFictive())
             type = " (fictive)";
-        else if (!m.vertexTab[i].isVisible())
+        else if (!m.m_vertices[i]->isVisible())
             type = " (hidden)";
         else
             type = "";
-        strm << m.vertexTab[i].idx() << ": "
-                          << m.vertexTab[i].point().x() << " "
-                          << m.vertexTab[i].point().y() << " "
-                          << m.vertexTab[i].point().z() << type << " - f="
-                          << m.vertexTab[i].face() << std::endl;
+        strm << m.m_vertices[i]->idx() << ": "
+                          << m.m_vertices[i]->point().x() << " "
+                          << m.m_vertices[i]->point().y() << " "
+                          << m.m_vertices[i]->point().z() << type << " - f="
+                          << m.m_vertices[i]->face() << std::endl;
     }
     strm << "Faces:\n";
     for (int i = 0; i < m.faceTab.size(); ++i) {
@@ -152,7 +160,7 @@ void Mesh::facePop(int fIdx) {
         if (j >= fIdx) {
             faceTab[j].setIdx(j);
             for (int k = 0; k < 3; ++k) {
-                vertexTab[faceTab[j].vertices()[k]].setFace(j);
+                m_vertices[faceTab[j].vertices()[k]]->setFace(j);
             }
         }
         for (int k = 0; k < 3; ++k) {
@@ -165,9 +173,10 @@ void Mesh::facePop(int fIdx) {
 
 
 void Mesh::vertexPop(int vIdx) {
-    vertexTab.remove(vIdx);
-    for (int j = vIdx; j < vertexTab.size(); ++j) {
-        vertexTab[j].setIdx(j);
+    delete m_vertices[vIdx];
+    m_vertices.remove(vIdx);
+    for (int j = vIdx; j < m_vertices.size(); ++j) {
+        m_vertices[j]->setIdx(j);
     }
     for (int j = 0; j < faceTab.size(); ++j) {
         for (int k = 0; k < 3; ++k) {

@@ -2,7 +2,7 @@
 #define OPENGLDISPLAYMESH_H
 
 #include "meshes/mesh.h"
-#include "meshes/2d/meshdelaunay.h"
+#include "meshes/2d/mesh2d.h"
 #include "meshes/2d/meshparabola.h"
 #include "meshes/2d/meshcrust.h"
 #include "meshes/2d/meshruppert.h"
@@ -23,9 +23,9 @@ void Mesh::drawMesh() {
         // Ne pas afficher les faces ayant un point fictif
         if (!isFaceVisible(face_it->idx())) continue;
 
-        a = vertexTab[faceVertices[0]];
-        b = vertexTab[faceVertices[1]];
-        c = vertexTab[faceVertices[2]];
+        a = *m_vertices[faceVertices[0]];
+        b = *m_vertices[faceVertices[1]];
+        c = *m_vertices[faceVertices[2]];
 
         // Création du triangle
         glBegin(GL_TRIANGLES);
@@ -47,9 +47,9 @@ void Mesh::drawMeshWireFrame() {
         // Ne pas afficher les faces ayant un point fictif
         if (!isFaceVisible(face_it->idx())) continue;
 
-        a = vertexTab[faceVertices[0]];
-        b = vertexTab[faceVertices[1]];
-        c = vertexTab[faceVertices[2]];
+        a = *m_vertices[faceVertices[0]];
+        b = *m_vertices[faceVertices[1]];
+        c = *m_vertices[faceVertices[2]];
 
         glBegin(GL_LINE_STRIP);
         glColor3d(a.color()[0], a.color()[1], a.color()[2]);
@@ -83,9 +83,9 @@ void Mesh2D::drawMesh() {
         if (!isFaceVisible(face_it->idx())) continue;
         //if (isFaceFictive(face_it->idx())) continue;
 
-        a = vertexTab[faceVertices[0]];
-        b = vertexTab[faceVertices[1]];
-        c = vertexTab[faceVertices[2]];
+        a = *m_vertices[faceVertices[0]];
+        b = *m_vertices[faceVertices[1]];
+        c = *m_vertices[faceVertices[2]];
 
         // Création du triangle
         glColor3d(face_it->color()[0], face_it->color()[1], face_it->color()[2]);
@@ -105,9 +105,9 @@ void Mesh2D::drawMeshWireFrame() {
         // Ne pas afficher les faces ayant un point fictif
         if (!isFaceVisible(face_it->idx())) continue;
 
-        a = vertexTab[faceVertices[0]];
-        b = vertexTab[faceVertices[1]];
-        c = vertexTab[faceVertices[2]];
+        a = *m_vertices[faceVertices[0]];
+        b = *m_vertices[faceVertices[1]];
+        c = *m_vertices[faceVertices[2]];
 
         glColor3d(0, 1, 0);
         glBegin(GL_LINE_STRIP);
@@ -133,10 +133,10 @@ void Mesh2D::drawVoronoiWireFrame() {
     Circulator_on_faces cf, cfbegin;
     int f1, f2;
     glColor3d(1, 0, 0);
-    for (QVector<Vertex>::iterator vertex_it = vertexTab.begin(); vertex_it != vertexTab.end(); ++vertex_it){
-        if (!vertex_it->isFictive()) {
+    for (QVector<Vertex*>::iterator vertex_it = m_vertices.begin(); vertex_it != m_vertices.end(); ++vertex_it){
+        if (!(*vertex_it)->isFictive()) {
 
-            cfbegin = incident_faces(*vertex_it);
+            cfbegin = incident_faces(**vertex_it);
             cf = cfbegin;
             do {
                 f1 = cf->idx();
@@ -160,9 +160,9 @@ void Crust::drawMeshWireFrame(){
         // Ne pas afficher les faces ayant un point fictif
         if (!isFaceVisible(face_it->idx())) continue;
 
-        a = vertexTab[faceVertices[0]];
-        b = vertexTab[faceVertices[1]];
-        c = vertexTab[faceVertices[2]];
+        a = *m_vertices[faceVertices[0]];
+        b = *m_vertices[faceVertices[1]];
+        c = *m_vertices[faceVertices[2]];
 
         glColor3d(0, 1, 0);
         if(a.idx() < this->_firstVoronoiIndex && b.idx() < this->_firstVoronoiIndex){
@@ -201,9 +201,9 @@ void MeshRuppert::drawMesh() {
         // Ne pas afficher les faces ayant un point fictif
         if (!isFaceVisible(face_it->idx())) continue;
 
-        a = vertexTab[faceVertices[0]];
-        b = vertexTab[faceVertices[1]];
-        c = vertexTab[faceVertices[2]];
+        a = *m_vertices[faceVertices[0]];
+        b = *m_vertices[faceVertices[1]];
+        c = *m_vertices[faceVertices[2]];
         int r = 0;
         int g = 1;
         if(isConstraint(a.idx(), b.idx())){
@@ -244,8 +244,8 @@ void MeshRuppert::drawMesh() {
     for (int i = 0; i < constraint().size(); i++){
         std::array<int, 2> edge = constraint()[i];
         Vertex a, b;
-        a = vertexTab[edge[0]];
-        b = vertexTab[edge[1]];
+        a = *m_vertices[edge[0]];
+        b = *m_vertices[edge[1]];
         glBegin(GL_LINE_STRIP);
         glColor3d(1.0, 0, 0);
         glVertexDraw(a);

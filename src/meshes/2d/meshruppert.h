@@ -1,7 +1,8 @@
 #ifndef MESH_RUPPERT_H
 #define MESH_RUPPERT_H
-#include "meshdelaunay.h"
-#include <queue>
+
+#include "mesh2d.h"
+
 
 class MeshRuppert : public Mesh2D{
 protected:
@@ -27,4 +28,4 @@ public:
 
 };
 
-#endif // MESH_RUPPERT_H
+#endif  // MESH_RUPPERT_H

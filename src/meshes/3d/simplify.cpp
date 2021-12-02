@@ -47,7 +47,7 @@ std::array<int, 3> Mesh::edgeCollapse(int VE, int FE) {
     }
 
     // Remplacer V1 par V2 pour les faces adjacentes à V1
-    cof = incident_faces(vertexTab[V1], FE);
+    cof = incident_faces(*m_vertices[V1], FE);
     ++cof;
     while (cof->idx() != FE_Opp) {
         for (int i = 0; i < 3; ++i) {
@@ -55,7 +55,7 @@ std::array<int, 3> Mesh::edgeCollapse(int VE, int FE) {
                 faceTab[cof->idx()].setVertice(V2, i);
             }
             // Changer la face pointée par chaque sommet
-            vertexTab[faceTab[cof->idx()].vertices()[i]].setFace(cof->idx());
+            m_vertices[faceTab[cof->idx()].vertices()[i]]->setFace(cof->idx());
         }
         ++cof;
     }
@@ -76,15 +76,15 @@ std::array<int, 3> Mesh::edgeCollapse(int VE, int FE) {
 
     // Changer les coordonnées de V2 : au milieu de l'arête à supprimer
     // (V1 + V2) * 0.5
-    vertexTab[V2].setPoint((vertexTab[V1].point() + vertexTab[V2].point()) * 0.5);
+    m_vertices[V2]->setPoint((m_vertices[V1]->point() + m_vertices[V2]->point()) * 0.5);
 
     // On retourne les éléments à supprimer du Mesh : V1, FE et FE_Opp
     return {V1, FE, FE_Opp};
 }
 
 double Mesh::getEdgeLength(Edge e) {
-    Point a = vertexTab[e.v1].point();
-    Point b = vertexTab[e.v2].point();
+    Point a = m_vertices[e.v1]->point();
+    Point b = m_vertices[e.v2]->point();
     return difference(a, b).norm();
 }
 
@@ -100,14 +100,14 @@ struct comparatorEdges {
 void Mesh::simplify (int n) {
     // Pas de simplification si le nombre de sommets à obtenir est supérieur au
     // nombre de sommets actuels.
-    if (vertexTab.size() <= n) return;
+    if (m_vertices.size() <= n) return;
 
     std::vector<Edge> edges;
     std::vector<int> deletedFaces;
     std::vector<int> deletedVertices;
     std::array<int, 3> deletedElements;
     Edge e;
-    int nbVertices = vertexTab.size(), f;
+    int nbVertices = m_vertices.size(), f;
     bool edgeNew, faceHidden;
     compareEdges.mesh = this;
 
@@ -154,7 +154,7 @@ void Mesh::simplify (int n) {
 
     // Tant que le maillage n'a pas n sommets ou qu'il n'y a plus d'arêtes
     while (n < nbVertices && edges.size() > 0) {
-    //while (vertexTab.size() <= nbVertices && edges.size() > 0) {
+    //while (m_vertices.size() <= nbVertices && edges.size() > 0) {
         // Ordonner les arêtes par leur longueur (ordre croissant)
         std::sort(edges.begin(), edges.end(), compareEdges);
         // On supprime la plus petite arête

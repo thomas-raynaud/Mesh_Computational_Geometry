@@ -1,4 +1,4 @@
-#include "meshdelaunay.h"
+#include "mesh2d.h"
 
 Point Mesh2D::computeCenter(Point A, Point B, Point C){
        double ptanA, ptanB, ptanC, coefA, coefB, coefC;
@@ -35,9 +35,9 @@ void Mesh2D::buildVoronoi(){
     _vVertices = QVector<Vertex>();
     for (QVector<Face>::iterator face_it = faceTab.begin(); face_it != faceTab.end(); ++face_it){
        Point A, B, C;
-       A = vertexTab[face_it->vertices()[0]].point();
-       B = vertexTab[face_it->vertices()[1]].point();
-       C = vertexTab[face_it->vertices()[2]].point();
+       A = m_vertices[face_it->vertices()[0]]->point();
+       B = m_vertices[face_it->vertices()[1]]->point();
+       C = m_vertices[face_it->vertices()[2]]->point();
 
        //Ajout de Q
        _vVertices.push_back(Vertex(computeCenter(A, B, C), 0, i));

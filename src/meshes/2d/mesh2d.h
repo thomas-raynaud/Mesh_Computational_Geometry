@@ -1,9 +1,9 @@
-#ifndef MESHDELAUNAY_H
-#define MESHDELAUNAY_H
+#ifndef MESH2D_H
+#define MESH2D_H
 
-#include <queue>
 #include "meshes/mesh.h"
 #include "techniques/predicate.h"
+
 
 class Mesh2D : public Mesh { // Mesh sur une surface 2D
 
@@ -36,4 +36,4 @@ public:
     virtual void drawVoronoiWireFrame();
 };
 
-#endif // MESHDELAUNAY_H
+#endif  // MESH2D_H

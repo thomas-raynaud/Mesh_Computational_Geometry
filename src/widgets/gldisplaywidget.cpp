@@ -4,7 +4,7 @@
 
 #include "meshes/mesh.h"
 #include "meshes/3d/mesh3d.h"
-#include "meshes/2d/meshdelaunay.h"
+#include "meshes/2d/mesh2d.h"
 #include "meshes/2d/meshparabola.h"
 #include "meshes/2d/meshcrust.h"
 #include "meshes/2d/meshruppert.h"

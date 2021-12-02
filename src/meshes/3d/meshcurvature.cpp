@@ -23,9 +23,9 @@ std::vector<Point> Mesh::getLaplacians() {
         A = 0;
 
         do {
-            a = vertexTab[cf->vertices()[0]].point();
-            b = vertexTab[cf->vertices()[1]].point();
-            c = vertexTab[cf->vertices()[2]].point();
+            a = m_vertices[cf->vertices()[0]]->point();
+            b = m_vertices[cf->vertices()[1]]->point();
+            c = m_vertices[cf->vertices()[2]]->point();
             A += (1.f / 3.f) * ((1.f / 2.f) * (crossProduct(difference(b, a), difference(c, a))).norm());
             cf++;
         } while (cf != cfbegin);
@@ -80,7 +80,7 @@ void Mesh::computeColors(int curveAxis) {
     std::vector<double> curvature;
     std::vector<Point> laplacians = getLaplacians();
     // Calculer la courbure moyenne
-    for (int i = 0; i < vertexTab.size(); ++i) {
+    for (int i = 0; i < m_vertices.size(); ++i) {
         if (curveAxis == 0)
             mean_curvature = std::abs(std::log(laplacians[i].norm()) / -2);
         else
@@ -91,11 +91,11 @@ void Mesh::computeColors(int curveAxis) {
     }
 
     // Trouver la teinte de la couleur en fonction de la courbure
-    for (int i = 0; i < vertexTab.size(); ++i) {
+    for (int i = 0; i < m_vertices.size(); ++i) {
         mean_curvature = curvature[i];
         // Courbure faible : vert, à courbure forte : rouge
         hue = ((mean_curvature - min) / max) * 270.0 + 90.0;
-        vertexTab[i].setColor(hsv2rgb(hue, 1.0, 1.0));
+        m_vertices[i]->setColor(hsv2rgb(hue, 1.0, 1.0));
     }
 
 }
