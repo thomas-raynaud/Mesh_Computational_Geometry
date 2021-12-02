@@ -1,9 +1,8 @@
 #ifndef MESH3D_H
 #define MESH3D_H
 
-#include <fstream>
-#include <sstream>
-#include "mesh.h"
+#include "meshes/mesh.h"
+
 
 class Tetrahedron : public Mesh {
 public:

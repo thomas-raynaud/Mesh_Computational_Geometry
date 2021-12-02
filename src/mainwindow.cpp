@@ -1,6 +1,6 @@
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
-#include "iostream"
+
 
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
@@ -15,10 +15,11 @@ MainWindow::MainWindow(QWidget *parent) :
     ui->pushButtonRaffine->hide();
 }
 
-MainWindow::~MainWindow()
-{
+
+MainWindow::~MainWindow() {
     delete ui;
 }
+
 
 void MainWindow::on_pushButtonDisplayType_released() {
     if (ui->pushButtonDisplayType->text() == "Show wireframe")
@@ -28,16 +29,18 @@ void MainWindow::on_pushButtonDisplayType_released() {
     ui->widget->toggleDisplayType();
 }
 
+
 void MainWindow::on_comboBoxMeshswitch_currentIndexChanged(int index) {
     ui->widget->switchMesh(index);
 }
+
 
 void MainWindow::on_comboBoxColorswitch_currentIndexChanged(int index) {
     ui->widget->switchCurveAxis(index);
 }
 
-void MainWindow::on_comboBoxTPswitch_currentIndexChanged(int index)
-{
+
+void MainWindow::on_comboBoxTPswitch_currentIndexChanged(int index) {
     ui->pushButtonxxyy->setEnabled(true);
     ui->pushButtonRosenbrock->setEnabled(true);
     ui->pushButtonDisplayType->setEnabled(true);
@@ -114,33 +117,32 @@ void MainWindow::on_comboBoxTPswitch_currentIndexChanged(int index)
     ui->widget->switchTP(index);
 }
 
-void MainWindow::on_pushButtonInsertNPoints_released()
-{
+
+void MainWindow::on_pushButtonInsertNPoints_released() {
     ui->widget->insertNPoints(100);
 }
 
-void MainWindow::on_pushButtonInsertPoint_released()
-{
+
+void MainWindow::on_pushButtonInsertPoint_released() {
     ui->widget->insertNPoints(1);
 }
 
-void MainWindow::on_pushButtonxxyy_released()
-{
+
+void MainWindow::on_pushButtonxxyy_released() {
     ui->widget->switchParabolaType(0);
 }
 
-void MainWindow::on_pushButtonRosenbrock_released()
-{
+
+void MainWindow::on_pushButtonRosenbrock_released() {
     ui->widget->switchParabolaType(1);
 }
 
-void MainWindow::on_pushButtonSimplifyMesh_clicked()
-{
+
+void MainWindow::on_pushButtonSimplifyMesh_clicked() {
    ui->widget->simplifyMesh();
 }
 
-void MainWindow::on_pushButtonRaffine_clicked()
-{
-    ui->widget->raffine(0.85);
 
+void MainWindow::on_pushButtonRaffine_clicked() {
+    ui->widget->raffine(0.85);
 }

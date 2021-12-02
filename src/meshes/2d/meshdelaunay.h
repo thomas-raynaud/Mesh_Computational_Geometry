@@ -2,8 +2,8 @@
 #define MESHDELAUNAY_H
 
 #include <queue>
-#include "mesh.h"
-#include "predicate.h"
+#include "meshes/mesh.h"
+#include "techniques/predicate.h"
 
 class Mesh2D : public Mesh { // Mesh sur une surface 2D
 

@@ -1,5 +1,6 @@
 #include "mesh_refined_delaunay.h"
 
+
 Mesh_Constrained::Mesh_Constrained() {
     Mesh2D();
     insertion(Point(-2, 1, 0));
@@ -11,11 +12,6 @@ Mesh_Constrained::Mesh_Constrained() {
     insertion(Point(4, 0, 0));
     insertion(Point(5, 0, 0));
 
-
-
-
     // Ajouter les arêtes contraintes
     faceTab.push_back(Face());
-
-    //constraints.push_back();
 }

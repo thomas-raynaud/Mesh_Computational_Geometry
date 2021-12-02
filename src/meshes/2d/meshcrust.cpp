@@ -1,5 +1,9 @@
 #include "meshcrust.h"
 
+#include <fstream>
+#include <sstream>
+#include <string>
+
 
 Crust::Crust(){
     // Insertion des points du fichier

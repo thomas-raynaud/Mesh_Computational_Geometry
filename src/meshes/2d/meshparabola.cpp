@@ -1,5 +1,8 @@
 #include "meshparabola.h"
 
+#include <cmath>
+
+
 Parabola::Parabola(int type) : Mesh2D(), _parabola_type(type) {
     // Changement de profondeur des sommets existants
     for (QVector<Vertex>::iterator vertex_it = vertexTab.begin(); vertex_it != vertexTab.end(); ++vertex_it) {

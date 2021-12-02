@@ -1,11 +1,11 @@
 #ifndef OPENGLDISPLAYMESH_H
 #define OPENGLDISPLAYMESH_H
 
-#include "mesh.h"
-#include "meshdelaunay.h"
-#include "meshparabola.h"
-#include "meshcrust.h"
-#include "meshruppert.h"
+#include "meshes/mesh.h"
+#include "meshes/2d/meshdelaunay.h"
+#include "meshes/2d/meshparabola.h"
+#include "meshes/2d/meshcrust.h"
+#include "meshes/2d/meshruppert.h"
 
 
 // Draw a vertex

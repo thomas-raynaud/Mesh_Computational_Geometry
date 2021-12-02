@@ -1,5 +1,10 @@
 #include "mesh3d.h"
 
+#include <fstream>
+#include <sstream>
+#include <iostream>
+
+
 Tetrahedron::Tetrahedron() {
     // Création des points
     vertexTab.push_back(Vertex(Point(-0.5,-0.5,-0.5), 0, 0));

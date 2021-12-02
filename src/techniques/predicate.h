@@ -1,7 +1,7 @@
 #ifndef PREDICATE_H
 #define PREDICATE_H
 
-#include "point.h"
+#include "utils/point.h"
 
 /* Prédicats géométriques */
 

@@ -1,5 +1,8 @@
 #include "point.h"
 
+#include <cmath>
+
+
 double Point::norm() {
     return sqrt(_x * _x + _y * _y + _z * _z);
 }

@@ -5,8 +5,6 @@
 #ifndef POINT_H
 #define POINT_H
 
-#include <cmath>
-#include <iostream>
 
 class Point {
 protected:

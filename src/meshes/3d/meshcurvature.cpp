@@ -1,4 +1,7 @@
-#include "mesh.h"
+#include "meshes/mesh.h"
+
+#include <cmath>
+
 
 std::vector<Point> Mesh::getLaplacians() {
     if (laplacianTab.size() != 0) return laplacianTab;

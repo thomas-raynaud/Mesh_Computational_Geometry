@@ -7,8 +7,8 @@
 #include <sstream>
 #include <functional>
 
-#include "point.h"
-#include "color.h"
+#include "utils/point.h"
+#include "utils/color.h"
 
 
 

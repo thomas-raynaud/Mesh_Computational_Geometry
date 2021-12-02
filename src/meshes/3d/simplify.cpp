@@ -1,6 +1,6 @@
 #include<vector>
-#include "mesh.h"
-#include "point.h"
+#include "meshes/mesh.h"
+#include "utils/point.h"
 
 // VE : sommet opposé à l'arête à supprimer dans la face FE
 // FE : face qui a une de ses arêtes à supprimer, et a pour sommet FE.

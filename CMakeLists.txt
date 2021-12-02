@@ -14,24 +14,24 @@ set(CMAKE_AUTOUIC ON)
 set(CMAKE_INSTALL_PREFIX "${CMAKE_INSTALL_PREFIX}/${PROJECT_NAME}")
 
 set(SOURCES
-    ${CMAKE_SOURCE_DIR}/main.cpp
-    ${CMAKE_SOURCE_DIR}/mainwindow.cpp
-    ${CMAKE_SOURCE_DIR}/gldisplaywidget.cpp
-    ${CMAKE_SOURCE_DIR}/mesh.cpp
-    ${CMAKE_SOURCE_DIR}/meshcrust.cpp
-    ${CMAKE_SOURCE_DIR}/meshruppert.cpp
-    ${CMAKE_SOURCE_DIR}/point.cpp
-    ${CMAKE_SOURCE_DIR}/opengldisplaymesh.cpp
-    ${CMAKE_SOURCE_DIR}/simplify.cpp
-    ${CMAKE_SOURCE_DIR}/voronoi.cpp
-    ${CMAKE_SOURCE_DIR}/visibilitymarch.cpp
-    ${CMAKE_SOURCE_DIR}/mesh3d.cpp
-    ${CMAKE_SOURCE_DIR}/color.cpp
-    ${CMAKE_SOURCE_DIR}/meshcurvature.cpp
-    ${CMAKE_SOURCE_DIR}/meshdelaunay.cpp
-    ${CMAKE_SOURCE_DIR}/meshparabola.cpp
-    ${CMAKE_SOURCE_DIR}/predicate.cpp
-    ${CMAKE_SOURCE_DIR}/mesh_refined_delaunay.cpp
+    ${CMAKE_SOURCE_DIR}/src/main.cpp
+    ${CMAKE_SOURCE_DIR}/src/mainwindow.cpp
+    ${CMAKE_SOURCE_DIR}/src/opengldisplaymesh.cpp
+    ${CMAKE_SOURCE_DIR}/src/widgets/gldisplaywidget.cpp
+    ${CMAKE_SOURCE_DIR}/src/meshes/mesh.cpp
+    ${CMAKE_SOURCE_DIR}/src/meshes/2d/meshcrust.cpp
+    ${CMAKE_SOURCE_DIR}/src/meshes/2d/meshruppert.cpp
+    ${CMAKE_SOURCE_DIR}/src/meshes/2d/mesh_refined_delaunay.cpp
+    ${CMAKE_SOURCE_DIR}/src/meshes/2d/voronoi.cpp
+    ${CMAKE_SOURCE_DIR}/src/meshes/2d/visibilitymarch.cpp
+    ${CMAKE_SOURCE_DIR}/src/meshes/2d/meshdelaunay.cpp
+    ${CMAKE_SOURCE_DIR}/src/meshes/2d/meshparabola.cpp
+    ${CMAKE_SOURCE_DIR}/src/meshes/3d/simplify.cpp
+    ${CMAKE_SOURCE_DIR}/src/meshes/3d/mesh3d.cpp
+    ${CMAKE_SOURCE_DIR}/src/meshes/3d/meshcurvature.cpp
+    ${CMAKE_SOURCE_DIR}/src/techniques/predicate.cpp
+    ${CMAKE_SOURCE_DIR}/src/utils/point.cpp
+    ${CMAKE_SOURCE_DIR}/src/utils/color.cpp
 )
 
 # Add resource files
@@ -40,7 +40,8 @@ file(
     DESTINATION ${CMAKE_CURRENT_BINARY_DIR}
 )
 
-include_directories(${CMAKE_SOURCE_DIR})
+include_directories(${CMAKE_SOURCE_DIR}/src)
+include_directories(${CMAKE_SOURCE_DIR}/src/widgets)
 
 # Configure OpenGL
 set(OpenGL_COMPONENT
