@@ -47,7 +47,7 @@ std::array<int, 3> Mesh::edgeCollapse(int VE, int FE) {
     }
 
     // Remplacer V1 par V2 pour les faces adjacentes à V1
-    cof = incident_faces(*m_vertices[V1], FE);
+    cof = incident_faces(m_vertices[V1], FE);
     ++cof;
     while (cof->idx() != FE_Opp) {
         for (int i = 0; i < 3; ++i) {
@@ -55,7 +55,7 @@ std::array<int, 3> Mesh::edgeCollapse(int VE, int FE) {
                 faceTab[cof->idx()].setVertice(V2, i);
             }
             // Changer la face pointée par chaque sommet
-            m_vertices[faceTab[cof->idx()].vertices()[i]]->setFace(cof->idx());
+            m_vertices[faceTab[cof->idx()].vertices()[i]].setFace(cof->idx());
         }
         ++cof;
     }
@@ -76,15 +76,15 @@ std::array<int, 3> Mesh::edgeCollapse(int VE, int FE) {
 
     // Changer les coordonnées de V2 : au milieu de l'arête à supprimer
     // (V1 + V2) * 0.5
-    m_vertices[V2]->setPoint((m_vertices[V1]->point() + m_vertices[V2]->point()) * 0.5);
+    m_vertices[V2].setPoint((m_vertices[V1].point() + m_vertices[V2].point()) * 0.5);
 
     // On retourne les éléments à supprimer du Mesh : V1, FE et FE_Opp
     return {V1, FE, FE_Opp};
 }
 
 double Mesh::getEdgeLength(Edge e) {
-    Point a = m_vertices[e.v1]->point();
-    Point b = m_vertices[e.v2]->point();
+    Point a = m_vertices[e.v1].point();
+    Point b = m_vertices[e.v2].point();
     return difference(a, b).norm();
 }
 

@@ -23,9 +23,9 @@ std::vector<Point> Mesh::getLaplacians() {
         A = 0;
 
         do {
-            a = m_vertices[cf->vertices()[0]]->point();
-            b = m_vertices[cf->vertices()[1]]->point();
-            c = m_vertices[cf->vertices()[2]]->point();
+            a = m_vertices[cf->vertices()[0]].point();
+            b = m_vertices[cf->vertices()[1]].point();
+            c = m_vertices[cf->vertices()[2]].point();
             A += (1.f / 3.f) * ((1.f / 2.f) * (crossProduct(difference(b, a), difference(c, a))).norm());
             cf++;
         } while (cf != cfbegin);
@@ -95,7 +95,7 @@ void Mesh::computeColors(int curveAxis) {
         mean_curvature = curvature[i];
         // Courbure faible : vert, à courbure forte : rouge
         hue = ((mean_curvature - min) / max) * 270.0 + 90.0;
-        m_vertices[i]->setColor(hsv2rgb(hue, 1.0, 1.0));
+        m_vertices[i].setColor(hsv2rgb(hue, 1.0, 1.0));
     }
 
 }

@@ -7,10 +7,10 @@
 
 Tetrahedron::Tetrahedron() {
     // Création des points
-    m_vertices.push_back(new Vertex(Point(-0.5,-0.5,-0.5), 0, 0));
-    m_vertices.push_back(new Vertex(Point(0.5,-0.5,-0.5), 1, 1));
-    m_vertices.push_back(new Vertex(Point(0,0.5,-0.5), 2, 2));
-    m_vertices.push_back(new Vertex(Point(0,-0.5,0.5), 3, 3));
+    m_vertices.push_back(Vertex(Point(-0.5,-0.5,-0.5), 0, 0));
+    m_vertices.push_back(Vertex(Point(0.5,-0.5,-0.5), 1, 1));
+    m_vertices.push_back(Vertex(Point(0,0.5,-0.5), 2, 2));
+    m_vertices.push_back(Vertex(Point(0,-0.5,0.5), 3, 3));
     // Création des faces
     faceTab.push_back(Face({0, 1, 2}, {1, 2, 3}, 0)); // face 0
     faceTab.push_back(Face({1, 3, 2}, {2, 0, 3}, 1)); // face 1
@@ -20,11 +20,11 @@ Tetrahedron::Tetrahedron() {
 
 Pyramid::Pyramid() {
     // Création des points
-    m_vertices.push_back(new Vertex(Point(-0.5,-0.5,-0.5), 0, 0));
-    m_vertices.push_back(new Vertex(Point(-0.5,0.5,-0.5), 0, 1));
-    m_vertices.push_back(new Vertex(Point(0.5,-0.5,-0.5), 0, 2));
-    m_vertices.push_back(new Vertex(Point(0.5,0.5,-0.5), 1, 3));
-    m_vertices.push_back(new Vertex(Point(0,0,0.5), 2, 4));
+    m_vertices.push_back(Vertex(Point(-0.5,-0.5,-0.5), 0, 0));
+    m_vertices.push_back(Vertex(Point(-0.5,0.5,-0.5), 0, 1));
+    m_vertices.push_back(Vertex(Point(0.5,-0.5,-0.5), 0, 2));
+    m_vertices.push_back(Vertex(Point(0.5,0.5,-0.5), 1, 3));
+    m_vertices.push_back(Vertex(Point(0,0,0.5), 2, 4));
     // Création des faces
     faceTab.push_back(Face({0, 1, 2}, {1, 5, 2}, 0)); // face 0
     faceTab.push_back(Face({1, 3, 2}, {4, 0, 3}, 1)); // face 1
@@ -36,11 +36,11 @@ Pyramid::Pyramid() {
 
 BoundingBox2D::BoundingBox2D() {
     // Création des points
-    m_vertices.push_back(new Vertex(Point(-0.5,-0.5,-0.5), 0, 0));
-    m_vertices.push_back(new Vertex(Point(-0.5,0.5,-0.5), 0, 1));
-    m_vertices.push_back(new Vertex(Point(0.5,-0.5,-0.5), 0, 2));
-    m_vertices.push_back(new Vertex(Point(0.5,0.5,-0.5), 1, 3));
-    m_vertices.push_back(new Vertex(Point(-0.5,-0.5,-100), 2, 4, true)); // Sommet infini
+    m_vertices.push_back(Vertex(Point(-0.5,-0.5,-0.5), 0, 0));
+    m_vertices.push_back(Vertex(Point(-0.5,0.5,-0.5), 0, 1));
+    m_vertices.push_back(Vertex(Point(0.5,-0.5,-0.5), 0, 2));
+    m_vertices.push_back(Vertex(Point(0.5,0.5,-0.5), 1, 3));
+    m_vertices.push_back(Vertex(Point(-0.5,-0.5,-100), 2, 4, true)); // Sommet infini
     // Création des faces
     faceTab.push_back(Face({0, 1, 2}, {0, 1, 2}, 0)); // face 0
     faceTab.push_back(Face({1, 3, 2}, {4, 0, 3}, 1)); // face 1
@@ -76,8 +76,8 @@ QueenMesh::QueenMesh() {
         y = atof(line.substr(delimiterPos1, delimiterPos2).c_str()); // y
         delimiterPos3 = line.find(" ", delimiterPos2 + 1);
         z = atof(line.substr(delimiterPos2, delimiterPos3 ).c_str()); // z
-        m_vertices.push_back(new Vertex(Point(x, y, z), -1, i));
-        m_vertices[m_vertices.size() - 1]->setIdx(i);
+        m_vertices.push_back(Vertex(Point(x, y, z), -1, i));
+        m_vertices[m_vertices.size() - 1].setIdx(i);
     }
 
     /**** Création des faces ****/
@@ -92,9 +92,9 @@ QueenMesh::QueenMesh() {
         ind_vertices = {v1, v2, v3};
         ind_faces = {-1, -1, -1};
         // Ajouter les faces incidentes au sommets
-        if (m_vertices[v1]->face() == -1) m_vertices[v1]->setFace(i);
-        if (m_vertices[v2]->face() == -1) m_vertices[v2]->setFace(i);
-        if (m_vertices[v3]->face() == -1) m_vertices[v3]->setFace(i);
+        if (m_vertices[v1].face() == -1) m_vertices[v1].setFace(i);
+        if (m_vertices[v2].face() == -1) m_vertices[v2].setFace(i);
+        if (m_vertices[v3].face() == -1) m_vertices[v3].setFace(i);
         faceTab.push_back(Face(ind_vertices, ind_faces));
         faceTab[faceTab.size() - 1].setIdx(i);
     }

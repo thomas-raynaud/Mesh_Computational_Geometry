@@ -100,7 +100,7 @@ class Circulator_on_vertices; // Itérer sur les sommets adjacents à un sommet
 class Mesh {
 
 protected:
-    QVector<Vertex*> m_vertices;
+    QVector<Vertex> m_vertices;
     QVector<Face> faceTab;           // "Sac" de faces
     std::vector<Point> laplacianTab; // Vecteurs laplaciens de chaque sommet
 
@@ -120,16 +120,16 @@ public:
 
     bool isFaceFictive(const int face) const {
         std::array<int, 3> faceVertices = faceTab[face].vertices();
-        return m_vertices[faceVertices[0]]->isFictive() ||
-                m_vertices[faceVertices[1]]->isFictive() ||
-                m_vertices[faceVertices[2]]->isFictive();
+        return m_vertices[faceVertices[0]].isFictive() ||
+                m_vertices[faceVertices[1]].isFictive() ||
+                m_vertices[faceVertices[2]].isFictive();
     }
 
     bool isFaceVisible(const int face) const {
         std::array<int, 3> faceVertices = faceTab[face].vertices();
-        return !m_vertices[faceVertices[0]]->isFictive() && m_vertices[faceVertices[0]]->isVisible() &&
-                !m_vertices[faceVertices[1]]->isFictive() && m_vertices[faceVertices[1]]->isVisible() &&
-                !m_vertices[faceVertices[2]]->isFictive() && m_vertices[faceVertices[2]]->isVisible();
+        return !m_vertices[faceVertices[0]].isFictive() && m_vertices[faceVertices[0]].isVisible() &&
+                !m_vertices[faceVertices[1]].isFictive() && m_vertices[faceVertices[1]].isVisible() &&
+                !m_vertices[faceVertices[2]].isFictive() && m_vertices[faceVertices[2]].isVisible();
     }
 
     int getNbVertices() { return m_vertices.size(); }
@@ -188,17 +188,17 @@ public:
 
 class Iterator_on_vertices {
 
-    Vertex **p;
+    Vertex *p;
 
 public:
     Iterator_on_vertices() : p(nullptr) {}
-    Iterator_on_vertices(Vertex** x) : p(x) {}
+    Iterator_on_vertices(Vertex *x) : p(x) {}
 
     bool operator!=(const Iterator_on_vertices& it) const { return p != it.p; }
     bool operator==(const Iterator_on_vertices& it) const { return p == it.p; }
 
-    Vertex& operator*()  { return **p; }
-    Vertex* operator->() { return *p;  }
+    Vertex& operator*()  { return *p; }
+    Vertex* operator->() { return p;  }
 
     Iterator_on_vertices& operator++() { ++p; return *this; }
     Iterator_on_vertices operator++(int) {

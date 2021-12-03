@@ -34,7 +34,7 @@ QVector<int> MeshRuppert::edgeNotInDel(){
     for(int i = 0; i < constraint().size(); i++){
         std::array<int, 2> edge = constraint()[i];
         Circulator_on_vertices cv, cv_begin;
-        cv_begin = this->neighbour_vertices(*m_vertices[edge[0]]);
+        cv_begin = this->neighbour_vertices(m_vertices[edge[0]]);
         cv = cv_begin;
         bool init = false;
         do{
@@ -50,8 +50,8 @@ QVector<int> MeshRuppert::edgeNotInDel(){
 void MeshRuppert::splitEdge(int edge_index){
         std::array<int, 2> edge = _constraint[edge_index];
         int idx = m_vertices.size();
-        Point a = m_vertices[edge[0]]->point();
-        Point b = m_vertices[edge[1]]->point();
+        Point a = m_vertices[edge[0]].point();
+        Point b = m_vertices[edge[1]].point();
         insertion(Point((a.x()+b.x())*0.5, (a.y()+b.y())*0.5, 0));
         _constraint.remove(edge_index);
         _constraint.push_back({edge[0], idx});
@@ -82,9 +82,9 @@ int MeshRuppert::findWorstTriangle(double alpha){
             int a_index = itf->vertices()[0];
             int b_index = itf->vertices()[1];
             int c_index = itf->vertices()[2];
-            Point a = m_vertices[a_index]->point();
-            Point b = m_vertices[b_index]->point();
-            Point c = m_vertices[c_index]->point();
+            Point a = m_vertices[a_index].point();
+            Point b = m_vertices[b_index].point();
+            Point c = m_vertices[c_index].point();
 
             //Calcul des angles
             std::array<double, 3> angl = {cos(b, a, c), cos(a, b, c), cos(b, c, a)};
@@ -115,9 +115,9 @@ void MeshRuppert::raffinement(double alpha){
         Face face = faceTab[fidx];
         //Caclul du centre du certcle circonscrit
         Point A, B, C;
-        A = m_vertices[face.vertices()[0]]->point();
-        B = m_vertices[face.vertices()[1]]->point();
-        C = m_vertices[face.vertices()[2]]->point();
+        A = m_vertices[face.vertices()[0]].point();
+        B = m_vertices[face.vertices()[1]].point();
+        C = m_vertices[face.vertices()[2]].point();
 
         //insertion du centre de voronoi dans le maillage test
         Point Q = computeCenter(A, B, C);
@@ -138,15 +138,15 @@ void MeshRuppert::raffinement(double alpha){
                 offset++;
                 int vidx = this->m_vertices.size() - 1;
                 Circulator_on_faces cf;
-                cf = incident_faces(*m_vertices[vidx]);
+                cf = incident_faces(m_vertices[vidx]);
                 do{
                     if(isFaceVisible(cf->idx())){
                         int a_index = cf->vertices()[0];
                         int b_index = cf->vertices()[1];
                         int c_index = cf->vertices()[2];
-                        Point a = m_vertices[a_index]->point();
-                        Point b = m_vertices[b_index]->point();
-                        Point c = m_vertices[c_index]->point();
+                        Point a = m_vertices[a_index].point();
+                        Point b = m_vertices[b_index].point();
+                        Point c = m_vertices[c_index].point();
 
                         //Calcul des angles
                         std::array<double, 3> angl = {cos(b, a, c), cos(a, b, c), cos(b, c, a)};
@@ -166,14 +166,14 @@ void MeshRuppert::raffinement(double alpha){
                         }
                     }
                         ++cf;
-                }while(cf != incident_faces(*m_vertices[vidx]));
+                }while(cf != incident_faces(m_vertices[vidx]));
             }
             //Ajout du pire centre de cercle circonscrit
             if(worst_face != -1){
                 Point A, B, C;
-                A = m_vertices[faceTab[worst_face].vertices()[0]]->point();
-                B = m_vertices[faceTab[worst_face].vertices()[1]]->point();
-                C = m_vertices[faceTab[worst_face].vertices()[2]]->point();
+                A = m_vertices[faceTab[worst_face].vertices()[0]].point();
+                B = m_vertices[faceTab[worst_face].vertices()[1]].point();
+                C = m_vertices[faceTab[worst_face].vertices()[2]].point();
 
                 Q = computeCenter(A, B, C);
                 insertion(Q);
