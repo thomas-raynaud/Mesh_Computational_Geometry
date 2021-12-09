@@ -98,7 +98,6 @@ void GLDisplayWidget::switchMesh(int index) {
     switch(m_mesh_type) {
         case 0:     m_mesh = new Tetrahedron(); break;
         case 1:     m_mesh = new Pyramid(); break;
-        case 2:     m_mesh = new BoundingBox2D(); break;
         case 3:     m_mesh = new QueenMesh(); break;
         default:    m_mesh = new Tetrahedron(); break;
     }

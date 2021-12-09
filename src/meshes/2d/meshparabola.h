@@ -10,8 +10,8 @@ class Parabola : public Mesh2D { // Mesh construit à partir de (x,y) |--> (x^2+
 public:
     Parabola(int type = 0);
     virtual ~Parabola() {}
-    void drawMesh();
-    void drawMeshWireFrame();
+    void drawMesh() override;
+    void drawMeshWireFrame() override;
 };
 
 #endif // MESHPARABOLA_H

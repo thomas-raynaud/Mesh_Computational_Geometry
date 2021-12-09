@@ -19,6 +19,7 @@ set(SOURCES
     ${CMAKE_SOURCE_DIR}/src/opengldisplaymesh.cpp
     ${CMAKE_SOURCE_DIR}/src/widgets/gldisplaywidget.cpp
     ${CMAKE_SOURCE_DIR}/src/meshes/mesh.cpp
+    ${CMAKE_SOURCE_DIR}/src/meshes/2d/mesh2d.cpp
     ${CMAKE_SOURCE_DIR}/src/meshes/2d/meshcrust.cpp
     ${CMAKE_SOURCE_DIR}/src/meshes/2d/meshruppert.cpp
     ${CMAKE_SOURCE_DIR}/src/meshes/2d/mesh_refined_delaunay.cpp

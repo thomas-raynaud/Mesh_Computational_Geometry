@@ -6,9 +6,9 @@
 Parabola::Parabola(int type) : Mesh2D(), _parabola_type(type) {
     // Changement de profondeur des sommets existants
     for (QVector<Vertex>::iterator vertex_it = m_vertices.begin(); vertex_it != m_vertices.end(); ++vertex_it) {
-        if (vertex_it->isFictive()) continue;
+        if (vertex_it->idx() == _inf_v) continue;
         vertex_it->setPoint(phi(vertex_it->point()));
-        vertex_it->setDisplay(false);
+        m_hidden_vertices.insert(vertex_it->idx());
     }
 
     double x, y, z;
@@ -33,7 +33,7 @@ Parabola::Parabola(int type) : Mesh2D(), _parabola_type(type) {
     // trouver zmin et zmax
     double zmin = DBL_MAX, zmax = 0.0, hue;
     for (QVector<Vertex>::iterator vertex_it = m_vertices.begin(); vertex_it != m_vertices.end(); ++vertex_it) {
-        if (vertex_it->isFictive() || !vertex_it->isVisible()) continue;
+        if (!is_vertex_visible(*vertex_it)) continue;
         zmin = std::min(zmin, vertex_it->point().z());
         zmax = std::max(zmax, vertex_it->point().z());
     }

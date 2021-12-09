@@ -1,34 +1,31 @@
 #include "mesh2d.h"
 
 #include <queue>
+#include <iostream>
 
 
 Mesh2D::Mesh2D() {
-    // Création des points
-    m_vertices.push_back(Vertex(Point(-20,  0, 0), 0, 0));
-    m_vertices.push_back(Vertex(Point( 20, -20, 0), 0, 1));
-    m_vertices.push_back(Vertex(Point( 20,  20, 0), 0, 2));
-
-    m_vertices[0].setDisplay(false);
-    m_vertices[1].setDisplay(false);
-    m_vertices[2].setDisplay(false);
-
-    m_vertices.push_back(Vertex(Point(0, 0, -1), 1, 3, true)); // Sommet infini
+    // Create an invisible tetrahedron that wraps up the 2D mesh.
+    double far_dist = 20.0;
+    m_vertices.push_back(Vertex(Point(-far_dist,  0,        0), 0, 0));
+    m_vertices.push_back(Vertex(Point( far_dist, -far_dist, 0), 0, 1));
+    m_vertices.push_back(Vertex(Point( far_dist,  far_dist, 0), 0, 2));
+    m_vertices.push_back(Vertex(Point(0, 0, -1), 1, 3)); // Infinite vertex
     _inf_v = 3;
-
-    // Création des faces
+    m_hidden_vertices.insert({ 0, 1, 2, 3 });
     faceTab.push_back(Face({0, 1, 2}, {1, 2, 3}, 0));  // face 0
     faceTab.push_back(Face({1, 3, 2}, {2, 0, 3}, 1));  // face 1
     faceTab.push_back(Face({0, 2, 3}, {1, 3, 0}, 2));  // face 2
     faceTab.push_back(Face({0, 3, 1}, {1, 0, 2}, 3));  // face 3
 
-
-    // Départ : insérer 3 points
+    // Create 3 visible vertices, our actual 2D mesh.
     insertion(Point(-1, -1, 0));
     insertion(Point(1, -1, 0));
     insertion(Point(0, 1, 0));
 
     this->buildVoronoi();
+
+    std::cout << *this << std::endl;
 }
 
 void Mesh2D::flipEdge(const int &f1, const int &f2) {

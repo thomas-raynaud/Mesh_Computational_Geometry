@@ -91,11 +91,6 @@
           </item>
           <item>
            <property name="text">
-            <string>2D bounding box</string>
-           </property>
-          </item>
-          <item>
-           <property name="text">
             <string>Statue (OFF file)</string>
            </property>
           </item>

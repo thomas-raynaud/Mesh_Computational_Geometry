@@ -17,64 +17,92 @@ void glVertexDraw(const Vertex & v) {
 // Draw mesh with plain faces
 void Mesh::drawMesh() {
     // Iteration sur chaque face du mesh
-    for (QVector<Face>::iterator face_it = faceTab.begin() ; face_it != faceTab.end(); ++face_it) {
-        Vertex a, b, c;
-        std::array<int, 3> faceVertices = face_it->vertices();
-        // Ne pas afficher les faces ayant un point fictif
-        if (!isFaceVisible(face_it->idx())) continue;
-
-        a = m_vertices[faceVertices[0]];
-        b = m_vertices[faceVertices[1]];
-        c = m_vertices[faceVertices[2]];
-
-        // Création du triangle
-        glBegin(GL_TRIANGLES);
-        glColor3d(a.color()[0], a.color()[1], a.color()[2]);
-        glVertexDraw(a); // 1er point de la face
-        glColor3d(b.color()[0], b.color()[1], b.color()[2]);
-        glVertexDraw(b); // 2e point de la face
-        glColor3d(c.color()[0], c.color()[1], c.color()[2]);
-        glVertexDraw(c); // 3e point de la face
-        glEnd();
+    QVector<Face>::iterator face_it;
+    for (face_it = faceTab.begin(); face_it != faceTab.end(); ++face_it) {
+        draw_plain_face(*face_it);
     }
+}
+
+// Draw mesh with plain faces
+void Mesh2D::drawMesh() {
+    QVector<Face>::iterator face_it;
+    for (face_it = faceTab.begin(); face_it != faceTab.end(); ++face_it) {
+        // Don't display faces with a fictive point.
+        if (!isFaceVisible(face_it->idx())) continue;
+        draw_plain_face(*face_it);
+    }
+}
+
+void Mesh::draw_plain_face(const Face &face) {
+    Vertex a, b, c;
+    get_face_vertices(face, a, b, c);
+
+    glBegin(GL_TRIANGLES);
+    glColor3d(a.color()[0], a.color()[1], a.color()[2]);
+    glVertexDraw(a);
+    glColor3d(b.color()[0], b.color()[1], b.color()[2]);
+    glVertexDraw(b);
+    glColor3d(c.color()[0], c.color()[1], c.color()[2]);
+    glVertexDraw(c);
+    glEnd();
+}
+
+void Mesh::get_face_vertices(const Face &f, Vertex &a, Vertex &b, Vertex &c) {
+    std::array<int, 3> faceVertices = f.vertices();
+    a = m_vertices[faceVertices[0]];
+    b = m_vertices[faceVertices[1]];
+    c = m_vertices[faceVertices[2]];
+}
+
+void Mesh::draw_wireframe_face(const Face &face) {
+    Vertex a, b, c;
+    get_face_vertices(face, a, b, c);
+
+    glBegin(GL_LINE_STRIP);
+    glColor3d(a.color()[0], a.color()[1], a.color()[2]);
+    glVertexDraw(a);
+    glColor3d(b.color()[0], b.color()[1], b.color()[2]);
+    glVertexDraw(b);
+    glEnd();
+
+    glBegin(GL_LINE_STRIP);
+    glColor3d(b.color()[0], b.color()[1], b.color()[2]);
+    glVertexDraw(b);
+    glColor3d(c.color()[0], c.color()[1], c.color()[2]);
+    glVertexDraw(c);
+    glEnd();
+
+    glBegin(GL_LINE_STRIP);
+    glColor3d(c.color()[0], c.color()[1], c.color()[2]);
+    glVertexDraw(c);
+    glColor3d(a.color()[0], a.color()[1], a.color()[2]);
+    glVertexDraw(a);
+    glEnd();
 }
 
 // Draw the wireframe of the mesh
 void Mesh::drawMeshWireFrame() {
-    for (QVector<Face>::iterator face_it = faceTab.begin() ; face_it != faceTab.end(); ++face_it) {
-        Vertex a, b, c;
-        std::array<int, 3> faceVertices = face_it->vertices();
-        // Ne pas afficher les faces ayant un point fictif
-        if (!isFaceVisible(face_it->idx())) continue;
-
-        a = m_vertices[faceVertices[0]];
-        b = m_vertices[faceVertices[1]];
-        c = m_vertices[faceVertices[2]];
-
-        glBegin(GL_LINE_STRIP);
-        glColor3d(a.color()[0], a.color()[1], a.color()[2]);
-        glVertexDraw(a);
-        glColor3d(b.color()[0], b.color()[1], b.color()[2]);
-        glVertexDraw(b);
-        glEnd();
-
-        glBegin(GL_LINE_STRIP);
-        glColor3d(b.color()[0], b.color()[1], b.color()[2]);
-        glVertexDraw(b);
-        glColor3d(c.color()[0], c.color()[1], c.color()[2]);
-        glVertexDraw(c);
-        glEnd();
-
-        glBegin(GL_LINE_STRIP);
-        glColor3d(c.color()[0], c.color()[1], c.color()[2]);
-        glVertexDraw(c);
-        glColor3d(a.color()[0], a.color()[1], a.color()[2]);
-        glVertexDraw(a);
-        glEnd();
+    QVector<Face>::iterator face_it;
+    for (face_it = faceTab.begin() ; face_it != faceTab.end(); ++face_it) {
+        draw_wireframe_face(*face_it);
     }
 }
 
-void Mesh2D::drawMesh() {
+// Draw the wireframe of the mesh
+void Mesh2D::drawMeshWireFrame() {
+    QVector<Face>::iterator face_it;
+    for (face_it = faceTab.begin() ; face_it != faceTab.end(); ++face_it) {
+        Vertex a, b, c;
+        std::array<int, 3> faceVertices = face_it->vertices();
+        // Don't display faces with a fictive point
+        if (!isFaceVisible(face_it->idx())) continue;
+        draw_wireframe_face(*face_it);
+    }
+
+    this->drawVoronoiWireFrame();
+}
+
+/*void Mesh2D::drawMesh() {
     // Iteration sur chaque face du mesh
     for (QVector<Face>::iterator face_it = faceTab.begin(); face_it != faceTab.end(); ++face_it) {
         Vertex a, b, c;
@@ -127,14 +155,14 @@ void Mesh2D::drawMeshWireFrame() {
     }
 
     this->drawVoronoiWireFrame();
-}
+}*/
 
 void Mesh2D::drawVoronoiWireFrame() {
     Circulator_on_faces cf, cfbegin;
     int f1, f2;
     glColor3d(1, 0, 0);
     for (QVector<Vertex>::iterator vertex_it = m_vertices.begin(); vertex_it != m_vertices.end(); ++vertex_it){
-        if (!vertex_it->isFictive()) {
+        if (!is_vertex_fictive(*vertex_it)) {
 
             cfbegin = incident_faces(*vertex_it);
             cf = cfbegin;

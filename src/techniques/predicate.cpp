@@ -1,35 +1,55 @@
 #include "predicate.h"
 
-float testOrientation(const Point &a, const Point &b, const Point &c) {
-    // On travaille en 2D -> Z à 0
-    Point p(a.x(), a.y(), 0), q(b.x(), b.y(), 0), r(c.x(), c.y(), 0);
-    Point pq(difference(p, q));
-    Point pr(difference(p, r));
-    return dotProduct(crossProduct(pq, pr), Point(0, 0, 1));
+#include "utils/math.h"
+
+
+float test_orientation(
+        const glm::vec3 &a,
+        const glm::vec3 &b,
+        const glm::vec3 &c
+    ) {
+    // We work in 2D -> Z at 0
+    glm::vec3 p(a.x, a.y, 0);
+    glm::vec3 q(b.x, b.y, 0);
+    glm::vec3 r(c.x, c.y, 0);
+    glm::vec3 pq(p - q);
+    glm::vec3 pr(p - r);
+    return glm::dot(glm::cross(pq, pr), glm::vec3(0, 0, 1));
 }
 
-int isInTriangle(const Point &a, const Point &b, const Point &c, const Point &d) {
-    float orientationABC = testOrientation(a, b, c);
-    float orientationABD = testOrientation(a, b, d);
-    float orientationCAD = testOrientation(c, a, d);
-    float orientationCDB = testOrientation(c, d, b);
-    if ((orientationABC > 0.f) != (orientationABD > 0.f) ||
-        (orientationABC > 0.f) != (orientationCAD > 0.f) ||
-        (orientationABC > 0.f) != (orientationCDB > 0.f)) {
-        return 0; // Orientation différente -> d en dehors
+
+int is_in_triangle(
+        const glm::vec3 &a,
+        const glm::vec3 &b,
+        const glm::vec3 &c,
+        const glm::vec3 &d
+    ) {
+    float orientation_abc = test_orientation(a, b, c);
+    float orientation_abd = test_orientation(a, b, d);
+    float orientation_cad = test_orientation(c, a, d);
+    float orientation_cdb = test_orientation(c, d, b);
+    if ((orientation_abc > 0.f) != (orientation_abd > 0.f) ||
+        (orientation_abc > 0.f) != (orientation_cad > 0.f) ||
+        (orientation_abc > 0.f) != (orientation_cdb > 0.f)) {
+        return 0; // Different orientation -> d outside
     }
-    return 1; // d dans le triangle
+    return 1; // d in the triangle
 }
 
-int etreDansCercle(const Point &a, const Point &b, const Point &c, const Point &d) {
-    // p, q, r, s correspondent aux points a, b, c, d avec p au milieu de la parabole phi
-    Point p = Point(0, 0, 0);
-    Point q = difference(b, a);
-    Point r = difference(c, a);
-    Point s = difference(d, a);
-    // -signe(((PHI(q) - PHI(p)) X (PHI(q) - PHI(p))) . (PHI(s) - PHI(p)))
-    double res = -(dotProduct(crossProduct(difference(phi(q), phi(p)),
-                                           difference(phi(r), phi(p))),
-                              difference(phi(s), phi(p))));
+
+int is_in_circle(
+        const glm::vec3 &a,
+        const glm::vec3 &b,
+        const glm::vec3 &c,
+        const glm::vec3 &d
+    ) {
+    // p, q, r, s correspond to the points a, b, c, d with p in the middle of
+    // the phi parabol
+    glm::vec3 p = glm::vec3(0, 0, 0);
+    glm::vec3 q = b - a;
+    glm::vec3 r = c - a;
+    glm::vec3 s = d - a;
+    // -sign(((PHI(q) - PHI(p)) X (PHI(r) - PHI(p))) . (PHI(s) - PHI(p)))
+    float res = -(glm::dot(glm::cross(phi(q) - phi(p), phi(r) - phi(p)), phi(s) - phi(p)));
     return res > 0;
 }

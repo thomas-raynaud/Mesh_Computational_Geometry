@@ -3,7 +3,7 @@
 #include "utils/point.h"
 
 // VE : sommet opposé à l'arête à supprimer dans la face FE
-// FE : face qui a une de ses arêtes à supprimer, et a pour sommet FE.
+// FE : face qui a une de ses arêtes à supprimer
 std::array<int, 3> Mesh::edgeCollapse(int VE, int FE) {
     int V1, V2; // Sommets de l'arête à supprimer. V1, V2 et VE forment FE.
     int FE_Opp; // Face opposée à VE depuis la face FE
@@ -31,12 +31,6 @@ std::array<int, 3> Mesh::edgeCollapse(int VE, int FE) {
             FA4 = faceTab[FE_Opp].adjacentFaces()[(i + 2) % 3];
             break;
         }
-    }
-
-    // Les faces incidentes à l'arête et les faces adjacentes doivent être visibles
-    if (!isFaceVisible(FA1) || !isFaceVisible(FA2) || !isFaceVisible(FA3) || !isFaceVisible(FA4)
-            || !isFaceVisible(FE) || !isFaceVisible(FE_Opp)) {
-        return {-1, -1, -1};
     }
 
     // Vérifier si FA1 / FA2 et FA3 / FA4 ne sont pas déjà connectés
@@ -116,23 +110,6 @@ void Mesh::simplify (int n) {
 
     for(Iterator_on_faces itf = faces_begin(); itf != faces_end(); ++itf) {
         f = itf->idx();
-        if (!isFaceVisible(f)) continue;
-
-        // Ne pas prendre les arêtes ayant des faces incidentes en bordure
-        faceHidden = false;
-        for (uint i = 0; i < 3; ++i) {
-            if (!isFaceVisible(faceTab[f].adjacentFaces()[i])) {
-                faceHidden = true;
-                break;
-                for (uint j = 0; j < 3; ++j) {
-                    if (!isFaceVisible(faceTab[faceTab[f].adjacentFaces()[i]].adjacentFaces()[j])) {
-                        faceHidden = true;
-                        break;
-                    }
-                }
-            }
-        }
-        if (faceHidden) continue;
 
         // Créer l'arête
         for (uint i = 0; i < 3; ++i) {
@@ -175,8 +152,7 @@ void Mesh::simplify (int n) {
                 if (edges[i].fe == deletedElements[1] || edges[i].fe == deletedElements[2] // une face incidente a été supprimée
                         || fe_opp == deletedElements[1] || fe_opp == deletedElements[2]
                         || edges[i].ve == deletedElements[0] || edges[i].v1 == deletedElements[0] || edges[i].v2 == deletedElements[0] // un sommet lié à l'arête a été supprimée
-                        || edges[i].ve == edges[i].v1 || edges[i].v1 == edges[i].v2 || edges[i].v2 == edges[i].ve // les sommets de l'arête ont fusionné
-                        || !isFaceVisible(edges[i].fe) || !isFaceVisible(fe_opp)) { // une des faces incidentes de l'arête est devenue invisible
+                        || edges[i].ve == edges[i].v1 || edges[i].v1 == edges[i].v2 || edges[i].v2 == edges[i].ve) { // les sommets de l'arête ont fusionné
                     edges.erase(edges.begin() + i);
                     --i;
                     continue;

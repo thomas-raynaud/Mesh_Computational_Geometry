@@ -13,7 +13,7 @@ public:
 
     QVector<std::array<int, 2>> constraint(){return _constraint;}
 
-    virtual void drawMesh();
+    virtual void drawMesh() override;
     bool isConstraint(int a, int b);
 
     void splitEdge(int);

@@ -1,14 +1,30 @@
 #ifndef PREDICATE_H
 #define PREDICATE_H
 
-#include "utils/point.h"
+#include <glm/glm.hpp>
 
-/* Prédicats géométriques */
 
-// Retourne une valeur > à 0 si abc est orienté dans le sens trigonométrique
-float testOrientation(const Point &a, const Point &b, const Point &c);
-int isInTriangle(const Point &a, const Point &b, const Point &c, const Point &d);
-// d est dans le cercle circonscrit au triangle (a,b,c) ? (a,b,c) orienté dans le sens trigonométrique
-int etreDansCercle(const Point &a, const Point &b, const Point &c, const Point &d);
+// Returns a value > 0 if abc is oriented in the trigonometric direction
+float test_orientation(
+    const glm::vec3 &a,
+    const glm::vec3 &b,
+    const glm::vec3 &c
+);
 
-#endif // PREDICATE_H
+// Check if point d is in the triangle abc
+int is_in_triangle(
+    const glm::vec3 &a,
+    const glm::vec3 &b,
+    const glm::vec3 &c,
+    const glm::vec3 &d
+);
+// Check if d is in the circumscribed circle of the triangle abc,
+// with abc oriented in the trigonometric direction
+int is_in_circle(
+    const glm::vec3 &a,
+    const glm::vec3 &b,
+    const glm::vec3 &c,
+    const glm::vec3 &d
+);
+
+#endif  // PREDICATE_H

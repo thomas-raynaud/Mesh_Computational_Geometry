@@ -2,14 +2,18 @@
 #define MESH2D_H
 
 #include "meshes/mesh.h"
+
+#include <set>
+
 #include "techniques/predicate.h"
 
 
 class Mesh2D : public Mesh { // Mesh sur une surface 2D
 
 protected:
-    int _inf_v; // Indice du sommet infini
+    int _inf_v; // Index of infinite vertex
     QVector<Vertex> _vVertices; // Vertex de Voronoi, ce vector est indexé de la même manière que faces
+    std::set<int> m_hidden_vertices;
 
 public:
     Mesh2D();
@@ -31,9 +35,35 @@ public:
 
     Point computeCenter(Point, Point, Point);
 
-    virtual void drawMesh();
-    virtual void drawMeshWireFrame();
+    const bool is_vertex_fictive(const Vertex &v) const {
+        return v.idx() == _inf_v;
+    }
+
+    const bool is_vertex_visible(const Vertex &v) const {
+        return m_hidden_vertices.find(v.idx()) == m_hidden_vertices.end();
+    }
+
+    const bool isFaceFictive(const int face) const {
+        std::array<int, 3> face_vertices = faceTab[face].vertices();
+        return  is_vertex_fictive(m_vertices[face_vertices[0]]) ||
+                is_vertex_fictive(m_vertices[face_vertices[1]]) ||
+                is_vertex_fictive(m_vertices[face_vertices[2]]);
+    }
+
+    const bool isFaceVisible(const int face) const {
+        std::array<int, 3> face_vertices = faceTab[face].vertices();
+        return  !is_vertex_visible(m_vertices[face_vertices[0]]) ||
+                !is_vertex_visible(m_vertices[face_vertices[1]]) ||
+                !is_vertex_visible(m_vertices[face_vertices[2]]);
+    }
+
+    virtual void drawMesh() override;
+    virtual void drawMeshWireFrame() override;
     virtual void drawVoronoiWireFrame();
+
+    friend std::ostream& operator<<(std::ostream &strm, const Mesh2D &m);
 };
+
+std::ostream& operator<<(std::ostream &strm, const Mesh2D &m);
 
 #endif  // MESH2D_H

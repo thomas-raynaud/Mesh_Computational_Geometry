@@ -1,9 +1,9 @@
 #include "color.h"
 
-std::array<double, 3> hsv2rgb(int H, double S, double V) {
+glm::vec3 hsv2rgb(int H, double S, double V) {
     double              hh, p, q, t, ff;
     long                i;
-    std::array<double, 3>  out;
+    glm::vec3           out;
 
     if(S <= 0.0) {
         out[0] = V;
@@ -21,38 +21,37 @@ std::array<double, 3> hsv2rgb(int H, double S, double V) {
     t = V * (1.0 - (S * (1.0 - ff)));
 
     switch(i) {
-    case 0:
-        out[0] = V;
-        out[1] = t;
-        out[2] = p;
-        break;
-    case 1:
-        out[0] = q;
-        out[1] = V;
-        out[2] = p;
-        break;
-    case 2:
-        out[0] = p;
-        out[1] = V;
-        out[2] = t;
-        break;
-
-    case 3:
-        out[0] = p;
-        out[1] = q;
-        out[2] = V;
-        break;
-    case 4:
-        out[0] = t;
-        out[1] = p;
-        out[2] = V;
-        break;
-    case 5:
-    default:
-        out[0] = V;
-        out[1] = p;
-        out[2] = q;
-        break;
+        case 0:
+            out.r = V;
+            out.g = t;
+            out.b = p;
+            break;
+        case 1:
+            out.r = q;
+            out.g = V;
+            out.b = p;
+            break;
+        case 2:
+            out.r = p;
+            out.g = V;
+            out.b = t;
+            break;
+        case 3:
+            out.r = p;
+            out.g = q;
+            out.b = V;
+            break;
+        case 4:
+            out.r = t;
+            out.g = p;
+            out.b = V;
+            break;
+        case 5:
+        default:
+            out.r = V;
+            out.g = p;
+            out.b = q;
+            break;
     }
     return out;
 }
