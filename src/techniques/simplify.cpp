@@ -1,182 +1,136 @@
-#include<vector>
-#include "meshes/mesh.h"
-#include "utils/point.h"
+#include "simplify.h"
 
-// VE : sommet opposé à l'arête à supprimer dans la face FE
-// FE : face qui a une de ses arêtes à supprimer
-std::array<int, 3> Mesh::edgeCollapse(int VE, int FE) {
-    int V1, V2; // Sommets de l'arête à supprimer. V1, V2 et VE forment FE.
-    int FE_Opp; // Face opposée à VE depuis la face FE
-    int FA1, FA2; // Faces adjacentes à FE. -> FA1 et FA2 != FE_Opp
-    int FA3, FA4; // Faces adjacentes à FE_Opp. -> FA3 et FA4 != FE
+#include "meshes/Edge.h"
 
-    Circulator_on_faces cof; // Circulateur sur les faces de V1 et V2
 
-    // Trouver V1, V2, FA1, FA2 et FE_Opp
-    for (int i = 0; i < 3; ++i) {
-        if (faceTab[FE].vertices()[i] == VE) {
-            FE_Opp = faceTab[FE].adjacentFaces()[i];
-            V1 = faceTab[FE].vertices()[(i + 1) % 3];
-            V2 = faceTab[FE].vertices()[(i + 2) % 3];
-            FA1 = faceTab[FE].adjacentFaces()[(i + 1) % 3];
-            FA2 = faceTab[FE].adjacentFaces()[(i + 2) % 3];
+bool collapse_edge(
+        Mesh &mesh,
+        Vertex *ve,
+        Face *fe
+    ) {
+    Vertex *v1, *v2;    // [v1-v2] is the edge to delete. v1-v2-ve corresponds to fe.
+    Face *fe_opp;       // Face opposite to ve from the face fe.
+    Face *fa1, *fa2;    // Adjacent faces to fe. fa1 & fa2 != fe_opp
+    Face *fa3, *fa4;   // Adjacent faces to fe_opp. fa3 & fa4 != fe
+
+    FaceCirculator fc; // Circulate on the faces of v1 and v2
+
+    // Find v1, v2, fa1, fa2 and fe_opp
+    std::array<Vertex *, 3> face_vts = fe->get_vertices();
+    std::array<Face *, 3> adj_faces = fe->get_adjacent_faces();
+    for (size_t v_ind = 0; v_ind < 3; ++v_ind) {
+        if (*face_vts[v_ind] == *ve) {
+            fe_opp = adj_faces[v_ind];
+            v1 = face_vts[(v_ind + 1) % 3];
+            v2 = face_vts[(v_ind + 2) % 3];
+            fa1 = adj_faces[(v_ind + 1) % 3];
+            fa2 = adj_faces[(v_ind + 2) % 3];
+            break;
+        }
+    }
+    // Find fa3 and fa4
+    for (size_t v_ind = 0; v_ind < 3; ++v_ind) {
+        if (face_vts[v_ind] == v1) {
+            fa3 = adj_faces[v_ind];
+            fa4 = adj_faces[(v_ind + 2) % 3];
             break;
         }
     }
 
-    // Trouver FA3 et FA4
-    for (int i = 0; i < 3; ++i) {
-        if (faceTab[FE_Opp].vertices()[i] == V1) {
-            FA3 = faceTab[FE_Opp].adjacentFaces()[i];
-            FA4 = faceTab[FE_Opp].adjacentFaces()[(i + 2) % 3];
-            break;
+    // Check if fa1 / fa2 and fa3 / fa4 are not already connected.
+    for (size_t v_ind = 0; v_ind < 3; ++v_ind) {
+        if (
+            *(fa1->get_adjacent_faces()[v_ind]) == *fa2 ||
+            *(fa3->get_adjacent_faces()[v_ind]) == *fa4)
+        {
+            return false;
         }
     }
-
-    // Vérifier si FA1 / FA2 et FA3 / FA4 ne sont pas déjà connectés
-    for (int i = 0; i < 3; ++i) {
-        if (faceTab[FA1].adjacentFaces()[i] == FA2 || faceTab[FA3].adjacentFaces()[i] == FA4) {
-            return {-1, -1, -1};
-        }
-    }
-
-    // Remplacer V1 par V2 pour les faces adjacentes à V1
-    cof = incident_faces(m_vertices[V1], FE);
-    ++cof;
-    while (cof->idx() != FE_Opp) {
-        for (int i = 0; i < 3; ++i) {
-            if(faceTab[cof->idx()].vertices()[i] == V1){
-                faceTab[cof->idx()].setVertice(V2, i);
+    fc = mesh.incident_faces(*v1, *fe);
+    ++fc;
+    while (*fc != *fe_opp) {
+        face_vts = fc->get_vertices();
+        for (size_t v_ind = 0; v_ind < 3; ++v_ind) {
+            // Replace v1 with v2 for the adjacent faces of v1
+            if (face_vts[v_ind] == v1) {
+                fc->set_vertex(v_ind, v2);
             }
-            // Changer la face pointée par chaque sommet
-            m_vertices[faceTab[cof->idx()].vertices()[i]].setFace(cof->idx());
+            // Change the face attached by each vertex
+            face_vts[v_ind]->set_incident_face(&*fc);
         }
-        ++cof;
+        ++fc;
     }
 
-    // Connecter FA1 <-> FA2, FA3 <-> FA4
-    for (int i = 0; i < 3; ++i) {
-        // FA1 <-> FA2
-        if (faceTab[FA1].adjacentFaces()[i] == FE)
-            faceTab[FA1].setAdjacentFace(FA2, i);
-        if (faceTab[FA2].adjacentFaces()[i] == FE)
-            faceTab[FA2].setAdjacentFace(FA1, i);
-        //FA3 <-> FA4
-        if (faceTab[FA3].adjacentFaces()[i] == FE_Opp)
-            faceTab[FA3].setAdjacentFace(FA4, i);
-        if (faceTab[FA4].adjacentFaces()[i] == FE_Opp)
-            faceTab[FA4].setAdjacentFace(FA3, i);
+    // Connect fa1 <-> fa2, fa3 <-> fa4
+    for (size_t f_ind = 0; f_ind < 3; ++f_ind) {
+        // fa1 <-> fa2
+        if (*(fa1->get_adjacent_faces()[f_ind]) == *fe)
+            fa1->set_adjacent_face(f_ind, fa2);
+        if (*(fa2->get_adjacent_faces()[f_ind]) == *fe)
+            fa2->set_adjacent_face(f_ind, fa1);
+        // fa3 <-> fa4
+        if (*(fa3->get_adjacent_faces()[f_ind]) == *fe_opp)
+            fa3->set_adjacent_face(f_ind, fa4);
+        if (*(fa4->get_adjacent_faces()[f_ind]) == *fe_opp)
+            fa4->set_adjacent_face(f_ind, fa3);
     }
 
-    // Changer les coordonnées de V2 : au milieu de l'arête à supprimer
-    // (V1 + V2) * 0.5
-    m_vertices[V2].setPoint((m_vertices[V1].point() + m_vertices[V2].point()) * 0.5);
+    // Change the coordinates of v2. Place it in the middle of the deleted edge.
+    v2->set_position((v1->get_position() + v2->get_position()) * 0.5f);
 
-    // On retourne les éléments à supprimer du Mesh : V1, FE et FE_Opp
-    return {V1, FE, FE_Opp};
+    mesh.pop_vertex(v1);
+    mesh.pop_face(fe);
+    mesh.pop_face(fe_opp);
+
+    return true;
 }
 
-double Mesh::getEdgeLength(Edge e) {
-    Point a = m_vertices[e.v1].point();
-    Point b = m_vertices[e.v2].point();
-    return difference(a, b).norm();
+
+void get_edges(Mesh &mesh, std::map<Edge_Hash, Edge, std::less<Edge>> &edges) {
+    FaceIterator face_it;
+    std::array<Vertex*, 3> face_vts;
+    for(face_it = mesh.faces_begin(); face_it != mesh.faces_end(); ++face_it) {
+        face_vts = face_it->get_vertices();
+        for (size_t i = 0; i < 3; ++i) {
+            Edge e(
+                face_vts[(i + 1) % 3],
+                face_vts[(i + 2) % 3],
+                &*face_it,
+                face_vts[i]
+            );
+            if (edges.find(e.get_hash()) == edges.end()) {
+                edges[e.get_hash()] = e;
+            }
+        }
+    }
 }
 
-struct comparatorEdges {
-  bool operator() (Edge e1, Edge e2) {
-      return mesh->getEdgeLength(e1) < mesh->getEdgeLength(e2);
-  }
-  Mesh *mesh;
-} compareEdges;
 
+void simplify(Mesh &mesh, int n) {
+    // Don't simplify if the number of vertices is <= to n.
+    if (mesh.get_nb_vertices() <= n) return;
 
-// n : nombres de sommets après simplification
-void Mesh::simplify (int n) {
-    // Pas de simplification si le nombre de sommets à obtenir est supérieur au
-    // nombre de sommets actuels.
-    if (m_vertices.size() <= n) return;
+    // Edges sorted based on their length
+    std::map<Edge_Hash, Edge, std::less<Edge>> edges;
+    int nb_vertices = mesh.get_nb_vertices();
+    bool edge_deleted;
+    Edge *edge_to_delete;
+    std::map<Edge_Hash, Edge>::iterator edge_it;
 
-    std::vector<Edge> edges;
-    std::vector<int> deletedFaces;
-    std::vector<int> deletedVertices;
-    std::array<int, 3> deletedElements;
-    Edge e;
-    int nbVertices = m_vertices.size(), f;
-    bool edgeNew, faceHidden;
-    compareEdges.mesh = this;
+    do {
+        get_edges(mesh, edges);
+        // Delete the smallest one.
+        edge_it = edges.begin();
+        edge_deleted = false;
 
-    // Récupérer les arêtes du mesh
-    //edges = getEdges();
-
-    for(Iterator_on_faces itf = faces_begin(); itf != faces_end(); ++itf) {
-        f = itf->idx();
-
-        // Créer l'arête
-        for (uint i = 0; i < 3; ++i) {
-            e.ve = faceTab[f].vertices()[i];
-            e.fe = f;
-            e.v1 = faceTab[f].vertices()[(i + 1) % 3];
-            e.v2 = faceTab[f].vertices()[(i + 2) % 3];
-            // Regarder si l'arête conjuguée est dans le tableau
-            edgeNew = true;
-            for (uint j = 0; j < edges.size(); ++j) {
-                if (edges[j].v1 == e.v2 && edges[j].v2 == e.v1) {
-                    edgeNew = false;
-                    break;
-                }
-            }
-            if (edgeNew) edges.push_back(e);
+        while (!edge_deleted) {
+            edge_to_delete = &edge_it->second;
+            edge_deleted = collapse_edge(
+                mesh,
+                edge_to_delete->ve,
+                edge_to_delete->fe
+            );
+            ++edge_it;
         }
-    }
-
-    // Tant que le maillage n'a pas n sommets ou qu'il n'y a plus d'arêtes
-    while (n < nbVertices && edges.size() > 0) {
-    //while (m_vertices.size() <= nbVertices && edges.size() > 0) {
-        // Ordonner les arêtes par leur longueur (ordre croissant)
-        std::sort(edges.begin(), edges.end(), compareEdges);
-        // On supprime la plus petite arête
-        deletedElements = edgeCollapse(edges[0].ve, edges[0].fe);
-
-        if (deletedElements[0] != -1) { // Arête bien supprimée
-            // réarranger les arêtes : changer les références des arêtes impactées
-
-            for (uint i = 1; i < edges.size(); ++i) {
-                int fe_opp;
-                for (int j = 0; j < 3; ++j) {
-                    if (faceTab[edges[i].fe].vertices()[j] == edges[i].ve) {
-                        fe_opp = faceTab[edges[i].fe].adjacentFaces()[j];
-                        break;
-                    }
-                }
-                // Supprimer l'arête si ...
-                if (edges[i].fe == deletedElements[1] || edges[i].fe == deletedElements[2] // une face incidente a été supprimée
-                        || fe_opp == deletedElements[1] || fe_opp == deletedElements[2]
-                        || edges[i].ve == deletedElements[0] || edges[i].v1 == deletedElements[0] || edges[i].v2 == deletedElements[0] // un sommet lié à l'arête a été supprimée
-                        || edges[i].ve == edges[i].v1 || edges[i].v1 == edges[i].v2 || edges[i].v2 == edges[i].ve) { // les sommets de l'arête ont fusionné
-                    edges.erase(edges.begin() + i);
-                    --i;
-                    continue;
-                }
-            }
-            --nbVertices;
-            deletedVertices.push_back(deletedElements[0]);
-            deletedFaces.push_back(deletedElements[1]);
-            deletedFaces.push_back(deletedElements[2]);
-        }
-        edges.erase(edges.begin());
-    }
-
-
-    // Nettoyer le maillage
-    std::sort(deletedVertices.begin(), deletedVertices.end(), std::greater<int>());
-    std::sort(deletedFaces.begin(), deletedFaces.end(), std::greater<int>());
-
-    // Faces
-    for (uint i = 0; i < deletedFaces.size(); ++i) {
-        facePop(deletedFaces[i]);
-    }
-    // Sommets
-    for (uint i = 0; i < deletedVertices.size(); ++i) {
-        vertexPop(deletedVertices[i]);
-    }
+    } while(n < nb_vertices && edges.size() > 0 && edge_deleted);
 }

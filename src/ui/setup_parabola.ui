@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>setup_parabola</class>
+ <widget class="QWidget" name="setup_parabola">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>400</width>
+    <height>120</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>Form</string>
+  </property>
+  <widget class="QGroupBox" name="parabola_groupbox">
+   <property name="geometry">
+    <rect>
+     <x>0</x>
+     <y>0</y>
+     <width>401</width>
+     <height>121</height>
+    </rect>
+   </property>
+   <property name="title">
+    <string>Parabola setup</string>
+   </property>
+   <widget class="QWidget" name="verticalLayoutWidget">
+    <property name="geometry">
+     <rect>
+      <x>0</x>
+      <y>30</y>
+      <width>401</width>
+      <height>80</height>
+     </rect>
+    </property>
+    <layout class="QVBoxLayout" name="parabola_layout">
+     <item>
+      <layout class="QHBoxLayout" name="parabola_type_layout">
+       <item>
+        <widget class="QLabel" name="parabola_type_label">
+         <property name="text">
+          <string>Parabola type:</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QComboBox" name="parabola_type_combobox">
+         <item>
+          <property name="text">
+           <string>Paraboloid</string>
+          </property>
+         </item>
+         <item>
+          <property name="text">
+           <string>Rosenbrock</string>
+          </property>
+         </item>
+        </widget>
+       </item>
+      </layout>
+     </item>
+    </layout>
+   </widget>
+  </widget>
+ </widget>
+ <resources/>
+ <connections/>
+</ui>

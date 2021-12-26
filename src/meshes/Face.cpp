@@ -1,6 +1,7 @@
 #include "Face.h"
 
 #include "Vertex.h"
+#include "utils/math.h"
 
 
 int Face::face_count = 0;
@@ -36,6 +37,14 @@ glm::vec3 Face::get_color() const {
 
 Face_Hash Face::get_hash() const {
     return m_ind;
+}
+
+float Face::get_max_angle() const {
+    glm::vec3 a, b, c;
+    a = m_vertices[0]->get_position();
+    b = m_vertices[1]->get_position();
+    c = m_vertices[2]->get_position();
+    return std::max(cos(b, a, c), std::max(cos(a, b, c), cos(b, c, a)));
 }
 
 

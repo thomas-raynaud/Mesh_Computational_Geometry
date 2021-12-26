@@ -65,6 +65,10 @@ set(QT_COMPONENT
 )
 find_package(Qt5 ${QT_VERSION} COMPONENTS ${QT_COMPONENT} REQUIRED)
 
+# Catch
+find_package(Catch2 REQUIRED)
+target_link_libraries(tests Catch2::Catch2)
+
 
 add_executable(${PROJECT_NAME} ${SOURCES})
 

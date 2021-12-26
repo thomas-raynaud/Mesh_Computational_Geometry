@@ -1,5 +1,5 @@
-#ifndef GLDISPLAYWIDGET_H
-#define GLDISPLAYWIDGET_H
+#ifndef SCENE_H
+#define SCENE_H
 
 #include <QGLWidget>
 #include <QtWidgets>
@@ -8,22 +8,18 @@
 
 class Mesh;
 
-class GLDisplayWidget : public QGLWidget {
+class Scene : public QGLWidget {
 
 public:
-    explicit GLDisplayWidget(QWidget *parent = 0);
-    ~GLDisplayWidget();
+    explicit Scene(QWidget *parent = 0);
+    ~Scene();
 
-    /**
-     * The scene may be initialized in this function since the mesh
-     * is a data member...
-     */
-    void initializeGL();
+    void init();
     // Display the GL scene
-    void paintGL();
-    void resizeGL(int width, int height);
+    void paint();
+    void resize(int width, int height);
     // Display plain faces or wireframe
-    void toggleDisplayType();
+    void switch_display_type();
 
     /**
      * Change the type of mesh to display: current mesh is destroyed
@@ -63,7 +59,7 @@ private:
      * The object to be displayed, may be replaced by a scene if there
      * are several objects...
      */
-    Mesh * m_mesh;
+    std::shared_ptr<Mesh> m_mesh;
 };
 
-#endif  // GLDISPLAYWIDGET_H
+#endif  // SCENE_H

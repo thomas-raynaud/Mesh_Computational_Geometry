@@ -1,5 +1,9 @@
 #include "Mesh.h"
 
+#include <iostream>
+
+#include "Face.h"
+#include "Vertex.h"
 #include "Edge.h"
 
 
@@ -7,6 +11,11 @@ Mesh::Mesh() {}
 
 int Mesh::get_nb_vertices() {
     return m_vertices.size();
+}
+
+
+int Mesh::get_nb_faces() {
+    return m_faces.size();
 }
 
 
@@ -51,6 +60,26 @@ void Mesh::connect_adjacent_faces() {
             }
         }
     }
+}
+
+
+void Mesh::add_vertex(Vertex *vtx) {
+    m_vertices[vtx->get_hash()] = *vtx;
+}
+
+
+void Mesh::add_face(Face *face) {
+    m_faces[face->get_hash()] = *face;
+}
+
+
+void Mesh::pop_vertex(Vertex *v) {
+    m_vertices.erase(v->get_hash());
+}
+
+
+void Mesh::pop_face(Face *f) {
+    m_faces.erase(f->get_hash());
 }
 
 
@@ -223,12 +252,11 @@ VertexCirculator Mesh::neighbour_vertices(const Vertex &v) {
 }
 
 
-std::ostream& operator<<(std::ostream &strm, const Mesh &m) {
+std::ostream& operator<<(std::ostream &strm, const Mesh &mesh) {
     strm << "===============" << std::endl;
-    strm    << "Mesh: " << m.m_vertices.size() << " vertices, "
-            << m.m_faces.size() << " faces" << std::endl;
+    strm    << "Mesh: " << mesh.m_vertices.size() << " vertices, "
+            << mesh.m_faces.size() << " faces" << std::endl;
     strm << "Vertices:" << std::endl;
-    std::string type;
     VertexConstIteratorType vertex_it;
     FaceConstIteratorType face_it;
     Vertex v;
@@ -236,7 +264,10 @@ std::ostream& operator<<(std::ostream &strm, const Mesh &m) {
     glm::vec3 pos;
     std::array<Vertex*, 3> face_vts;
     std::array<Face*, 3> adj_faces;
-    for (vertex_it = m.m_vertices.begin(); vertex_it != m.m_vertices.end(); ++vertex_it) {
+    for (   vertex_it = mesh.m_vertices.begin();
+            vertex_it != mesh.m_vertices.end();
+            ++vertex_it
+    ) {
         v = vertex_it->second;
         pos = v.get_position();
         strm << v.get_hash() << ": ";
@@ -244,7 +275,10 @@ std::ostream& operator<<(std::ostream &strm, const Mesh &m) {
         strm << " - f=" << v.get_incident_face() << std::endl;
     }
     strm << "Faces:" << std::endl;
-    for (face_it = m.m_faces.begin(); face_it != m.m_faces.end(); ++face_it) {
+    for (   face_it = mesh.m_faces.begin();
+            face_it != mesh.m_faces.end();
+            ++face_it
+    ) {
         f = face_it->second;
         face_vts = f.get_vertices();
         adj_faces = f.get_adjacent_faces();
@@ -258,12 +292,4 @@ std::ostream& operator<<(std::ostream &strm, const Mesh &m) {
     }
     strm << "===============" << std::endl;
     return strm;
-}
-
-void Mesh::pop_vertex(Vertex *v) {
-    m_vertices.erase(v->get_hash());
-}
-
-void Mesh::pop_face(Face *f) {
-    m_faces.erase(f->get_hash());
 }

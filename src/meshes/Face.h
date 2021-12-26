@@ -22,6 +22,7 @@ public:
     std::array<Face*, 3> get_adjacent_faces() const;
     glm::vec3 get_color() const;
     Face_Hash get_hash() const;
+    float get_max_angle() const;
 
     void set_vertices(std::array<Vertex*, 3> vertices);
     void set_adjacent_faces(std::array<Face*, 3> adjacent_faces);

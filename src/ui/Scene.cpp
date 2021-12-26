@@ -1,4 +1,4 @@
-#include "gldisplaywidget.h"
+#include "GLDisplayWidget.h"
 
 #include <glm/gtc/matrix_transform.hpp>
 
@@ -120,6 +120,10 @@ void GLDisplayWidget::switchTP(int index) {
         case 1:
             delete m_mesh;
             m_mesh = new Mesh2D();
+            // Create 3 visible vertices, our actual 2D mesh.
+            insertion(glm::vec3(-1.f,   -1.f,   0.f));
+            insertion(glm::vec3( 1.f,   -1.f,   0.f));
+            insertion(glm::vec3( 0.f,    1.f,   0.f));
             break;
         case 2:
             delete m_mesh;

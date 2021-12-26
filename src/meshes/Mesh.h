@@ -1,7 +1,7 @@
 #ifndef MESH_H
 #define MESH_H
 
-#include <QGLWidget>
+#include <vector>
 #include <unordered_map>
 
 #include "Vertex.h"
@@ -30,15 +30,11 @@ protected:
 public:
     Mesh();
 
-    virtual void draw_mesh();
-    // Draw the mesh with the color of the faces
-    virtual void draw_mesh_mosaics();
-    virtual void draw_mesh_wireframe();
-    virtual void draw_plain_face(const Face &face);
-    virtual void draw_wireframe_face(const Face &face);
-
     int get_nb_vertices();
-    void get_face_vertices(const Face &f, Vertex &a, Vertex &b, Vertex &c);
+    int get_nb_faces();
+
+    void add_vertex(Vertex *vtx);
+    void add_face(Face *face);
 
     virtual void pop_vertex(Vertex *v);
     void pop_face(Face *f);
@@ -124,6 +120,6 @@ private:
     int m_ind;
 };
 
-std::ostream& operator<<(std::ostream &strm, const Mesh &m);
+std::ostream& operator<<(std::ostream &strm, const Mesh &mesh);
 
 #endif // MESH_H
