@@ -7,5 +7,6 @@ class MainSetup : public QWidget
 
 public:
 public slots:
-private:
+signals:
+    
 };

@@ -1,4 +1,4 @@
-#include "GLDisplayWidget.h"
+#include "Scene.h"
 
 #include <glm/gtc/matrix_transform.hpp>
 

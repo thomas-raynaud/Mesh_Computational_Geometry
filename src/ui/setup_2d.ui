@@ -94,10 +94,10 @@
      </layout>
     </item>
     <item>
-     <widget class="QWidget" name="setup_ruppert" native="true"/>
+     <widget class="SetupRuppert" name="setup_ruppert" native="true"/>
     </item>
     <item>
-     <widget class="QWidget" name="setup_parabola" native="true"/>
+     <widget class="SetupParabola" name="setup_parabola" native="true"/>
     </item>
    </layout>
   </widget>

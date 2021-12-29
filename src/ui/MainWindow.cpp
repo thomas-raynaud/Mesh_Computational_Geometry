@@ -1,23 +1,21 @@
-#include "mainwindow.h"
-#include "ui_mainwindow.h"
+#include "MainWindow.h"
+
 
 
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
-    ui(new Ui::MainWindow)
+    ui()
 {
-    ui->setupUi(this);
+    ui.setupUi(this);
+    m_dimension = Dimension::D2;
+    ui.setup_3d->hide();
+    connect()
     ui->pushButtonInsertNPoints->hide();
     ui->pushButtonInsertPoint->hide();
     ui->pushButtonxxyy->hide();
     ui->pushButtonRosenbrock->hide();
     ui->pushButtonSimplifyMesh->hide();
     ui->pushButtonRaffine->hide();
-}
-
-
-MainWindow::~MainWindow() {
-    delete ui;
 }
 
 

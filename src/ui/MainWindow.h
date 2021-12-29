@@ -3,6 +3,14 @@
 
 #include <QMainWindow>
 
+#include "ui_main_window.h"
+
+
+enum Dimension {
+    D2,
+    D3
+}
+
 namespace Ui {
     class MainWindow;
 }
@@ -27,7 +35,8 @@ private slots:
     void on_pushButtonRaffine_clicked();
 
 private:
-    Ui::MainWindow *ui;
+    Ui::MainWindow ui;
+    Dimension m_dimension;
 };
 
 #endif  // MAINWINDOW_H
