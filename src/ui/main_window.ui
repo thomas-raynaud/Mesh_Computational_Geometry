@@ -35,7 +35,7 @@
      <rect>
       <x>0</x>
       <y>0</y>
-      <width>251</width>
+      <width>257</width>
       <height>490</height>
      </rect>
     </property>
@@ -127,7 +127,7 @@
         <item>
          <widget class="QPushButton" name="voronoi_display_push_button">
           <property name="text">
-           <string>Show Voronoi Wireframe</string>
+           <string>Show Voronoi wireframe</string>
           </property>
          </widget>
         </item>
@@ -141,7 +141,7 @@
            </widget>
           </item>
           <item>
-           <widget class="QLineEdit" name="lineEdit"/>
+           <widget class="QLineEdit" name="insert_points_line_edit"/>
           </item>
           <item>
            <widget class="QLabel" name="insert_points_label_2">
@@ -151,7 +151,7 @@
            </widget>
           </item>
           <item>
-           <widget class="QPushButton" name="insert_points_button">
+           <widget class="QPushButton" name="insert_points_push_button">
             <property name="text">
              <string>Go</string>
             </property>
@@ -172,7 +172,7 @@
            <widget class="QComboBox" name="parabola_type_combobox">
             <item>
              <property name="text">
-              <string>Paraboloid</string>
+              <string>Elliptic paraboloid</string>
              </property>
             </item>
             <item>
@@ -202,7 +202,7 @@
           </property>
           <layout class="QVBoxLayout" name="verticalLayout_2">
            <item>
-            <layout class="QHBoxLayout" name="horizontalLayout_2">
+            <layout class="QHBoxLayout" name="color_display_layout">
              <item>
               <widget class="QLabel" name="color_display_label">
                <property name="text">
@@ -237,7 +237,7 @@
             </layout>
            </item>
            <item>
-            <layout class="QHBoxLayout" name="horizontalLayout_3">
+            <layout class="QHBoxLayout" name="mesh_3d_type_layout">
              <item>
               <widget class="QLabel" name="mesh3d__type_label">
                <property name="text">
@@ -267,7 +267,7 @@
             </layout>
            </item>
            <item>
-            <widget class="QPushButton" name="simplify_button">
+            <widget class="QPushButton" name="simplify_push_button">
              <property name="text">
               <string>Simplify</string>
              </property>

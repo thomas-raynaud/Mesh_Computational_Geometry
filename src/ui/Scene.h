@@ -4,6 +4,12 @@
 #include <QGLWidget>
 #include <QtWidgets>
 #include <QTimer>
+#include <unordered_map>
+
+#include "meshes/Face.h"
+#include "meshes/Vertex.h"
+#include "meshes/Mesh.h"
+#include "MeshConfig.h"
 
 
 class Mesh;
@@ -18,6 +24,14 @@ public:
     // Display the GL scene
     void paint();
     void resize(int width, int height);
+
+    void set_mesh(std::shared_ptr<Mesh> &mesh);
+    void set_voronoi_vertices(
+        std::shared_ptr<std::unordered_map<Face_Hash, Vertex>> &voronoi_vertices
+    );
+    void set_mesh_config(std::shared_ptr<MeshConfig> &mesh_config);
+
+
     // Display plain faces or wireframe
     void switch_display_type();
 
@@ -49,17 +63,16 @@ private:
     QTimer m_timer;             // Timer to update the scene
     float m_x, m_y, m_z;        // Translation
     float m_x_angle, m_y_angle; // Rotation
-    int m_curve_axis;
-    int m_mesh_type;
-    bool m_wireframe_display;
 
     QPoint m_last_mouse_pos;    // To keep the last position of the mouse
 
     /**
      * The object to be displayed, may be replaced by a scene if there
-     * are several objects...
+     * are several objects.
      */
-    std::shared_ptr<Mesh> m_mesh;
+    std::weak_ptr<Mesh> m_mesh;
+    std::weak_ptr<std::unordered_map<Face_Hash, Vertex>> m_voronoi_vertices;
+    std::weak_ptr<MeshConfig> m_mesh_config;
 };
 
 #endif  // SCENE_H

@@ -1,4 +1,4 @@
-#include "ruppert.h"
+#include "MeshRuppert.h"
 
 #include "delaunay.h"
 #include "utils/math.h"

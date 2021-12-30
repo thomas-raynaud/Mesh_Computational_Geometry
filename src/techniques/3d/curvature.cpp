@@ -62,7 +62,7 @@ void compute_laplacians(Mesh3D *mesh) {
 }
 
 
-void set_curvature_colors(Mesh3D *mesh, int curvature_axis) {
+void set_curvature_colors(Mesh3D *mesh, ColorDisplayType color_display_type) {
     float min = FLT_MAX, max = 0.0, mean_curvature;
     int hue = 0;
     std::unordered_map<Vertex_Hash, glm::vec3> laplacians = mesh->get_laplacians();
@@ -71,12 +71,13 @@ void set_curvature_colors(Mesh3D *mesh, int curvature_axis) {
     glm::vec3 lap;
     curvatures.reserve(mesh->get_nb_vertices());
     // Compute the mean curvature
+    int curvature_axis = color_display_type - 1;
     for (vtx_it = mesh->vertices_begin(); vtx_it != mesh->vertices_end(); ++vtx_it) {
         lap = laplacians[vtx_it->get_hash()];
-        if (curvature_axis == 0)
+        if (color_display_type == ColorDisplayType::MeanCurvature)
             mean_curvature = std::abs(std::log(glm::length(lap)) / -2);
         else
-            mean_curvature = std::abs((lap[curvature_axis - 1] / glm::length(lap)) / -2);
+            mean_curvature = std::abs((lap[curvature_axis] / glm::length(lap)) / -2);
         min = std::min(min, mean_curvature);
         max = std::max(max, mean_curvature);
         curvatures[vtx_it->get_hash()] = mean_curvature;

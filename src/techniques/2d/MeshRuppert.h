@@ -21,6 +21,8 @@ public:
     void split_encroached_constraint_edges();
     Face* find_worst_aspect_ratio_triangle(float alpha);
     void refine(float alpha);
+
+    void draw_mesh_wireframe_faces_color();
 };
 
 #endif  // RUPPERT_H

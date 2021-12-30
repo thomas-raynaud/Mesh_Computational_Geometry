@@ -1,4 +1,4 @@
-#include "crust.h"
+#include "MeshCrust.h"
 
 #include <fstream>
 #include <sstream>
@@ -7,7 +7,7 @@
 #include "voronoi.h"
 
 
-Crust::Crust(){
+MeshCrust::MeshCrust(){
     // Insert points in the file.
     std::ifstream file("resources/points_courbe.txt");
     if(!file) return;
@@ -33,6 +33,6 @@ Crust::Crust(){
     }
 }
 
-bool Crust::is_voronoi_vertex(const Vertex &vtx) {
+bool MeshCrust::is_voronoi_vertex(const Vertex &vtx) {
     return m_is_voronoi_vertex[vtx.get_hash()];
 }

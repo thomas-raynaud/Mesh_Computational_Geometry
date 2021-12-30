@@ -5,10 +5,9 @@
 
 Mesh2D::Mesh2D() {
     // Create an invisible tetrahedron that wraps up the 2D mesh.
-    float far_dist = 20.f;
-    Vertex va(glm::vec3(-far_dist,       0.f, 0.f));
-    Vertex vb(glm::vec3( far_dist, -far_dist, 0.f));
-    Vertex vc(glm::vec3( far_dist,  far_dist, 0.f));
+    Vertex va(glm::vec3(-MAX_DIST,       0.f, 0.f));
+    Vertex vb(glm::vec3( MAX_DIST, -MAX_DIST, 0.f));
+    Vertex vc(glm::vec3( MAX_DIST,  MAX_DIST, 0.f));
     Vertex inf_vtx(glm::vec3(0.f, 0.f, -1.f));
     m_vertices[va.get_hash()] = va;
     m_vertices[vb.get_hash()] = vb;

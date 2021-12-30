@@ -1,4 +1,4 @@
-#include "parabola.h"
+#include "MeshParabola.h"
 
 #include <cmath>
 
@@ -9,7 +9,7 @@
 #define MESH_PRECISION 2000
 
 
-Parabola::Parabola(ParabolaType parabola_type)
+MeshParabola::MeshParabola(ParabolaType parabola_type)
         : Mesh2D(), m_parabola_type(parabola_type)
 {
     float x, y, z;

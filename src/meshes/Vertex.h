@@ -3,6 +3,8 @@
 
 #include <glm/glm.hpp>
 
+#define MAX_DIST 20.f
+
 
 class Face;
 
