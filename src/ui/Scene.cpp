@@ -16,6 +16,8 @@ Scene::Scene(QWidget *parent) : QGLWidget(parent) {
     m_y_angle = 0.f;
 }
 
+Scene::~Scene() {}
+
 
 void Scene::init() {
     // Background color
@@ -48,8 +50,8 @@ void Scene::paint() {
 
     std::shared_ptr<Mesh> mesh = m_mesh.lock();
     std::shared_ptr<MeshConfig> mesh_config = m_mesh_config.lock();
-    std::shared_ptr<std::unordered_map<Face_Hash, Vertex>> voronoi_vertices
-        = m_voronoi_vertices.lock();
+    std::shared_ptr<std::unordered_map<Face_Hash, glm::vec3>> voronoi_pts
+        = m_voronoi_pts.lock();
     switch (mesh_config->dimension) {
         case Dimension::D2:
             switch(mesh_config->algorithm_2d_type) {
@@ -87,7 +89,7 @@ void Scene::paint() {
     if (mesh_config->show_voronoi_display) {
         draw_voronoi_wireframe(
             (Mesh2D*)mesh.get(),
-            *voronoi_vertices
+            *voronoi_pts
         );
     }
 }
@@ -111,10 +113,10 @@ void Scene::set_mesh(std::shared_ptr<Mesh> &mesh) {
     m_mesh = mesh;
 }
 
-void Scene::set_voronoi_vertices(
-    std::shared_ptr<std::unordered_map<Face_Hash, Vertex>> &voronoi_vertices
+void Scene::set_voronoi_points(
+    std::shared_ptr<std::unordered_map<Face_Hash, glm::vec3>> &voronoi_pts
 ) {
-    m_voronoi_vertices = voronoi_vertices;
+    m_voronoi_pts = voronoi_pts;
 }
 
 void Scene::set_mesh_config(std::shared_ptr<MeshConfig> &mesh_config) {

@@ -50,8 +50,8 @@ Pyramid::Pyramid() {
     Face fc({ &va, &ve, &vb });
     Face fd({ &vb, &ve, &vd });
     Face fe({ &vc, &vd, &ve });
-    Face fe({ &va, &vc, &ve });
-    std::vector<Face> faces({ fa, fb, fc, fd, fe });
+    Face ff({ &va, &vc, &ve });
+    std::vector<Face> faces({ fa, fb, fc, fd, fe, ff });
     for (Face f : faces) {
         m_faces[f.get_hash()] = f;
     }
@@ -65,7 +65,7 @@ Pyramid::Pyramid() {
     connect_adjacent_faces();
 }
 
-QueenMesh::QueenMesh() {
+MeshQueen::MeshQueen() {
     // Read file
     std::ifstream off_file("resources/queen.off");
     if (!off_file) {

@@ -41,11 +41,11 @@ private:
     std::shared_ptr<MeshConfig> m_mesh_config;
 
     std::shared_ptr<Mesh> m_mesh;
-    std::shared_ptr<std::unordered_map<Face_Hash, Vertex>> m_voronoi_vertices;
+    std::shared_ptr<std::unordered_map<Face_Hash, glm::vec3>> m_voronoi_pts;
 
     void switch_dimension();
     void update_voronoi_vertices();
-    void set_mesh();
+    void set_mesh(const Mesh &mesh);
 };
 
 #endif  // MAINWINDOW_H

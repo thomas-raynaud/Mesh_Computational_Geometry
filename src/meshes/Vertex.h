@@ -14,7 +14,7 @@ class Vertex {
 
 public:
     Vertex(glm::vec3 pos, Face *incident_face=nullptr);
-    Vertex() {}
+    Vertex();
 
     glm::vec3 get_position() const;
     glm::vec3 get_color() const;

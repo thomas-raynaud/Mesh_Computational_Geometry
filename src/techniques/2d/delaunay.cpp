@@ -47,10 +47,10 @@ void flip_edge(Face *f1, Face *f2) {
 }
 
 
-void split_triangle(Mesh2D *mesh, Vertex *vtx, Face *face) {
+Vertex* split_triangle(Mesh2D *mesh, glm::vec3 &point, Face *face) {
     std::array<Vertex*, 3> face_vts = face->get_vertices();
     std::array<Face*, 3> adj_faces = face->get_adjacent_faces();
-    mesh->add_vertex(vtx);
+    Vertex *vtx = mesh->add_vertex(point);
     // Create 2 new faces
     Face fa({ vtx, face_vts[0], face_vts[1] });
     Face fb({ vtx, face_vts[1], face_vts[2] });
@@ -86,14 +86,14 @@ void split_triangle(Mesh2D *mesh, Vertex *vtx, Face *face) {
     face_vts[1]->set_incident_face(&fb);
     face_vts[2]->set_incident_face(face);
     vtx->set_incident_face(&fa);
+    return vtx;
 }
 
 
 Vertex* insert_delaunay_vertex(Mesh2D *mesh, glm::vec3 p) {
     // Check if the point is inside the convex hull.
     glm::vec3 a, b, c;
-    Vertex new_vtx(p);
-    mesh->add_vertex(&new_vtx);
+    Vertex *new_vtx = nullptr;
     Vertex *inf_vtx = mesh->get_infinite_vertex();
     FaceCirculator fc_begin = mesh->incident_faces(*inf_vtx);
     FaceCirculator fc = fc_begin;
@@ -117,14 +117,14 @@ Vertex* insert_delaunay_vertex(Mesh2D *mesh, glm::vec3 p) {
     } while (fc != fc_begin && face_split == nullptr);
 
     if (face_split != nullptr) {
-        split_triangle(mesh, &new_vtx, face_split);
+        new_vtx = split_triangle(mesh, p, face_split);
         // Flip fictive edges if they are incident to another fictive face.
         fc_begin = mesh->incident_faces(*inf_vtx);
         fc = fc_begin;
         do {
             face_vts = fc->get_vertices();
             for (size_t i = 0; i < 3; ++i) {
-                if (    *(face_vts[i]) == new_vtx &&
+                if (    *(face_vts[i]) == *new_vtx &&
                         *(face_vts[i + 1]) == *inf_vtx
                 ) {
                     face_start = &*fc;
@@ -177,23 +177,26 @@ Vertex* insert_delaunay_vertex(Mesh2D *mesh, glm::vec3 p) {
             }
             else edge_visible = false;
         }
-        return;
     }
 
     // The point is in the convex hull. Find in which face it is located.
     // -> visibility march
     // We start from a random face.
     FaceIterator face_it = mesh->faces_begin();
-    std::advance(face_it, rand() % mesh->get_nb_faces());
+    size_t rand_face_ind = rand() % mesh->get_nb_faces();
+    for (size_t i = 0; i < rand_face_ind; ++i) {
+        ++face_it;
+    }
+    //std::advance(face_it, rand() % mesh->get_nb_faces());
     while (mesh->is_face_fictive(*face_it)) ++face_it;
     Face *face = &*face;
     do {
         previous_face = face;
-        face = take_step_visibility_march(mesh, *face, new_vtx);
+        face = take_step_visibility_march(mesh, *face, p);
     } while (face != nullptr); // We arrived in the correct triangle
-    split_triangle(mesh, &new_vtx, previous_face);
-    rearrange_delaunay(mesh, &new_vtx);
-
+    new_vtx = split_triangle(mesh, p, previous_face);
+    rearrange_delaunay(mesh, new_vtx);
+    return new_vtx;
 }
 
 

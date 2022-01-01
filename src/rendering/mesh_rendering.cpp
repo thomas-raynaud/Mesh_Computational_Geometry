@@ -71,11 +71,12 @@ void draw_wireframe_face(const Face &face, const glm::vec3 &color) {
 
 void draw_voronoi_wireframe(
     Mesh2D *mesh,
-    std::unordered_map<Face_Hash, Vertex> &voronoi_vertices
+    std::unordered_map<Face_Hash, glm::vec3> &voronoi_pts
 ) {
     FaceCirculator fc, fc_begin;
     VertexIterator vtx_it;
     glm::vec3 color(1, 0, 0);
+    glm::vec3 p;
     Face *f1, *f2;
     for (   vtx_it = mesh->vertices_begin();
             vtx_it != mesh->vertices_end();
@@ -91,8 +92,10 @@ void draw_voronoi_wireframe(
             if (!mesh->is_face_visible(*f1) || !mesh->is_face_visible(*f2))
                 continue;
             glBegin(GL_LINE_STRIP);
-            draw_vertex(voronoi_vertices[f1->get_hash()]);
-            draw_vertex(voronoi_vertices[f2->get_hash()]);
+            p = voronoi_pts[f1->get_hash()];
+            glVertex3f(p.x, p.y, p.z);
+            p = voronoi_pts[f2->get_hash()];
+            glVertex3f(p.x, p.y, p.z);
             glEnd();
         } while (fc != fc_begin);
     }

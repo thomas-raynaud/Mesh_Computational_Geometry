@@ -33,7 +33,7 @@ public:
     int get_nb_vertices();
     int get_nb_faces();
 
-    void add_vertex(Vertex *vtx);
+    Vertex* add_vertex(glm::vec3 &pos);
     void add_face(Face *face);
 
     virtual void pop_vertex(Vertex *v);

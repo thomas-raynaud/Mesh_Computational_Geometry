@@ -1,6 +1,6 @@
 #include "curvature.h"
 
-#include "Mesh3D.h"
+#include "meshes/Mesh3D.h"
 #include "utils/color.h"
 
 
@@ -71,7 +71,7 @@ void set_curvature_colors(Mesh3D *mesh, ColorDisplayType color_display_type) {
     glm::vec3 lap;
     curvatures.reserve(mesh->get_nb_vertices());
     // Compute the mean curvature
-    int curvature_axis = color_display_type - 1;
+    int curvature_axis = (int)color_display_type - 1;
     for (vtx_it = mesh->vertices_begin(); vtx_it != mesh->vertices_end(); ++vtx_it) {
         lap = laplacians[vtx_it->get_hash()];
         if (color_display_type == ColorDisplayType::MeanCurvature)

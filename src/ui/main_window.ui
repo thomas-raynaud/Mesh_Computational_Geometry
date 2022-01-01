@@ -35,53 +35,55 @@
      <rect>
       <x>0</x>
       <y>0</y>
-      <width>257</width>
-      <height>490</height>
+      <width>251</width>
+      <height>508</height>
      </rect>
     </property>
     <layout class="QVBoxLayout" name="setup_layout">
      <item>
-      <layout class="QVBoxLayout" name="main_setup_layout">
-       <item>
-        <widget class="QGroupBox" name="dimension_groupbox">
-         <property name="sizePolicy">
-          <sizepolicy hsizetype="Expanding" vsizetype="Preferred">
-           <horstretch>0</horstretch>
-           <verstretch>0</verstretch>
-          </sizepolicy>
-         </property>
-         <property name="title">
-          <string/>
-         </property>
-         <property name="flat">
-          <bool>false</bool>
-         </property>
-         <layout class="QHBoxLayout" name="horizontalLayout">
-          <item>
-           <widget class="QRadioButton" name="radio_button_2d">
-            <property name="text">
-             <string>2D</string>
-            </property>
-           </widget>
-          </item>
-          <item>
-           <widget class="QRadioButton" name="radio_button_3d">
-            <property name="text">
-             <string>3D</string>
-            </property>
-           </widget>
-          </item>
-         </layout>
-        </widget>
-       </item>
-       <item>
-        <widget class="QPushButton" name="display_type_push_button">
-         <property name="text">
-          <string>Show wireframe</string>
-         </property>
-        </widget>
-       </item>
-      </layout>
+      <widget class="QWidget" name="main_setup_widget" native="true">
+       <layout class="QVBoxLayout" name="verticalLayout_3">
+        <item>
+         <widget class="QGroupBox" name="dimension_groupbox">
+          <property name="sizePolicy">
+           <sizepolicy hsizetype="Expanding" vsizetype="Preferred">
+            <horstretch>0</horstretch>
+            <verstretch>0</verstretch>
+           </sizepolicy>
+          </property>
+          <property name="title">
+           <string/>
+          </property>
+          <property name="flat">
+           <bool>false</bool>
+          </property>
+          <layout class="QHBoxLayout" name="horizontalLayout">
+           <item>
+            <widget class="QRadioButton" name="radio_button_2d">
+             <property name="text">
+              <string>2D</string>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <widget class="QRadioButton" name="radio_button_3d">
+             <property name="text">
+              <string>3D</string>
+             </property>
+            </widget>
+           </item>
+          </layout>
+         </widget>
+        </item>
+        <item>
+         <widget class="QPushButton" name="display_type_push_button">
+          <property name="text">
+           <string>Show wireframe</string>
+          </property>
+         </widget>
+        </item>
+       </layout>
+      </widget>
      </item>
      <item>
       <widget class="QGroupBox" name="d2_groupbox">
@@ -160,120 +162,124 @@
          </layout>
         </item>
         <item>
-         <layout class="QHBoxLayout" name="parabola_layout">
-          <item>
-           <widget class="QLabel" name="parabola_type_label">
-            <property name="text">
-             <string>Parabola type:</string>
-            </property>
-           </widget>
-          </item>
-          <item>
-           <widget class="QComboBox" name="parabola_type_combobox">
-            <item>
-             <property name="text">
-              <string>Elliptic paraboloid</string>
-             </property>
-            </item>
-            <item>
-             <property name="text">
-              <string>Rosenbrock</string>
-             </property>
-            </item>
-           </widget>
-          </item>
-         </layout>
-        </item>
-        <item>
-         <layout class="QHBoxLayout" name="ruppert_layout">
-          <item>
-           <widget class="QPushButton" name="refine_push_button">
-            <property name="text">
-             <string>Refine</string>
-            </property>
-           </widget>
-          </item>
-         </layout>
-        </item>
-        <item>
-         <widget class="QGroupBox" name="d3_groupbox">
-          <property name="title">
-           <string>3D:</string>
-          </property>
-          <layout class="QVBoxLayout" name="verticalLayout_2">
+         <widget class="QWidget" name="parabola_widget" native="true">
+          <layout class="QHBoxLayout" name="parabola_layout">
            <item>
-            <layout class="QHBoxLayout" name="color_display_layout">
-             <item>
-              <widget class="QLabel" name="color_display_label">
-               <property name="text">
-                <string>Color display:</string>
-               </property>
-              </widget>
-             </item>
-             <item>
-              <widget class="QComboBox" name="color_display_combobox">
-               <item>
-                <property name="text">
-                 <string>Mean curvature</string>
-                </property>
-               </item>
-               <item>
-                <property name="text">
-                 <string>X curvature</string>
-                </property>
-               </item>
-               <item>
-                <property name="text">
-                 <string>Y curvature</string>
-                </property>
-               </item>
-               <item>
-                <property name="text">
-                 <string>Z curvature</string>
-                </property>
-               </item>
-              </widget>
-             </item>
-            </layout>
+            <widget class="QLabel" name="parabola_type_label">
+             <property name="text">
+              <string>Parabola type:</string>
+             </property>
+            </widget>
            </item>
            <item>
-            <layout class="QHBoxLayout" name="mesh_3d_type_layout">
+            <widget class="QComboBox" name="parabola_type_combobox">
              <item>
-              <widget class="QLabel" name="mesh3d__type_label">
-               <property name="text">
-                <string>Mesh type:</string>
-               </property>
-              </widget>
+              <property name="text">
+               <string>Elliptic paraboloid</string>
+              </property>
              </item>
              <item>
-              <widget class="QComboBox" name="mesh_3d_type_combobox">
-               <item>
-                <property name="text">
-                 <string>Tetrahedron</string>
-                </property>
-               </item>
-               <item>
-                <property name="text">
-                 <string>Pyramid</string>
-                </property>
-               </item>
-               <item>
-                <property name="text">
-                 <string>Queen statue</string>
-                </property>
-               </item>
-              </widget>
+              <property name="text">
+               <string>Rosenbrock</string>
+              </property>
              </item>
-            </layout>
+            </widget>
            </item>
+          </layout>
+         </widget>
+        </item>
+        <item>
+         <widget class="QWidget" name="ruppert_widget" native="true">
+          <layout class="QHBoxLayout" name="ruppert_layout">
            <item>
-            <widget class="QPushButton" name="simplify_push_button">
+            <widget class="QPushButton" name="refine_push_button">
              <property name="text">
-              <string>Simplify</string>
+              <string>Refine</string>
              </property>
             </widget>
            </item>
           </layout>
+         </widget>
+        </item>
+       </layout>
+      </widget>
+     </item>
+     <item>
+      <widget class="QGroupBox" name="d3_groupbox">
+       <property name="title">
+        <string>3D:</string>
+       </property>
+       <layout class="QVBoxLayout" name="verticalLayout_2">
+        <item>
+         <layout class="QHBoxLayout" name="color_display_layout">
+          <item>
+           <widget class="QLabel" name="color_display_label">
+            <property name="text">
+             <string>Color display:</string>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QComboBox" name="color_display_combobox">
+            <item>
+             <property name="text">
+              <string>Mean curvature</string>
+             </property>
+            </item>
+            <item>
+             <property name="text">
+              <string>X curvature</string>
+             </property>
+            </item>
+            <item>
+             <property name="text">
+              <string>Y curvature</string>
+             </property>
+            </item>
+            <item>
+             <property name="text">
+              <string>Z curvature</string>
+             </property>
+            </item>
+           </widget>
+          </item>
+         </layout>
+        </item>
+        <item>
+         <layout class="QHBoxLayout" name="mesh_3d_type_layout">
+          <item>
+           <widget class="QLabel" name="mesh3d__type_label">
+            <property name="text">
+             <string>Mesh type:</string>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QComboBox" name="mesh_3d_type_combobox">
+            <item>
+             <property name="text">
+              <string>Tetrahedron</string>
+             </property>
+            </item>
+            <item>
+             <property name="text">
+              <string>Pyramid</string>
+             </property>
+            </item>
+            <item>
+             <property name="text">
+              <string>Queen statue</string>
+             </property>
+            </item>
+           </widget>
+          </item>
+         </layout>
+        </item>
+        <item>
+         <widget class="QPushButton" name="simplify_push_button">
+          <property name="text">
+           <string>Simplify</string>
+          </property>
          </widget>
         </item>
        </layout>
@@ -287,7 +293,7 @@
   <customwidget>
    <class>Scene</class>
    <extends>QWidget</extends>
-   <header>scene.h</header>
+   <header>ui/Scene.h</header>
   </customwidget>
  </customwidgets>
  <resources/>

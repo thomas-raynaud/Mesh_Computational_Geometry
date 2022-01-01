@@ -4,8 +4,8 @@
 #include "utils/math.h"
 
 
-std::unordered_map<Face_Hash, Vertex> build_voronoi(Mesh2D *mesh) {
-    std::unordered_map<Face_Hash, Vertex> voronoi_vts;
+std::unordered_map<Face_Hash, glm::vec3> build_voronoi(Mesh2D *mesh) {
+    std::unordered_map<Face_Hash, glm::vec3> voronoi_vts;
     FaceIterator face_it;
     std::array<Vertex*, 3> face_vts;
     glm::vec3 face_center;
@@ -16,7 +16,7 @@ std::unordered_map<Face_Hash, Vertex> build_voronoi(Mesh2D *mesh) {
             face_vts[1]->get_position(),
             face_vts[2]->get_position()
         );
-        voronoi_vts[face_it->get_hash()] = Vertex(face_center, &*face_it);
+        voronoi_vts[face_it->get_hash()] = face_center;
     }
     return voronoi_vts;
 }

@@ -25,10 +25,10 @@ MeshCrust::MeshCrust(){
     }
 
     // Insert the Voronoi centers in the mesh
-    std::unordered_map<Face_Hash, Vertex> voronoi_vts = build_voronoi(this);
-    std::unordered_map<Face_Hash, Vertex>::iterator vtx_it;
-    for (vtx_it = voronoi_vts.begin(); vtx_it != voronoi_vts.end(); ++vtx_it) {
-        vtx = insert_delaunay_vertex(this, vtx->get_position());
+    std::unordered_map<Face_Hash, glm::vec3> voronoi_vts = build_voronoi(this);
+    std::unordered_map<Face_Hash, glm::vec3>::iterator voronoi_it;
+    for (voronoi_it = voronoi_vts.begin(); voronoi_it != voronoi_vts.end(); ++voronoi_it) {
+        vtx = insert_delaunay_vertex(this, voronoi_it->second);
         m_is_voronoi_vertex[vtx->get_hash()] = true;
     }
 }

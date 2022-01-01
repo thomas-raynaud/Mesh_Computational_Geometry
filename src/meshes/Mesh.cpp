@@ -41,7 +41,7 @@ void Mesh::connect_adjacent_faces() {
             Edge e(&m_vertices[v1_hash], &m_vertices[v2_hash]);
             e.fe = curr_face;
             if (edges.find(e.get_hash()) == edges.end()) { // New edge
-                edges[e.get_hash()] = e;
+                edges.insert({ e.get_hash(), e });
             } else {
                 // The edge has already been registered. The current face is
                 // adjacent with the edge's linked face.
@@ -63,8 +63,10 @@ void Mesh::connect_adjacent_faces() {
 }
 
 
-void Mesh::add_vertex(Vertex *vtx) {
-    m_vertices[vtx->get_hash()] = *vtx;
+Vertex* Mesh::add_vertex(glm::vec3 &pos) {
+    Vertex vtx(pos);
+    m_vertices[vtx.get_hash()] = vtx;
+    return &m_vertices[vtx.get_hash()];
 }
 
 
@@ -101,9 +103,8 @@ FaceIterator FaceIterator::operator++(int) {
     ++(*this);
     return temp;
 }
-
 FaceIterator Mesh::faces_begin() {
-    FaceIterator(m_faces.begin());
+    return FaceIterator(m_faces.begin());
 }
 FaceIterator Mesh::faces_end() {
     return FaceIterator(m_faces.end());

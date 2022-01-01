@@ -4,6 +4,7 @@
 #include <map>
 
 #include "meshes/Mesh.h"
+#include "meshes/Edge.h"
 
 
 /**
@@ -17,11 +18,8 @@ bool collapse_edge(
     Face *fe
 );
 
-void get_edges(
-    Mesh &mesh,
-    std::map<Edge_Hash, Edge> &edges,
-    std::less<Edge>
-);
+// Get edges of the mesh ordered based on their length (smallest first)
+void get_edges(Mesh &mesh, std::vector<Edge> &edges);
 
 /**
  * Simplify the mesh by removing its smallest edges. n represents the number of

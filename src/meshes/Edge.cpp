@@ -4,6 +4,8 @@
 #include "Face.h"
 
 
+Edge::Edge() {}
+
 Edge::Edge(Vertex *va, Vertex *vb) {
     init_edge(va, vb);
 }

@@ -2,37 +2,37 @@
 #define ENUMS_H
 
 
-enum Dimension {
+enum struct Dimension {
     D2,
     D3
 };
 
-enum MeshDisplayType {
+enum struct MeshDisplayType {
     PlainFaces,
     Wireframe
 };
 
-enum Algorithm2DType {
+enum struct Algorithm2DType {
     Delaunay,
     Crust,
     Ruppert,
     Parabola
 };
 
-enum Mesh3DType {
+enum struct Mesh3DType {
     Tetrahedron,
     Pyramid,
     QueenStatue
 };
 
-enum ColorDisplayType {
+enum struct ColorDisplayType {
     MeanCurvature,
     XCurvature,
     YCurvature,
     ZCurvature
 };
 
-enum ParabolaType {
+enum struct ParabolaType {
     EllipticParaboloid,
     Rosenbrock
 };

@@ -28,10 +28,10 @@ public:
 };
 
 
-class QueenMesh : public Mesh3D { // Mesh loaded from an OFF file
+class MeshQueen : public Mesh3D { // Mesh loaded from an OFF file
 public:
-    QueenMesh();
-    virtual ~QueenMesh() {}
+    MeshQueen();
+    virtual ~MeshQueen() {}
 };
 
 #endif  // MESH3D_H

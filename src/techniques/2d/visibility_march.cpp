@@ -1,16 +1,15 @@
 #include "visibility_march.h"
 
 #include "meshes/Mesh2D.h"
-#include "predicate.h"
+#include "techniques/predicate.h"
 
 
 Face* take_step_visibility_march(
     Mesh2D *mesh,
     const Face &face,
-    const Vertex &vtx
+    const glm::vec3 &p
 ) {
     glm::vec3 a, b;
-    glm::vec3 p = vtx.get_position();
     std::array<Vertex*, 3> face_vts = face.get_vertices();
     std::array<Face*, 3> adj_faces = face.get_adjacent_faces();
     for (size_t i = 0; i < 3; ++i) {
@@ -20,4 +19,5 @@ Face* take_step_visibility_march(
             return adj_faces[(i + 2) % 3];
         }
     }
+    return nullptr;
 }

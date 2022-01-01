@@ -15,24 +15,26 @@ set(CMAKE_INSTALL_PREFIX "${CMAKE_INSTALL_PREFIX}/${PROJECT_NAME}")
 
 set(SOURCES
     ${CMAKE_SOURCE_DIR}/src/main.cpp
-    ${CMAKE_SOURCE_DIR}/src/mainwindow.cpp
-    ${CMAKE_SOURCE_DIR}/src/opengldisplaymesh.cpp
-    ${CMAKE_SOURCE_DIR}/src/widgets/gldisplaywidget.cpp
-    ${CMAKE_SOURCE_DIR}/src/meshes/mesh.cpp
-    ${CMAKE_SOURCE_DIR}/src/meshes/2d/mesh2d.cpp
-    ${CMAKE_SOURCE_DIR}/src/meshes/2d/meshcrust.cpp
-    ${CMAKE_SOURCE_DIR}/src/meshes/2d/meshruppert.cpp
-    ${CMAKE_SOURCE_DIR}/src/meshes/2d/mesh_refined_delaunay.cpp
-    ${CMAKE_SOURCE_DIR}/src/meshes/2d/voronoi.cpp
-    ${CMAKE_SOURCE_DIR}/src/meshes/2d/visibilitymarch.cpp
-    ${CMAKE_SOURCE_DIR}/src/meshes/2d/meshdelaunay.cpp
-    ${CMAKE_SOURCE_DIR}/src/meshes/2d/meshparabola.cpp
-    ${CMAKE_SOURCE_DIR}/src/meshes/3d/simplify.cpp
-    ${CMAKE_SOURCE_DIR}/src/meshes/3d/mesh3d.cpp
-    ${CMAKE_SOURCE_DIR}/src/meshes/3d/meshcurvature.cpp
+    ${CMAKE_SOURCE_DIR}/src/ui/MainWindow.cpp
+    ${CMAKE_SOURCE_DIR}/src/ui/Scene.cpp
+    ${CMAKE_SOURCE_DIR}/src/meshes/Vertex.cpp
+    ${CMAKE_SOURCE_DIR}/src/meshes/Face.cpp
+    ${CMAKE_SOURCE_DIR}/src/meshes/Edge.cpp
+    ${CMAKE_SOURCE_DIR}/src/meshes/Mesh.cpp
+    ${CMAKE_SOURCE_DIR}/src/meshes/Mesh2D.cpp
+    ${CMAKE_SOURCE_DIR}/src/meshes/Mesh3D.cpp
+    ${CMAKE_SOURCE_DIR}/src/rendering/mesh_rendering.cpp
     ${CMAKE_SOURCE_DIR}/src/techniques/predicate.cpp
-    ${CMAKE_SOURCE_DIR}/src/utils/point.cpp
+    ${CMAKE_SOURCE_DIR}/src/techniques/simplify.cpp
+    ${CMAKE_SOURCE_DIR}/src/techniques/2d/delaunay.cpp
+    ${CMAKE_SOURCE_DIR}/src/techniques/2d/MeshCrust.cpp
+    ${CMAKE_SOURCE_DIR}/src/techniques/2d/MeshParabola.cpp
+    ${CMAKE_SOURCE_DIR}/src/techniques/2d/MeshRuppert.cpp
+    ${CMAKE_SOURCE_DIR}/src/techniques/2d/visibility_march.cpp
+    ${CMAKE_SOURCE_DIR}/src/techniques/2d/voronoi.cpp
+    ${CMAKE_SOURCE_DIR}/src/techniques/3d/curvature.cpp
     ${CMAKE_SOURCE_DIR}/src/utils/color.cpp
+    ${CMAKE_SOURCE_DIR}/src/utils/math.cpp
 )
 
 # Add resource files
@@ -42,7 +44,6 @@ file(
 )
 
 include_directories(${CMAKE_SOURCE_DIR}/src)
-include_directories(${CMAKE_SOURCE_DIR}/src/widgets)
 
 # Configure OpenGL
 set(OpenGL_COMPONENT
@@ -67,7 +68,7 @@ find_package(Qt5 ${QT_VERSION} COMPONENTS ${QT_COMPONENT} REQUIRED)
 
 # Catch
 find_package(Catch2 REQUIRED)
-target_link_libraries(tests Catch2::Catch2)
+#target_link_libraries(tests Catch2::Catch2)
 
 
 add_executable(${PROJECT_NAME} ${SOURCES})

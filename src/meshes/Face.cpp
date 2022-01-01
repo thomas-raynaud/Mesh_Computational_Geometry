@@ -8,7 +8,7 @@ int Face::face_count = 0;
 
 Face::Face(
         std::array<Vertex*, 3> vertices,
-        std::array<Face*, 3> adjacent_faces={nullptr, nullptr, nullptr}
+        std::array<Face*, 3> adjacent_faces
     ) :     m_vertices(vertices),
             m_adjacent_faces(adjacent_faces)
 {

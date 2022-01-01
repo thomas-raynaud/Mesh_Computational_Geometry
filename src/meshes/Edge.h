@@ -15,6 +15,7 @@ struct Edge {
     Face *fe;   // One of the faces containing the edge
     Vertex *ve; // Vertex opposite of the edge in the face fe
 
+    Edge();
     Edge(Vertex *va, Vertex *vb);
     Edge(Vertex *va, Vertex *vb, Face *_fe, Vertex *_ve);
     void init_edge(Vertex *va, Vertex *vb);

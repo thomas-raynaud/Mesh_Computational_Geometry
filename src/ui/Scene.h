@@ -26,8 +26,8 @@ public:
     void resize(int width, int height);
 
     void set_mesh(std::shared_ptr<Mesh> &mesh);
-    void set_voronoi_vertices(
-        std::shared_ptr<std::unordered_map<Face_Hash, Vertex>> &voronoi_vertices
+    void set_voronoi_points(
+        std::shared_ptr<std::unordered_map<Face_Hash, glm::vec3>> &voronoi_pts
     );
     void set_mesh_config(std::shared_ptr<MeshConfig> &mesh_config);
 
@@ -71,7 +71,7 @@ private:
      * are several objects.
      */
     std::weak_ptr<Mesh> m_mesh;
-    std::weak_ptr<std::unordered_map<Face_Hash, Vertex>> m_voronoi_vertices;
+    std::weak_ptr<std::unordered_map<Face_Hash, glm::vec3>> m_voronoi_pts;
     std::weak_ptr<MeshConfig> m_mesh_config;
 };
 

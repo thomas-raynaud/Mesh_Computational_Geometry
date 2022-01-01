@@ -71,6 +71,7 @@ std::vector<Edge_Hash> MeshRuppert::constraint_edges_encroached_upon() {
         if (!edge_exists)
             encroached_edges.push_back(edge_it->first);
     }
+    return encroached_edges;
 }
 
 

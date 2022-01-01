@@ -1,5 +1,7 @@
 #include "simplify.h"
 
+#include <set>
+
 #include "meshes/Edge.h"
 
 
@@ -86,9 +88,10 @@ bool collapse_edge(
 }
 
 
-void get_edges(Mesh &mesh, std::map<Edge_Hash, Edge, std::less<Edge>> &edges) {
+void get_edges(Mesh &mesh, std::vector<Edge> &edges) {
     FaceIterator face_it;
     std::array<Vertex*, 3> face_vts;
+    std::set<Edge_Hash> edge_hashes_set;
     for(face_it = mesh.faces_begin(); face_it != mesh.faces_end(); ++face_it) {
         face_vts = face_it->get_vertices();
         for (size_t i = 0; i < 3; ++i) {
@@ -98,8 +101,9 @@ void get_edges(Mesh &mesh, std::map<Edge_Hash, Edge, std::less<Edge>> &edges) {
                 &*face_it,
                 face_vts[i]
             );
-            if (edges.find(e.get_hash()) == edges.end()) {
-                edges[e.get_hash()] = e;
+            if (edge_hashes_set.count(e.get_hash()) == 0) {
+                edges.push_back(e);
+                edge_hashes_set.insert(e.get_hash());
             }
         }
     }
@@ -111,12 +115,11 @@ void simplify(Mesh &mesh, int n) {
     if (mesh.get_nb_vertices() <= n) return;
 
     // Edges sorted based on their length
-    std::map<Edge_Hash, Edge, std::less<Edge>> edges;
+    std::vector<Edge> edges;
     int nb_vertices = mesh.get_nb_vertices();
     bool edge_deleted;
     Edge *edge_to_delete;
-    std::map<Edge_Hash, Edge>::iterator edge_it;
-
+    std::vector<Edge>::iterator edge_it;
     do {
         get_edges(mesh, edges);
         // Delete the smallest one.
@@ -124,7 +127,7 @@ void simplify(Mesh &mesh, int n) {
         edge_deleted = false;
 
         while (!edge_deleted) {
-            edge_to_delete = &edge_it->second;
+            edge_to_delete = &*edge_it;
             edge_deleted = collapse_edge(
                 mesh,
                 edge_to_delete->ve,
@@ -132,5 +135,5 @@ void simplify(Mesh &mesh, int n) {
             );
             ++edge_it;
         }
-    } while(n < nb_vertices && edges.size() > 0 && edge_deleted);
+    } while (n < nb_vertices && edges.size() > 0 && edge_deleted);
 }

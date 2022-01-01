@@ -12,7 +12,7 @@ class Mesh2D;
 Face* take_step_visibility_march(
     Mesh2D *mesh,
     const Face &face,
-    const Vertex &vtx
+    const glm::vec3 &p
 );
 
 #endif  // VISIBILITY_MARCH
