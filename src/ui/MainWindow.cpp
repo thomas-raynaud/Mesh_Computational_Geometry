@@ -31,7 +31,9 @@ MainWindow::MainWindow(QWidget *parent) :
     ui.parabola_widget->hide();
     ui.ruppert_widget->hide();
 
-    m_mesh = std::make_shared<Mesh>(Mesh2D());
+    set_mesh(Mesh2D());
+    update_voronoi_vertices();
+    ui.scene->set_mesh_config(m_mesh_config);
 }
 
 MainWindow::~MainWindow() {}

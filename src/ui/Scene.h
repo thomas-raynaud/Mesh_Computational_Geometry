@@ -20,10 +20,10 @@ public:
     explicit Scene(QWidget *parent = 0);
     ~Scene();
 
-    void init();
+    void initializeGL();
     // Display the GL scene
-    void paint();
-    void resize(int width, int height);
+    void paintGL();
+    void resizeGL(int width, int height);
 
     void set_mesh(std::shared_ptr<Mesh> &mesh);
     void set_voronoi_points(

@@ -18,8 +18,7 @@ Scene::Scene(QWidget *parent) : QGLWidget(parent) {
 
 Scene::~Scene() {}
 
-
-void Scene::init() {
+void Scene::initializeGL() {
     // Background color
     glClearColor(0.2, 0.2, 0.2, 1);
     // Shader
@@ -29,7 +28,7 @@ void Scene::init() {
 }
 
 
-void Scene::paint() {
+void Scene::paintGL() {
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
     // Center the camera
@@ -63,7 +62,7 @@ void Scene::paint() {
                         case MeshDisplayType::Wireframe:
                             mesh->draw_mesh_wireframe_vertices_color();
                             break;
-                }
+                    }
                 default:
                     switch(mesh_config->mesh_display_type) {
                         case MeshDisplayType::PlainFaces:
@@ -95,7 +94,7 @@ void Scene::paint() {
 }
 
 
-void Scene::resize(int width, int height) {
+void Scene::resizeGL(int width, int height) {
     glViewport(0, 0, width, height);
     glMatrixMode(GL_PROJECTION);
     glLoadIdentity();

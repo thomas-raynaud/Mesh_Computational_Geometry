@@ -17,9 +17,9 @@
    <widget class="Scene" name="scene" native="true">
     <property name="geometry">
      <rect>
-      <x>256</x>
+      <x>266</x>
       <y>0</y>
-      <width>731</width>
+      <width>721</width>
       <height>801</height>
      </rect>
     </property>
@@ -35,8 +35,8 @@
      <rect>
       <x>0</x>
       <y>0</y>
-      <width>251</width>
-      <height>508</height>
+      <width>266</width>
+      <height>520</height>
      </rect>
     </property>
     <layout class="QVBoxLayout" name="setup_layout">
@@ -62,6 +62,9 @@
             <widget class="QRadioButton" name="radio_button_2d">
              <property name="text">
               <string>2D</string>
+             </property>
+             <property name="checked">
+              <bool>true</bool>
              </property>
             </widget>
            </item>
@@ -143,12 +146,16 @@
            </widget>
           </item>
           <item>
-           <widget class="QLineEdit" name="insert_points_line_edit"/>
+           <widget class="QLineEdit" name="insert_points_line_edit">
+            <property name="text">
+             <string>1</string>
+            </property>
+           </widget>
           </item>
           <item>
            <widget class="QLabel" name="insert_points_label_2">
             <property name="text">
-             <string>points</string>
+             <string>point(s)</string>
             </property>
            </widget>
           </item>
