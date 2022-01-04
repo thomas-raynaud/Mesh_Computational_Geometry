@@ -101,59 +101,59 @@ void draw_voronoi_wireframe(
     }
 }
 
-void Mesh::draw_mesh_vertices_colors() {
+void draw_mesh_vertices_colors(Mesh *mesh) {
     FaceIterator face_it;
-    for (face_it = faces_begin(); face_it != faces_end(); ++face_it)
+    for (face_it = mesh->faces_begin(); face_it != mesh->faces_end(); ++face_it)
         draw_face(*face_it);
 }
 
-void Mesh::draw_mesh_faces_colors() {
+void draw_mesh_faces_colors(Mesh *mesh) {
     FaceIterator face_it;
-    for (face_it = faces_begin(); face_it != faces_end(); ++face_it)
+    for (face_it = mesh->faces_begin(); face_it != mesh->faces_end(); ++face_it)
         draw_face(*face_it, face_it->get_color());
 }
 
-void Mesh::draw_mesh_wireframe_vertices_color() {
+void draw_mesh_wireframe_vertices_color(Mesh *mesh) {
     FaceIterator face_it;
-    for (face_it = faces_begin(); face_it != faces_end(); ++face_it)
+    for (face_it = mesh->faces_begin(); face_it != mesh->faces_end(); ++face_it)
         draw_wireframe_face(*face_it);
 }
 
-void Mesh::draw_mesh_wireframe_faces_color() {
+void draw_mesh_wireframe_faces_color(Mesh *mesh) {
     FaceIterator face_it;
-    for (face_it = faces_begin(); face_it != faces_end(); ++face_it)
+    for (face_it = mesh->faces_begin(); face_it != mesh->faces_end(); ++face_it)
         draw_wireframe_face(*face_it, face_it->get_color());
 }
 
-void Mesh2D::draw_mesh_faces_colors() {
+void draw_mesh_faces_colors(Mesh2D *mesh) {
     FaceIterator face_it;
-    for (face_it = faces_begin(); face_it != faces_end(); ++face_it) {
-        if (!is_face_visible(*face_it)) continue;
+    for (face_it = mesh->faces_begin(); face_it != mesh->faces_end(); ++face_it) {
+        if (!mesh->is_face_visible(*face_it)) continue;
         draw_face(*face_it, face_it->get_color());
     }
 }
 
-void Mesh2D::draw_mesh_wireframe_faces_color() {
+void draw_mesh_wireframe_faces_color(Mesh2D *mesh) {
     FaceIterator face_it;
-    for (face_it = faces_begin(); face_it != faces_end(); ++face_it) {
-        if (!is_face_visible(*face_it)) continue;
+    for (face_it = mesh->faces_begin(); face_it != mesh->faces_end(); ++face_it) {
+        if (!mesh->is_face_visible(*face_it)) continue;
         draw_wireframe_face(*face_it, face_it->get_color());
     }
 }
 
-void MeshCrust::draw_mesh_wireframe_faces_color() {
+void draw_mesh_wireframe_faces_color(MeshCrust *mesh) {
     FaceIterator face_it;
     std::array<Vertex*, 3> face_vts;
     Vertex *v1, *v2;
     glColor3d(0, 1, 0);
-    for (face_it = faces_begin(); face_it != faces_end(); ++face_it) {
-        if (!is_face_visible(*face_it)) continue;
+    for (face_it = mesh->faces_begin(); face_it != mesh->faces_end(); ++face_it) {
+        if (!mesh->is_face_visible(*face_it)) continue;
         face_vts = face_it->get_vertices();
         for (size_t i = 0; i < 3; ++i) {
             v1 = face_vts[i];
             v2 = face_vts[(i + 1) % 3];
-            if (    !is_voronoi_vertex(*v1) &&
-                    !is_voronoi_vertex(*v2)
+            if (    !mesh->is_voronoi_vertex(*v1) &&
+                    !mesh->is_voronoi_vertex(*v2)
             ) {
                 glBegin(GL_LINE_STRIP);
                 draw_vertex(*v1);
@@ -164,17 +164,17 @@ void MeshCrust::draw_mesh_wireframe_faces_color() {
     }
 }
 
-void MeshRuppert::draw_mesh_wireframe_faces_color() {
+void draw_mesh_wireframe_faces_color(MeshRuppert *mesh) {
     FaceIterator face_it;
     std::array<Vertex*, 3> face_vts;
     Vertex *v1, *v2;
-    for (face_it = faces_begin();face_it != faces_end(); ++face_it) {
-        if (!is_face_visible(*face_it)) continue;
+    for (face_it = mesh->faces_begin(); face_it != mesh->faces_end(); ++face_it) {
+        if (!mesh->is_face_visible(*face_it)) continue;
         face_vts = face_it->get_vertices();
         for (size_t i = 0; i < 3; ++i) {
             v1 = face_vts[i];
             v2 = face_vts[(i + 1) % 3];
-            if (is_constraint(*v1, *v2))
+            if (mesh->is_constraint(*v1, *v2))
                 glColor3d(1, 0, 0);
             else
                 glColor3d(0, 1, 0);

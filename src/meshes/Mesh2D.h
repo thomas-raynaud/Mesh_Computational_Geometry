@@ -30,9 +30,6 @@ public:
     bool is_face_fictive(const Face &face) const;
     bool is_face_visible(const Face &face) const;
 
-    virtual void draw_mesh_faces_colors() override;
-    virtual void draw_mesh_wireframe_faces_color() override;
-
     friend std::ostream& operator<<(std::ostream &strm, const Mesh2D &m);
 };
 

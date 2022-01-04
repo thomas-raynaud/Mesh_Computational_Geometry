@@ -13,8 +13,6 @@ public:
     virtual ~MeshCrust() {}
 
     bool is_voronoi_vertex(const Vertex &vtx);
-
-    void draw_mesh_wireframe_faces_color();
 };
 
 #endif  // MESH_CRUST_H

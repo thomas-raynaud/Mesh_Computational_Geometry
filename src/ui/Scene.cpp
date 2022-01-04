@@ -18,6 +18,7 @@ Scene::Scene(QWidget *parent) : QGLWidget(parent) {
 
 Scene::~Scene() {}
 
+
 void Scene::initializeGL() {
     // Background color
     glClearColor(0.2, 0.2, 0.2, 1);
@@ -57,19 +58,25 @@ void Scene::paintGL() {
                 case Algorithm2DType::Parabola:
                     switch(mesh_config->mesh_display_type) {
                         case MeshDisplayType::PlainFaces:
-                            mesh->draw_mesh_vertices_colors();
+                            draw_mesh_vertices_colors(&*mesh);
                             break;
                         case MeshDisplayType::Wireframe:
-                            mesh->draw_mesh_wireframe_vertices_color();
+                            draw_mesh_wireframe_vertices_color(&*mesh);
                             break;
                     }
+                case Algorithm2DType::Crust:
+                    draw_mesh_wireframe_faces_color((MeshCrust*)&*mesh);
+                    break;
+                case Algorithm2DType::Ruppert:
+                    draw_mesh_wireframe_faces_color((MeshRuppert*)&*mesh);
+                    break;
                 default:
                     switch(mesh_config->mesh_display_type) {
                         case MeshDisplayType::PlainFaces:
-                            mesh->draw_mesh_faces_colors();
+                            draw_mesh_faces_colors((Mesh2D*)&*mesh);
                             break;
                         case MeshDisplayType::Wireframe:
-                            mesh->draw_mesh_wireframe_faces_color();
+                            draw_mesh_wireframe_faces_color((Mesh2D*)&*mesh);
                             break;
                     }
             }
@@ -77,10 +84,10 @@ void Scene::paintGL() {
         case Dimension::D3:
             switch(mesh_config->mesh_display_type) {
                 case MeshDisplayType::PlainFaces:
-                    mesh->draw_mesh_vertices_colors();
+                    draw_mesh_vertices_colors(&*mesh);
                     break;
                 case MeshDisplayType::Wireframe:
-                    mesh->draw_mesh_wireframe_vertices_color();
+                    draw_mesh_wireframe_vertices_color(&*mesh);
                     break;
             }
             break;

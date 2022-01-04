@@ -39,11 +39,6 @@ public:
     virtual void pop_vertex(Vertex *v);
     void pop_face(Face *f);
 
-    virtual void draw_mesh_vertices_colors();
-    virtual void draw_mesh_faces_colors();
-    virtual void draw_mesh_wireframe_vertices_color();
-    virtual void draw_mesh_wireframe_faces_color();
-
     friend class FaceIterator;
     FaceIterator faces_begin();
     FaceIterator faces_end();

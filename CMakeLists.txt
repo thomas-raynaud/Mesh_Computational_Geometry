@@ -13,17 +13,21 @@ set(CMAKE_AUTOUIC ON)
 
 set(CMAKE_INSTALL_PREFIX "${CMAKE_INSTALL_PREFIX}/${PROJECT_NAME}")
 
-set(SOURCES
-    ${CMAKE_SOURCE_DIR}/src/main.cpp
-    ${CMAKE_SOURCE_DIR}/src/ui/MainWindow.cpp
-    ${CMAKE_SOURCE_DIR}/src/ui/Scene.cpp
+set(
+    MESH_SOURCES
     ${CMAKE_SOURCE_DIR}/src/meshes/Vertex.cpp
     ${CMAKE_SOURCE_DIR}/src/meshes/Face.cpp
     ${CMAKE_SOURCE_DIR}/src/meshes/Edge.cpp
     ${CMAKE_SOURCE_DIR}/src/meshes/Mesh.cpp
     ${CMAKE_SOURCE_DIR}/src/meshes/Mesh2D.cpp
     ${CMAKE_SOURCE_DIR}/src/meshes/Mesh3D.cpp
+)
+set(
+    RENDERING_SOURCES
     ${CMAKE_SOURCE_DIR}/src/rendering/mesh_rendering.cpp
+)
+set(
+    TECHNIQUES_SOURCES
     ${CMAKE_SOURCE_DIR}/src/techniques/predicate.cpp
     ${CMAKE_SOURCE_DIR}/src/techniques/simplify.cpp
     ${CMAKE_SOURCE_DIR}/src/techniques/2d/delaunay.cpp
@@ -33,8 +37,20 @@ set(SOURCES
     ${CMAKE_SOURCE_DIR}/src/techniques/2d/visibility_march.cpp
     ${CMAKE_SOURCE_DIR}/src/techniques/2d/voronoi.cpp
     ${CMAKE_SOURCE_DIR}/src/techniques/3d/curvature.cpp
+)
+set(UTIL_SOURCES
     ${CMAKE_SOURCE_DIR}/src/utils/color.cpp
     ${CMAKE_SOURCE_DIR}/src/utils/math.cpp
+)
+
+set(SOURCES
+    ${CMAKE_SOURCE_DIR}/src/main.cpp
+    ${CMAKE_SOURCE_DIR}/src/ui/MainWindow.cpp
+    ${CMAKE_SOURCE_DIR}/src/ui/Scene.cpp
+    ${MESH_SOURCES}
+    ${RENDERING_SOURCES}
+    ${TECHNIQUES_SOURCES}
+    ${UTIL_SOURCES}
 )
 
 # Add resource files
@@ -66,12 +82,19 @@ set(QT_COMPONENT
 )
 find_package(Qt5 ${QT_VERSION} COMPONENTS ${QT_COMPONENT} REQUIRED)
 
+add_executable(${PROJECT_NAME} ${SOURCES})
+
 # Catch
 find_package(Catch2 REQUIRED)
-#target_link_libraries(tests Catch2::Catch2)
-
-
-add_executable(${PROJECT_NAME} ${SOURCES})
+add_executable(${PROJECT_NAME}_tests
+    ${CMAKE_CURRENT_LIST_DIR}/tests/test_all.cpp
+    ${CMAKE_CURRENT_LIST_DIR}/tests/test_simplify.cpp
+    ${MESH_SOURCES}
+    ${TECHNIQUES_SOURCES}
+    ${UTIL_SOURCES}
+)
+target_link_libraries(${PROJECT_NAME}_tests PRIVATE Catch2::Catch2)
+target_link_libraries(${PROJECT_NAME}_tests PRIVATE glm::glm)
 
 
 foreach(_comp ${OpenGL_COMPONENT})
