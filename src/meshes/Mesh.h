@@ -24,20 +24,20 @@ protected:
     std::unordered_map<Vertex_Hash, Vertex> m_vertices;
     std::unordered_map<Face_Hash, Face> m_faces;
 
-    // Update the face array by connecting adjacent faces
-    void connect_adjacent_faces();
-
 public:
     Mesh();
 
     int get_nb_vertices();
     int get_nb_faces();
 
-    Vertex* add_vertex(glm::vec3 &pos);
-    void add_face(Face *face);
+    Vertex* add_vertex(glm::vec3 pos);
+    Face* add_face(std::array<Vertex*, 3> face_vts);
 
     virtual void pop_vertex(Vertex *v);
     void pop_face(Face *f);
+
+    // Update the face array by connecting adjacent faces
+    void connect_adjacent_faces();
 
     friend class FaceIterator;
     FaceIterator faces_begin();
@@ -48,11 +48,15 @@ public:
     VertexIterator vertices_end();
 
     friend class FaceCirculator;
+    // Get faces incident to vertex v. If v is close to a boundary
+    // (nullptr faces), return an empty face circulator.
     FaceCirculator incident_faces(const Vertex &v);
     // Get circulator starting at face face_start
     FaceCirculator incident_faces(const Vertex &v, const Face &face_start);
 
     friend class VertexCirculator;
+    // Get vertices nearby the vertex v. If v is close to a boundary
+    // (nullptr faces), return an empty vertex circulator.
     VertexCirculator neighbour_vertices(const Vertex &v);
 
     friend std::ostream& operator<<(std::ostream &strm, const Mesh &m);
@@ -99,6 +103,7 @@ public:
     FaceCirculator& operator++();
     FaceCirculator& operator--();
     FaceCirculator operator++(int);
+    size_t get_nb_incident_faces();
 private:
     std::vector<Face*> m_incident_faces;    // Incident faces to a vertex
     int m_ind;                              // Current index in m_incident_faces
@@ -115,6 +120,7 @@ public:
     VertexCirculator& operator++();
     VertexCirculator& operator--();
     VertexCirculator operator++(int);
+    size_t get_nb_neighbour_vertices();
 private:
     std::vector<Vertex*> m_neighbour_vertices;
     int m_ind;

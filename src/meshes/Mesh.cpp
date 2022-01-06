@@ -63,15 +63,17 @@ void Mesh::connect_adjacent_faces() {
 }
 
 
-Vertex* Mesh::add_vertex(glm::vec3 &pos) {
+Vertex* Mesh::add_vertex(glm::vec3 pos) {
     Vertex vtx(pos);
-    m_vertices[vtx.get_hash()] = vtx;
+    m_vertices.insert({ vtx.get_hash(), vtx });
     return &m_vertices[vtx.get_hash()];
 }
 
 
-void Mesh::add_face(Face *face) {
-    m_faces[face->get_hash()] = *face;
+Face* Mesh::add_face(std::array<Vertex*, 3> face_vts) {
+    Face face(face_vts);
+    m_faces.insert({ face.get_hash(), face });
+    return &m_faces[face.get_hash()];
 }
 
 
@@ -165,11 +167,13 @@ FaceCirculator FaceCirculator::operator++(int) {
     ++(*this);
     return temp;
 }
+size_t FaceCirculator::get_nb_incident_faces() {
+    return m_incident_faces.size();
+}
 
 FaceCirculator Mesh::incident_faces(const Vertex &v) {
     Face *first_face = v.get_incident_face();
     std::vector<Face*> incident_faces;
-
     Face *current_face = first_face;
     int opposite_vertex_ind;
     std::array<Vertex *, 3> face_vts;
@@ -177,6 +181,7 @@ FaceCirculator Mesh::incident_faces(const Vertex &v) {
     do {
         // Find the index of v in the current face.
         // Opposite vertex is the next index.
+        if (current_face == nullptr) return FaceCirculator();
         face_vts = current_face->get_vertices();
         for (size_t v_ind = 0; v_ind < 3; ++v_ind) {
             if (*face_vts[v_ind] == v) {
@@ -188,12 +193,12 @@ FaceCirculator Mesh::incident_faces(const Vertex &v) {
         current_face = current_face->get_adjacent_faces()[opposite_vertex_ind];
     }
     while(current_face != first_face);
-
     return FaceCirculator(incident_faces);
 }
 
 FaceCirculator Mesh::incident_faces(const Vertex &v, const Face &face_start) {
     FaceCirculator fc(incident_faces(v)), fc_begin;
+    if (fc.get_nb_incident_faces() == 0) return fc;
     fc_begin = fc;
     do {
         if (*fc == face_start) return fc;
@@ -229,6 +234,9 @@ VertexCirculator VertexCirculator::operator++(int) {
     ++(*this);
     return temp;
 }
+size_t VertexCirculator::get_nb_neighbour_vertices() {
+    return m_neighbour_vertices.size();
+}
 
 VertexCirculator Mesh::neighbour_vertices(const Vertex &v) {
     Face *first_face = v.get_incident_face();
@@ -237,6 +245,7 @@ VertexCirculator Mesh::neighbour_vertices(const Vertex &v) {
     int opposite_vertex_ind;
     std::array<Vertex*, 3> face_vts;
     do {
+        if (current_face == nullptr) return VertexCirculator();
         for (int v_ind = 0; v_ind < 3; ++v_ind) {
             face_vts = current_face->get_vertices();
             if (*face_vts[v_ind] == v) {

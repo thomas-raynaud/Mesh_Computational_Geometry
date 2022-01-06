@@ -130,7 +130,7 @@ void MeshRuppert::refine(float alpha) {
         b = face_vts[1]->get_position();
         c = face_vts[2]->get_position();
         // Insert the Voronoi center in a temp mesh
-        q = compute_center(a, b, c);
+        q = compute_circumcenter(a, b, c);
         MeshRuppert mesh_tmp = *this;
         insert_delaunay_vertex(&mesh_tmp, q);
         encroached_edges = mesh_tmp.constraint_edges_encroached_upon();

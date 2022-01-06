@@ -52,22 +52,20 @@ Vertex* split_triangle(Mesh2D *mesh, glm::vec3 &point, Face *face) {
     std::array<Face*, 3> adj_faces = face->get_adjacent_faces();
     Vertex *vtx = mesh->add_vertex(point);
     // Create 2 new faces
-    Face fa({ vtx, face_vts[0], face_vts[1] });
-    Face fb({ vtx, face_vts[1], face_vts[2] });
-    fa.set_adjacent_faces({ adj_faces[2], &fb, face });
-    fb.set_adjacent_faces({ adj_faces[0], face, &fa });
-    mesh->add_face(&fa);
-    mesh->add_face(&fb);
+    Face *fa = mesh->add_face({ vtx, face_vts[0], face_vts[1] });
+    Face *fb = mesh->add_face({ vtx, face_vts[1], face_vts[2] });
+    fa->set_adjacent_faces({ adj_faces[2], fb, face });
+    fb->set_adjacent_faces({ adj_faces[0], face, fa });
     // Update the face split
     face->set_vertices({ vtx, face_vts[2], face_vts[0] });
-    face->set_adjacent_faces({ adj_faces[1], &fa, &fb });
+    face->set_adjacent_faces({ adj_faces[1], fa, fb });
     // Update fa's adjacent face.
     std::array<Vertex*, 3> adj_face_vts = adj_faces[2]->get_vertices();
     for (size_t i = 0; i < 3; ++i) {
         if (*adj_face_vts[i] != *face_vts[0] &&
             *adj_face_vts[i] != *face_vts[1]
         ) {
-            adj_faces[2]->set_adjacent_face(i, &fa);
+            adj_faces[2]->set_adjacent_face(i, fa);
             break;
         }
     }
@@ -77,15 +75,15 @@ Vertex* split_triangle(Mesh2D *mesh, glm::vec3 &point, Face *face) {
         if (*adj_face_vts[i] != *face_vts[1] &&
             *adj_face_vts[i] != *face_vts[2]
         ) {
-            adj_faces[2]->set_adjacent_face(i, &fb);
+            adj_faces[2]->set_adjacent_face(i, fb);
             break;
         }
     }
     // Update vertices' incident faces.
-    face_vts[0]->set_incident_face(&fa);
-    face_vts[1]->set_incident_face(&fb);
+    face_vts[0]->set_incident_face(fa);
+    face_vts[1]->set_incident_face(fb);
     face_vts[2]->set_incident_face(face);
-    vtx->set_incident_face(&fa);
+    vtx->set_incident_face(fa);
     return vtx;
 }
 

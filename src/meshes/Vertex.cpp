@@ -1,5 +1,7 @@
 #include "Vertex.h"
 
+#include <algorithm>
+
 
 int Vertex::vertex_count = 0;
 
@@ -9,12 +11,24 @@ Vertex::Vertex(
         Face *incident_face
     ) : m_pos(pos), m_incident_face(incident_face) { init(); }
 
-Vertex::Vertex() { init(); }
+Vertex::Vertex(const Vertex& vtx)
+    :   m_ind(vtx.m_ind),
+        m_pos(vtx.m_pos),
+        m_incident_face(vtx.m_incident_face)
+{}
 
+Vertex::Vertex() { init(); }
 
 void Vertex::init() {
     m_ind = vertex_count;
     ++vertex_count;
+}
+
+Vertex& Vertex::operator=(Vertex vtx) {
+    std::swap(m_ind, vtx.m_ind);
+    std::swap(m_pos, vtx.m_pos);
+    std::swap(m_incident_face, vtx.m_incident_face);
+    return *this;
 }
 
 
