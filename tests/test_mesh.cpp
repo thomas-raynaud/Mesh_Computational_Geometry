@@ -1,7 +1,7 @@
 #include <catch2/catch.hpp>
 
 #include "meshes/Edge.h"
-#include "meshes/Mesh.h"
+#include "meshes/Mesh2D.h"
 
 
 TEST_CASE( "Check that vertex hashes are unique", "[mesh]" ) {
@@ -19,7 +19,6 @@ TEST_CASE( "Check that vertex hashes are unique", "[mesh]" ) {
     }
 }
 
-#include <iostream>
 
 TEST_CASE( "Edge basic operations", "[mesh]" ) {
     Vertex va(glm::vec3(1, 1, 0));
@@ -38,6 +37,7 @@ TEST_CASE( "Edge basic operations", "[mesh]" ) {
     REQUIRE(e1 < e3);
     REQUIRE(!(e3 < e1));
 }
+
 
 TEST_CASE( "Mesh basic operations", "[mesh]" ) {
     Mesh mesh;
@@ -114,4 +114,37 @@ TEST_CASE( "Mesh basic operations", "[mesh]" ) {
     REQUIRE(*v_circ == *va); ++v_circ;
     v_circ = mesh.neighbour_vertices(*va);
     REQUIRE(v_circ.get_nb_neighbour_vertices() == 0);
+
+    // Pop vertices / faces
+    mesh.pop_vertex(va);
+    REQUIRE(mesh.get_nb_vertices() == 5);
+    mesh.pop_face(fa);
+    REQUIRE(mesh.get_nb_faces() == 4);
+}
+
+TEST_CASE( "Create a Mesh2D and test visibility of vertices and faces", "[mesh]" ) {
+    Mesh2D mesh;
+    REQUIRE(mesh.get_nb_faces() == 4);
+    REQUIRE(mesh.get_nb_vertices() == 4);
+    Vertex *inf_vtx = mesh.get_infinite_vertex();
+    REQUIRE(inf_vtx != nullptr);
+    REQUIRE(mesh.is_vertex_fictive(*inf_vtx) == true);
+    VertexIterator vtx_it;
+    size_t nb_vts_visible = 0;
+    for (vtx_it = mesh.vertices_begin(); vtx_it != mesh.vertices_end(); ++vtx_it) {
+        if (mesh.is_vertex_visible(*vtx_it))
+            ++nb_vts_visible;
+    }
+    REQUIRE(nb_vts_visible == 0);
+    FaceIterator face_it;
+    size_t nb_faces_fictive = 0;
+    size_t nb_faces_visible = 0;
+    for (face_it = mesh.faces_begin(); face_it != mesh.faces_end(); ++face_it) {
+        if (mesh.is_face_fictive(*face_it))
+            ++nb_faces_fictive;
+        if (mesh.is_face_visible(*face_it))
+            ++nb_faces_visible;
+    }
+    REQUIRE(nb_faces_visible == 0);
+    REQUIRE(nb_faces_fictive == 3);
 }

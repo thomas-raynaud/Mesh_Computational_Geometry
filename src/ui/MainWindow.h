@@ -46,6 +46,9 @@ private:
     void switch_dimension();
     void update_voronoi_vertices();
     void set_mesh(const Mesh &mesh);
+    // Insert vertices forming a bounding triangle. They will surround vertices
+    // that will be inserted afterwards.
+    void build_convex_hull();
 };
 
 #endif  // MAINWINDOW_H

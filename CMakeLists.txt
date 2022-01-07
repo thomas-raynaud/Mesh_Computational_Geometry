@@ -88,8 +88,11 @@ add_executable(${PROJECT_NAME} ${SOURCES})
 find_package(Catch2 REQUIRED)
 add_executable(${PROJECT_NAME}_tests
     ${CMAKE_CURRENT_LIST_DIR}/tests/test_all.cpp
-    ${CMAKE_CURRENT_LIST_DIR}/tests/test_mesh.cpp
     ${CMAKE_CURRENT_LIST_DIR}/tests/test_utils.cpp
+    ${CMAKE_CURRENT_LIST_DIR}/tests/test_mesh.cpp
+    ${CMAKE_CURRENT_LIST_DIR}/tests/test_predicates.cpp
+    ${CMAKE_CURRENT_LIST_DIR}/tests/test_visibility_march.cpp
+    ${CMAKE_CURRENT_LIST_DIR}/tests/test_delaunay.cpp
     ${MESH_SOURCES}
     ${TECHNIQUES_SOURCES}
     ${UTIL_SOURCES}

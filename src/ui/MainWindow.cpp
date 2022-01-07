@@ -32,6 +32,7 @@ MainWindow::MainWindow(QWidget *parent) :
     ui.ruppert_widget->hide();
 
     set_mesh(Mesh2D());
+    build_convex_hull();
     update_voronoi_vertices();
     ui.scene->set_mesh_config(m_mesh_config);
 }
@@ -50,9 +51,10 @@ void MainWindow::switch_dimension() {
             ui.parabola_widget->hide();
             ui.ruppert_widget->hide();
             m_mesh_config->algorithm_2d_type = Algorithm2DType::Delaunay;
-            update_voronoi_vertices();
             m_mesh_config->show_voronoi_display = false;
-            m_mesh = std::make_shared<Mesh>(Mesh2D());
+            set_mesh(Mesh2D());
+            build_convex_hull();
+            update_voronoi_vertices();
         }
         else {
             ui.d2_groupbox->hide();
@@ -60,20 +62,31 @@ void MainWindow::switch_dimension() {
             m_mesh_config->mesh_3d_type = Mesh3DType::Tetrahedron;
             set_mesh(Tetrahedron());
             compute_laplacians((Mesh3D*)m_mesh.get());
-            set_curvature_colors((Mesh3D*)m_mesh.get(), m_mesh_config->color_display_type);
+            set_curvature_colors(
+                (Mesh3D*)m_mesh.get(), m_mesh_config->color_display_type
+            );
         }
     }
 }
 
 void MainWindow::update_voronoi_vertices() {
-    std::unordered_map<Face_Hash, glm::vec3> voronoi_pts = build_voronoi((Mesh2D*)m_mesh.get());
-    m_voronoi_pts = std::make_shared<std::unordered_map<Face_Hash, glm::vec3>>(voronoi_pts);
+    std::unordered_map<Face_Hash, glm::vec3> voronoi_pts
+        = build_voronoi((Mesh2D*)m_mesh.get());
+    m_voronoi_pts
+        = std::make_shared<std::unordered_map<Face_Hash, glm::vec3>>(voronoi_pts);
     ui.scene->set_voronoi_points(m_voronoi_pts);
 }
 
 void MainWindow::set_mesh(const Mesh &mesh) {
     m_mesh = std::make_shared<Mesh>(mesh);
     ui.scene->set_mesh(m_mesh);
+}
+
+void MainWindow::build_convex_hull() {
+    Mesh2D *mesh = (Mesh2D*)m_mesh.get();
+    insert_delaunay_vertex(mesh, glm::vec3(-1, -1, 0));
+    insert_delaunay_vertex(mesh, glm::vec3( 1, -1, 0));
+    insert_delaunay_vertex(mesh, glm::vec3( 0,  1, 0));
 }
 
 void MainWindow::on_radio_button_2d_released() {
@@ -103,6 +116,7 @@ void MainWindow::on_algorithm_type_combobox_currentIndexChanged(int index) {
         ui.parabola_widget->hide();
         ui.ruppert_widget->hide();
         set_mesh(Mesh2D());
+        build_convex_hull();
     }
     else if (m_mesh_config->algorithm_2d_type == Algorithm2DType::Crust) {
         ui.parabola_widget->hide();

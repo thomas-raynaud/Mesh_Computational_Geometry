@@ -7,7 +7,7 @@
 #include "voronoi.h"
 
 
-MeshCrust::MeshCrust(){
+MeshCrust::MeshCrust() : Mesh2D() {
     // Insert points in the file.
     std::ifstream file("resources/points_courbe.txt");
     if(!file) return;
