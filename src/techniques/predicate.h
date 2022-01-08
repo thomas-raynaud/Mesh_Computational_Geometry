@@ -12,7 +12,7 @@ float test_orientation(
 );
 
 // Check if point d is in the triangle abc
-int is_in_triangle(
+bool is_in_triangle(
     const glm::vec3 &a,
     const glm::vec3 &b,
     const glm::vec3 &c,
@@ -20,7 +20,7 @@ int is_in_triangle(
 );
 // Check if d is in the circumscribed circle of the triangle abc,
 // with abc oriented in the trigonometric direction
-int is_in_circle(
+bool is_in_circle(
     const glm::vec3 &a,
     const glm::vec3 &b,
     const glm::vec3 &c,

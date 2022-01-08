@@ -3,7 +3,7 @@
 #include "meshes/Mesh2D.h"
 #include "techniques/2d/delaunay.h"
 
-
+/*
 TEST_CASE( "Insert a vertex", "[delaunay]" ) {
     Mesh2D mesh;
     size_t nb_vertices = mesh.get_nb_vertices();
@@ -11,4 +11,4 @@ TEST_CASE( "Insert a vertex", "[delaunay]" ) {
     ++nb_vertices;
     REQUIRE(va != nullptr);
     REQUIRE(mesh.get_nb_vertices() == nb_vertices);
-}
+}*/
