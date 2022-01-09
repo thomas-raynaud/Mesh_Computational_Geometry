@@ -14,12 +14,24 @@ TEST_CASE( "Flip an edge", "[delaunay]" ) {
     Vertex *b = mesh.add_vertex(glm::vec3(4, 4, 0));
     Vertex *c = mesh.add_vertex(glm::vec3(11, 2, 0));
     Vertex *d = mesh.add_vertex(glm::vec3(14, 9, 0));
+    Vertex *w = mesh.add_vertex(glm::vec3(9, 11, 0));
+    Vertex *x = mesh.add_vertex(glm::vec3(1, 7, 0));
+    Vertex *y = mesh.add_vertex(glm::vec3(7, 1, 0));
+    Vertex *z = mesh.add_vertex(glm::vec3(16, 5, 0));
     Face *f1 = mesh.add_face({ v00, v01, v11 });
     Face *f2 = mesh.add_face({ v10, v11, v01 });
     Face *f01 = mesh.add_face({ v00, v11, a });
     Face *f02 = mesh.add_face({ v00, b, v01 });
     Face *f11 = mesh.add_face({ v01, c, v10 });
     Face *f12 = mesh.add_face({ v10, d, v11 });
+    Face *fa = mesh.add_face({ a, v11, w });
+    Face *fb = mesh.add_face({ a, x, v00 });
+    Face *fc = mesh.add_face({ b, v00, x });
+    Face *fd = mesh.add_face({ b, y, v01 });
+    Face *fe = mesh.add_face({ c, v01, y });
+    Face *ff = mesh.add_face({ c, z, v10 });
+    Face *fg = mesh.add_face({ d, v10, z });
+    Face *fh = mesh.add_face({ d, w, v11 });
     v00->set_incident_face(f1);
     v01->set_incident_face(f1);
     v10->set_incident_face(f2);
@@ -28,7 +40,12 @@ TEST_CASE( "Flip an edge", "[delaunay]" ) {
     b->set_incident_face(f02);
     c->set_incident_face(f11);
     d->set_incident_face(f12);
+    w->set_incident_face(fa);
+    x->set_incident_face(fb);
+    y->set_incident_face(fd);
+    z->set_incident_face(ff);
     mesh.connect_adjacent_faces();
+    std::array<Face*, 3> adj_faces2 = f12->get_adjacent_faces();
     flip_edge(f1, f2);
     // Check vertices's incident faces
     Face *inc_face = v00->get_incident_face();
@@ -81,25 +98,43 @@ TEST_CASE( "Flip an edge", "[delaunay]" ) {
     REQUIRE((count_a == 1 && count_b == 1 && count_c == 1));
     // Check adjacent faces
     adj_faces = f01->get_adjacent_faces();
-    for (size_t i = 0; i < 3; ++i) {
-        if (adj_faces[i] != nullptr) REQUIRE(*adj_faces[i] == *f1);
-    }
+    REQUIRE((*adj_faces[0] == *f1 || *adj_faces[1] == *f1 || *adj_faces[2] == *f1));
     adj_faces = f12->get_adjacent_faces();
-    for (size_t i = 0; i < 3; ++i) {
-        if (adj_faces[i] != nullptr) REQUIRE(*adj_faces[i] == *f1);
-    }
+    REQUIRE((*adj_faces[0] == *f1 || *adj_faces[1] == *f1 || *adj_faces[2] == *f1));
     adj_faces = f02->get_adjacent_faces();
-    for (size_t i = 0; i < 3; ++i) {
-        if (adj_faces[i] != nullptr) REQUIRE(*adj_faces[i] == *f2);
-    }
+    REQUIRE((*adj_faces[0] == *f2 || *adj_faces[1] == *f2 || *adj_faces[2] == *f2));
     adj_faces = f11->get_adjacent_faces();
-    for (size_t i = 0; i < 3; ++i) {
-        if (adj_faces[i] != nullptr) REQUIRE(*adj_faces[i] == *f2);
-    }
+    REQUIRE((*adj_faces[0] == *f2 || *adj_faces[1] == *f2 || *adj_faces[2] == *f2));
 }
 
-TEST_CASE( "Split a triangle", "[delaunay]" ) {
 
+TEST_CASE( "Split a triangle", "[delaunay]" ) {
+    Mesh2D mesh;
+    Vertex *va = mesh.add_vertex(glm::vec3(6, 11, 0));
+    Vertex *vb = mesh.add_vertex(glm::vec3(8, 5, 0));
+    Vertex *vc = mesh.add_vertex(glm::vec3(12, 12, 0));
+    Vertex *vx = mesh.add_vertex(glm::vec3(4, 7, 0));
+    Vertex *vy = mesh.add_vertex(glm::vec3(13, 7, 0));
+    Vertex *vz = mesh.add_vertex(glm::vec3(8, 14, 0));
+    Face *f = mesh.add_face({ va, vb, vc });
+    Face *fa = mesh.add_face({ va, vx, vb });
+    Face *fb = mesh.add_face({ vb, vy, vc });
+    Face *fc = mesh.add_face({ vc, vz, va });
+    va->set_incident_face(f);
+    vb->set_incident_face(f);
+    vc->set_incident_face(f);
+    vx->set_incident_face(fa);
+    vy->set_incident_face(fb);
+    vz->set_incident_face(fc);
+    mesh.connect_adjacent_faces();
+    unsigned int nb_vertices = mesh.get_nb_vertices();
+    unsigned int nb_faces = mesh.get_nb_faces();
+    glm::vec3 p(9, 10, 0);
+    Vertex *vp = split_triangle(&mesh, p, f);
+    ++nb_vertices;
+    nb_faces += 2;
+    REQUIRE(mesh.get_nb_vertices() == nb_vertices);
+    REQUIRE(mesh.get_nb_faces() == nb_faces);
 }
 
 /*
