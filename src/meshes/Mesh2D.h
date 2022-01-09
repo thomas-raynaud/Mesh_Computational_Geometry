@@ -19,6 +19,8 @@ public:
 
     Vertex* get_infinite_vertex();
 
+    Face* add_face(std::array<Vertex*, 3> face_vts);
+
     int take_step_visibility_march(const Face &face, const Vertex &vtx);
     // Rearrange the triangles of the mesh after the insertion of vtx,
     // so that it corresponds to a Delaunay triangulation.

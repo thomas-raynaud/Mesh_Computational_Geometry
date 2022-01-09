@@ -31,7 +31,7 @@ public:
     int get_nb_faces();
 
     Vertex* add_vertex(glm::vec3 pos);
-    Face* add_face(std::array<Vertex*, 3> face_vts);
+    virtual Face* add_face(std::array<Vertex*, 3> face_vts);
 
     virtual void pop_vertex(Vertex *v);
     void pop_face(Face *f);

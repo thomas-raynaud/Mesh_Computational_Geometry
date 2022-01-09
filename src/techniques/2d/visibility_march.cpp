@@ -15,13 +15,10 @@ Face* take_step_visibility_march(
     a = face_vts[0]->get_position();
     b = face_vts[1]->get_position();
     c = face_vts[2]->get_position();
-    bool orientation_face = test_orientation(a, b, c) > 0.f;
-    bool orientation_p;
     for (size_t i = 0; i < 3; ++i) {
         a = face_vts[i]->get_position();
         b = face_vts[(i + 1) % 3]->get_position();
-        orientation_p = test_orientation(a, b, p) > 0.f;
-        if (orientation_face != orientation_p) {
+        if (test_orientation(a, b, p) < 0.f) {
             return adj_faces[(i + 2) % 3];
         }
     }

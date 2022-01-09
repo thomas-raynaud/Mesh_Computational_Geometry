@@ -1,5 +1,7 @@
 #include "Mesh2D.h"
 
+#include "techniques/predicate.h"
+
 #include <iostream>
 
 
@@ -26,6 +28,16 @@ Mesh2D::Mesh2D() {
 
 Vertex* Mesh2D::get_infinite_vertex() {
     return &m_vertices[m_infinite_vertex];
+}
+
+Face* Mesh2D::add_face(std::array<Vertex*, 3> face_vts) {
+    // Order the vertices in the trigonometrical direction
+    glm::vec3 a = face_vts[0]->get_position();
+    glm::vec3 b = face_vts[1]->get_position();
+    glm::vec3 c = face_vts[2]->get_position();
+    if (test_orientation(a, b, c) < 0.f)
+        std::swap(face_vts[0], face_vts[1]);
+    return Mesh::add_face(face_vts);
 }
 
 

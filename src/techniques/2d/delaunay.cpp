@@ -1,7 +1,6 @@
 #include "delaunay.h"
 
 #include <queue>
-#include <iostream>
 
 #include "meshes/Mesh2D.h"
 #include "techniques/predicate.h"
@@ -39,10 +38,19 @@ void flip_edge(Face *f1, Face *f2) {
     v01->set_incident_face(f2);
     v10->set_incident_face(f2);
     v11->set_incident_face(f1);
+
     // Change f02 & f12's adjacent faces
+    std::array<Face*, 3> adj_faces = f02->get_adjacent_faces();
     for (size_t i = 0; i < 3; ++i) {
-        if (*(f02->get_adjacent_faces()[i]) == *f1) f02->set_adjacent_face(i, f2);
-        if (*(f12->get_adjacent_faces()[i]) == *f2) f12->set_adjacent_face(i, f1);
+        if (adj_faces[i] == nullptr) continue;
+        if (*adj_faces[i] == *f1) f02->set_adjacent_face(i, f2);
+        break;
+    }
+    adj_faces = f12->get_adjacent_faces();
+    for (size_t i = 0; i < 3; ++i) {
+        if (adj_faces[i] == nullptr) continue;
+        if (*adj_faces[i] == *f2) f12->set_adjacent_face(i, f1);
+        break;
     }
 }
 
