@@ -22,6 +22,10 @@ Mesh2D::Mesh2D() {
     Face *fb = add_face({ vb, inf_vtx, vc      });
     Face *fc = add_face({ va, vc,      inf_vtx });
     Face *fd = add_face({ va, inf_vtx, vb      });
+    va->set_incident_face(fa);
+    vb->set_incident_face(fa);
+    vc->set_incident_face(fa);
+    inf_vtx->set_incident_face(fb);
     connect_adjacent_faces();
 }
 
@@ -92,7 +96,7 @@ std::ostream& operator<<(std::ostream &strm, const Mesh2D &mesh) {
         strm << v.get_hash() << ": ";
         strm << pos.x << " " << pos.y << " " << pos.z;
         strm << type_str;
-        strm << " - f=" << v.get_incident_face() << std::endl;
+        strm << " - f=" << v.get_incident_face()->get_hash() << std::endl;
     }
     strm << "Faces:" << std::endl;
     for (   face_it = mesh.m_faces.begin();

@@ -282,7 +282,7 @@ std::ostream& operator<<(std::ostream &strm, const Mesh &mesh) {
         pos = v.get_position();
         strm << v.get_hash() << ": ";
         strm << pos.x << " " << pos.y << " " << pos.z;
-        strm << " - f=" << v.get_incident_face() << std::endl;
+        strm << " - f=" << v.get_incident_face()->get_hash() << std::endl;
     }
     strm << "Faces:" << std::endl;
     for (   face_it = mesh.m_faces.begin();

@@ -46,7 +46,7 @@ TEST_CASE( "Flip an edge", "[delaunay]" ) {
     z->set_incident_face(ff);
     mesh.connect_adjacent_faces();
     std::array<Face*, 3> adj_faces2 = f12->get_adjacent_faces();
-    flip_edge(f1, f2);
+    delaunay::flip_edge(f1, f2);
     // Check vertices's incident faces
     Face *inc_face = v00->get_incident_face();
     REQUIRE((
@@ -130,19 +130,48 @@ TEST_CASE( "Split a triangle", "[delaunay]" ) {
     unsigned int nb_vertices = mesh.get_nb_vertices();
     unsigned int nb_faces = mesh.get_nb_faces();
     glm::vec3 p(9, 10, 0);
-    Vertex *vp = split_triangle(&mesh, p, f);
+    Vertex *vp = delaunay::split_triangle(&mesh, p, f);
     ++nb_vertices;
     nb_faces += 2;
     REQUIRE(mesh.get_nb_vertices() == nb_vertices);
     REQUIRE(mesh.get_nb_faces() == nb_faces);
+    std::array<Vertex*, 3> neighbour_vts = { va, vb, vc };
+    VertexCirculator vc_p = mesh.neighbour_vertices(*vp);
+    unsigned int offset = 0;
+    if (vc_p->get_hash() == vb->get_hash()) offset = 1;
+    else if (vc_p->get_hash() == vc->get_hash()) offset = 2;
+    REQUIRE(vc_p->get_hash() == neighbour_vts[offset]->get_hash());
+    vc_p++; offset = (offset + 1) % 3;
+    REQUIRE(vc_p->get_hash() == neighbour_vts[offset]->get_hash());
+    vc_p++; offset = (offset + 1) % 3;
+    REQUIRE(vc_p->get_hash() == neighbour_vts[offset]->get_hash());
 }
 
-/*
+
 TEST_CASE( "Insert a vertex", "[delaunay]" ) {
     Mesh2D mesh;
     size_t nb_vertices = mesh.get_nb_vertices();
-    Vertex *va = insert_delaunay_vertex(&mesh, glm::vec3(0, 0, 0));
+    size_t nb_faces = mesh.get_nb_faces();
+    Vertex *va = delaunay::insert_vertex(&mesh, glm::vec3(0, 0, 0));
     ++nb_vertices;
+    nb_faces += 2;
     REQUIRE(va != nullptr);
     REQUIRE(mesh.get_nb_vertices() == nb_vertices);
-}*/
+    REQUIRE(mesh.get_nb_faces() == nb_faces);
+    FaceCirculator fc = mesh.incident_faces(*va);
+    FaceCirculator fc_begin = fc;
+    unsigned int nb_incident_faces = 0;
+    do {
+        ++nb_incident_faces;
+        ++fc;
+    } while (fc_begin != fc);
+    REQUIRE(nb_incident_faces == 3);
+    VertexCirculator vc = mesh.neighbour_vertices(*va);
+    VertexCirculator vc_begin = vc;
+    unsigned int nb_neighbour_vertices = 0;
+    do {
+        ++nb_neighbour_vertices;
+        ++vc;
+    } while (vc_begin != vc);
+    REQUIRE(nb_neighbour_vertices == 3);
+}

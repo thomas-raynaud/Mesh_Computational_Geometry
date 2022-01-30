@@ -6,20 +6,20 @@
 
 MeshRuppert::MeshRuppert() : Mesh2D() {
     // Vertices
-    Vertex * v1  = insert_delaunay_vertex(this, glm::vec3( -1, -1, 0));
-    Vertex * v2  = insert_delaunay_vertex(this, glm::vec3(  1, -1, 0));
-    Vertex * v3  = insert_delaunay_vertex(this, glm::vec3(  0,  1, 0));
-    Vertex * v4  = insert_delaunay_vertex(this, glm::vec3(  3,  3, 0));
-    Vertex * v5  = insert_delaunay_vertex(this, glm::vec3( -2,  4, 0));
-    Vertex * v6  = insert_delaunay_vertex(this, glm::vec3(  1,  8, 0));
-    Vertex * v7  = insert_delaunay_vertex(this, glm::vec3( -1,  9, 0));
-    Vertex * v8  = insert_delaunay_vertex(this, glm::vec3( -7, 12, 0));
-    Vertex * v9  = insert_delaunay_vertex(this, glm::vec3(-10,  5, 0));
-    Vertex * v10 = insert_delaunay_vertex(this, glm::vec3( -4,  3, 0));
-    Vertex * v11 = insert_delaunay_vertex(this, glm::vec3( -4,  2, 0));
-    Vertex * v12 = insert_delaunay_vertex(this, glm::vec3( -7,  1, 0));
-    Vertex * v13 = insert_delaunay_vertex(this, glm::vec3( -3, -1, 0));
-    Vertex * v14 = insert_delaunay_vertex(this, glm::vec3(  2,  7, 0));
+    Vertex * v1  = delaunay::insert_vertex(this, glm::vec3( -1, -1, 0));
+    Vertex * v2  = delaunay::insert_vertex(this, glm::vec3(  1, -1, 0));
+    Vertex * v3  = delaunay::insert_vertex(this, glm::vec3(  0,  1, 0));
+    Vertex * v4  = delaunay::insert_vertex(this, glm::vec3(  3,  3, 0));
+    Vertex * v5  = delaunay::insert_vertex(this, glm::vec3( -2,  4, 0));
+    Vertex * v6  = delaunay::insert_vertex(this, glm::vec3(  1,  8, 0));
+    Vertex * v7  = delaunay::insert_vertex(this, glm::vec3( -1,  9, 0));
+    Vertex * v8  = delaunay::insert_vertex(this, glm::vec3( -7, 12, 0));
+    Vertex * v9  = delaunay::insert_vertex(this, glm::vec3(-10,  5, 0));
+    Vertex * v10 = delaunay::insert_vertex(this, glm::vec3( -4,  3, 0));
+    Vertex * v11 = delaunay::insert_vertex(this, glm::vec3( -4,  2, 0));
+    Vertex * v12 = delaunay::insert_vertex(this, glm::vec3( -7,  1, 0));
+    Vertex * v13 = delaunay::insert_vertex(this, glm::vec3( -3, -1, 0));
+    Vertex * v14 = delaunay::insert_vertex(this, glm::vec3(  2,  7, 0));
     // Constraints
     std::vector<Edge> edge_constraints_vec = {
         Edge(v4, v14),
@@ -79,7 +79,7 @@ void MeshRuppert::split_edge(const Edge_Hash &edge_hash) {
     Edge e = m_edge_constraints[edge_hash];
     glm::vec3 a = e.v1->get_position();
     glm::vec3 b = e.v2->get_position();
-    Vertex *new_vtx = insert_delaunay_vertex(this, (a + b) * 0.5f);
+    Vertex *new_vtx = delaunay::insert_vertex(this, (a + b) * 0.5f);
     m_edge_constraints.erase(edge_hash);
     Edge e1(e.v1, new_vtx);
     Edge e2(new_vtx, e.v2);
@@ -132,10 +132,10 @@ void MeshRuppert::refine(float alpha) {
         // Insert the Voronoi center in a temp mesh
         q = compute_circumcenter(a, b, c);
         MeshRuppert mesh_tmp = *this;
-        insert_delaunay_vertex(&mesh_tmp, q);
+        delaunay::insert_vertex(&mesh_tmp, q);
         encroached_edges = mesh_tmp.constraint_edges_encroached_upon();
         if (encroached_edges.size() == 0) {
-            insert_delaunay_vertex(this, q);
+            delaunay::insert_vertex(this, q);
         }
         else {
             // Split the constraint edges that q encroaches upon

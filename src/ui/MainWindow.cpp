@@ -11,6 +11,7 @@
 #include "techniques/3d/curvature.h"
 
 
+#include <iostream>
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
     ui()
@@ -84,9 +85,9 @@ void MainWindow::set_mesh(const Mesh &mesh) {
 
 void MainWindow::build_convex_hull() {
     Mesh2D *mesh = (Mesh2D*)m_mesh.get();
-    insert_delaunay_vertex(mesh, glm::vec3(-1, -1, 0));
-    insert_delaunay_vertex(mesh, glm::vec3( 1, -1, 0));
-    insert_delaunay_vertex(mesh, glm::vec3( 0,  1, 0));
+    delaunay::insert_vertex(mesh, glm::vec3(-1, -1, 0));
+    delaunay::insert_vertex(mesh, glm::vec3( 1, -1, 0));
+    delaunay::insert_vertex(mesh, glm::vec3( 0,  1, 0));
 }
 
 void MainWindow::on_radio_button_2d_released() {
@@ -151,7 +152,7 @@ void MainWindow::on_insert_points_push_button_released() {
         float rand_x = -2.f + (((float) rand()) / (float) RAND_MAX) * 4.f;
         float rand_y = -2.f + (((float) rand()) / (float) RAND_MAX) * 4.f;
         glm::vec3 p(rand_x, rand_y, 0);
-        insert_delaunay_vertex((Mesh2D*)m_mesh.get(), p);
+        delaunay::insert_vertex((Mesh2D*)m_mesh.get(), p);
     }
     compute_laplacians((Mesh3D*)m_mesh.get());
     set_curvature_colors((Mesh3D*)m_mesh.get(), m_mesh_config->color_display_type);

@@ -27,7 +27,7 @@ MeshParabola::MeshParabola(ParabolaType parabola_type)
             z = pow(a - x, 2.0) + b * pow(y - x * x, 2.0);
             z = z / 150.f;
         }
-        insert_delaunay_vertex(this, glm::vec3(x, y, z));
+        delaunay::insert_vertex(this, glm::vec3(x, y, z));
     }
     // Color attribution
     // Find Z min and Z max

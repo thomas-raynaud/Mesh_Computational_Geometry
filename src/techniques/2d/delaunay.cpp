@@ -7,6 +7,8 @@
 #include "techniques/2d/visibility_march.h"
 
 
+namespace delaunay {
+
 void flip_edge(Face *f1, Face *f2) {
     Vertex *v00, *v01;              // Vertices of f1 with v00 opposite of f2
     Vertex *v10, *v11;              // Vertices of f2 with v10 opposite of f1
@@ -98,7 +100,60 @@ Vertex* split_triangle(Mesh2D *mesh, glm::vec3 &point, Face *face) {
 }
 
 
-Vertex* insert_delaunay_vertex(Mesh2D *mesh, glm::vec3 p) {
+void rearrange_around_vertex(Mesh2D *mesh, Vertex *vtx) {
+    // Queue containing the triangles to test. The edge to test is opposite to
+    // vtx in each triangle.
+    std::queue<Face*> face_queue;
+    glm::vec3 a, b, c, d;
+    a = vtx->get_position();
+    FaceCirculator fc_begin = mesh->incident_faces(*vtx);
+    FaceCirculator fc = fc_begin;
+    Face *f1, *f2;
+    std::array<Vertex*, 3> face_vts;
+    std::array<Face*, 3> adj_faces;
+    // Add to the queue the triangles around vtx
+    do {
+        face_queue.push(&*fc);
+        ++fc;
+    } while (fc != fc_begin);
+    
+    while (!face_queue.empty()) {
+        f1 = face_queue.front();
+        face_queue.pop();
+        if (mesh->is_face_fictive(*f1)) continue;
+        // Test if locally Delaunay : check if d is in the circle of the
+        // triangle abc (f1).
+        face_vts = f1->get_vertices();
+        for (size_t i = 0; i < 3; ++i) {
+            if (*(face_vts[i]) == *vtx) {
+                // bc = applicant edge for flip
+                b = face_vts[(i + 1) % 3]->get_position();
+                c = face_vts[(i + 1) % 3]->get_position();
+                // f2 = triangle opposite to a
+                f2 = f1->get_adjacent_faces()[i];
+                break;
+            }
+        }
+        if (mesh->is_face_fictive(*f2)) continue;
+        // d = vertex in f2 opposite to f1
+        face_vts = f2->get_vertices();
+        adj_faces = f2->get_adjacent_faces();
+        for (size_t i = 0; i < 3; ++i) {
+            if (*(adj_faces[i]) == *f1) {
+                d = face_vts[i]->get_position();
+            }
+        }
+        if (is_in_circle(a, b, c, d)) { // Triangle not Delaunay locally
+            flip_edge(f1, f2);
+            // Add the newly formed edges
+            face_queue.push(f1);
+            face_queue.push(f2);
+        }
+    }
+}
+
+
+Vertex* insert_vertex(Mesh2D *mesh, glm::vec3 p) {
     // Check if the point is inside the convex hull.
     glm::vec3 a, b, c;
     Vertex *new_vtx = nullptr;
@@ -185,6 +240,7 @@ Vertex* insert_delaunay_vertex(Mesh2D *mesh, glm::vec3 p) {
             }
             else edge_visible = false;
         }
+        return new_vtx;
     }
 
     // The point is in the convex hull. Find in which face it is located.
@@ -197,65 +253,14 @@ Vertex* insert_delaunay_vertex(Mesh2D *mesh, glm::vec3 p) {
     }
     //std::advance(face_it, rand() % mesh->get_nb_faces());
     while (mesh->is_face_fictive(*face_it)) ++face_it;
-    Face *face = &*face;
+    Face *face = &*face_it;
     do {
         previous_face = face;
         face = take_step_visibility_march(mesh, *face, p);
     } while (face != nullptr); // We arrived in the correct triangle
     new_vtx = split_triangle(mesh, p, previous_face);
-    rearrange_delaunay(mesh, new_vtx);
+    rearrange_around_vertex(mesh, new_vtx);
     return new_vtx;
 }
 
-
-void rearrange_delaunay(Mesh2D *mesh, Vertex *vtx) {
-    // Queue containing the triangles to test. The edge to test is opposite to
-    // vtx in each triangle.
-    std::queue<Face*> face_queue;
-    glm::vec3 a, b, c, d;
-    a = vtx->get_position();
-    FaceCirculator fc_begin = mesh->incident_faces(*vtx);
-    FaceCirculator fc = fc_begin;
-    Face *f1, *f2;
-    std::array<Vertex*, 3> face_vts;
-    std::array<Face*, 3> adj_faces;
-    // Add to the queue the triangles around vtx
-    do {
-        face_queue.push(&*fc);
-        ++fc;
-    } while (fc != fc_begin);
-    
-    while (!face_queue.empty()) {
-        f1 = face_queue.front();
-        face_queue.pop();
-        if (mesh->is_face_fictive(*f1)) continue;
-        // Test if locally Delaunay : check if d is in the circle of the
-        // triangle abc (f1).
-        face_vts = f1->get_vertices();
-        for (size_t i = 0; i < 3; ++i) {
-            if (*(face_vts[i]) == *vtx) {
-                // bc = applicant edge for flip
-                b = face_vts[(i + 1) % 3]->get_position();
-                c = face_vts[(i + 1) % 3]->get_position();
-                // f2 = triangle opposite to a
-                f2 = f1->get_adjacent_faces()[i];
-                break;
-            }
-        }
-        if (mesh->is_face_fictive(*f2)) continue;
-        // d = vertex in f2 opposite to f1
-        face_vts = f2->get_vertices();
-        adj_faces = f2->get_adjacent_faces();
-        for (size_t i = 0; i < 3; ++i) {
-            if (*(adj_faces[i]) == *f1) {
-                d = face_vts[i]->get_position();
-            }
-        }
-        if (is_in_circle(a, b, c, d)) { // Triangle not Delaunay locally
-            flip_edge(f1, f2);
-            // Add the newly formed edges
-            face_queue.push(f1);
-            face_queue.push(f2);
-        }
-    }
 }
