@@ -1,8 +1,8 @@
 #include "Mesh2D.h"
 
-#include "techniques/predicate.h"
-
 #include <iostream>
+
+#include "techniques/predicate.h"
 
 
 Mesh2D::Mesh2D() {
@@ -18,16 +18,18 @@ Mesh2D::Mesh2D() {
         vc->get_hash(),
         inf_vtx->get_hash()
     });
-    Face *fa = add_face({ va, vb,      vc      });
-    Face *fb = add_face({ vb, inf_vtx, vc      });
-    Face *fc = add_face({ va, vc,      inf_vtx });
-    Face *fd = add_face({ va, inf_vtx, vb      });
+    Face *fa = Mesh::add_face({ va, vb,         vc      });
+    Face *fb = Mesh::add_face({ vb, inf_vtx,    vc      });
+    Face *fc = Mesh::add_face({ va, vc,         inf_vtx });
+    Face *fd = Mesh::add_face({ va, inf_vtx,    vb      });
     va->set_incident_face(fa);
     vb->set_incident_face(fa);
     vc->set_incident_face(fa);
     inf_vtx->set_incident_face(fb);
     connect_adjacent_faces();
 }
+
+Mesh2D::~Mesh2D() {}
 
 
 Vertex* Mesh2D::get_infinite_vertex() {
@@ -103,13 +105,13 @@ std::ostream& operator<<(std::ostream &strm, const Mesh2D &mesh) {
             face_it != mesh.m_faces.end();
             ++face_it
     ) {
+        f = face_it->second;
         if (mesh.is_face_fictive(f))
             type_str = " (fictive)";
         else if (!mesh.is_face_visible(f))
             type_str = " (hidden)";
         else
             type_str = "";
-        f = face_it->second;
         face_vts = f.get_vertices();
         adj_faces = f.get_adjacent_faces();
         strm << f.get_hash()  << type_str << ": " << std::endl;

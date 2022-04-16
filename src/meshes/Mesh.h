@@ -26,6 +26,7 @@ protected:
 
 public:
     Mesh();
+    virtual ~Mesh();
 
     int get_nb_vertices();
     int get_nb_faces();

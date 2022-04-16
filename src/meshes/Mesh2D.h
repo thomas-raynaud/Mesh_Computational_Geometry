@@ -14,7 +14,7 @@ protected:
 
 public:
     Mesh2D();
-    virtual ~Mesh2D() {}
+    virtual ~Mesh2D();
 
     Vertex* get_infinite_vertex();
 

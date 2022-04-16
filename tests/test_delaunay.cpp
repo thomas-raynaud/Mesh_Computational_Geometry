@@ -152,7 +152,7 @@ TEST_CASE( "Insert a vertex", "[delaunay]" ) {
     Mesh2D mesh;
     size_t nb_vertices = mesh.get_nb_vertices();
     size_t nb_faces = mesh.get_nb_faces();
-    Vertex *va = delaunay::insert_vertex(&mesh, glm::vec3(0, 0, 0));
+    Vertex *va = delaunay::insert_vertex(mesh, glm::vec3(0, 0, 0));
     ++nb_vertices;
     nb_faces += 2;
     REQUIRE(va != nullptr);

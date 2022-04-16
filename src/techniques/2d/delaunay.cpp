@@ -153,17 +153,17 @@ void rearrange_around_vertex(Mesh2D *mesh, Vertex *vtx) {
 }
 
 
-Vertex* insert_vertex(Mesh2D *mesh, glm::vec3 p) {
-    // Check if the point is inside the convex hull.
+Vertex* insert_vertex(Mesh2D &mesh, glm::vec3 p) {
     glm::vec3 a, b, c;
     Vertex *new_vtx = nullptr;
-    Vertex *inf_vtx = mesh->get_infinite_vertex();
-    FaceCirculator fc_begin = mesh->incident_faces(*inf_vtx);
+    Vertex *inf_vtx = mesh.get_infinite_vertex();
+    FaceCirculator fc_begin = mesh.incident_faces(*inf_vtx);
     FaceCirculator fc = fc_begin;
     std::array<Vertex*, 3> face_vts;
     Face *face_split = nullptr;
     Face *face_start = nullptr;
     Face *previous_face;
+    // Check if the point is inside the convex hull.
     do {
         face_vts = fc->get_vertices();
         for (size_t i = 0; i < 3; ++i) {
@@ -179,16 +179,16 @@ Vertex* insert_vertex(Mesh2D *mesh, glm::vec3 p) {
         ++fc;
     } while (fc != fc_begin && face_split == nullptr);
 
-    if (face_split != nullptr) {
-        new_vtx = split_triangle(mesh, p, face_split);
+    if (face_split != nullptr) {    // Outside the convex hull
+        new_vtx = split_triangle(&mesh, p, face_split);
         // Flip fictive edges if they are incident to another fictive face.
-        fc_begin = mesh->incident_faces(*inf_vtx);
+        fc_begin = mesh.incident_faces(*inf_vtx);
         fc = fc_begin;
         do {
             face_vts = fc->get_vertices();
             for (size_t i = 0; i < 3; ++i) {
                 if (    *(face_vts[i]) == *new_vtx &&
-                        *(face_vts[i + 1]) == *inf_vtx
+                        *(face_vts[(i + 1) % 3]) == *inf_vtx
                 ) {
                     face_start = &*fc;
                     break;
@@ -212,13 +212,13 @@ Vertex* insert_vertex(Mesh2D *mesh, glm::vec3 p) {
             }
             if (test_orientation(a, b, p) > 0.f) { // Edge visible from p
                 flip_edge(&*fc, previous_face);
-                fc = mesh->incident_faces(*inf_vtx, *previous_face);
+                fc = mesh.incident_faces(*inf_vtx, *previous_face);
                 ++fc;
             }
             else edge_visible = false;
         }
         // Add visible edges before the split face
-        fc = mesh->incident_faces(*inf_vtx, *face_start);
+        fc = mesh.incident_faces(*inf_vtx, *face_start);
         previous_face = &*fc;
         --fc;
         edge_visible = true;
@@ -235,31 +235,31 @@ Vertex* insert_vertex(Mesh2D *mesh, glm::vec3 p) {
             if (test_orientation(a, b, p) > 0.f) { // Edge visible from p
                 flip_edge(previous_face, &*fc);
                 previous_face = &*fc;
-                fc = mesh->incident_faces(*inf_vtx, *previous_face);
+                fc = mesh.incident_faces(*inf_vtx, *previous_face);
                 --fc;
             }
             else edge_visible = false;
         }
-        return new_vtx;
     }
-
-    // The point is in the convex hull. Find in which face it is located.
-    // -> visibility march
-    // We start from a random face.
-    FaceIterator face_it = mesh->faces_begin();
-    size_t rand_face_ind = rand() % mesh->get_nb_faces();
-    for (size_t i = 0; i < rand_face_ind; ++i) {
-        ++face_it;
+    else {
+        // The point is in the convex hull. Find in which face it is located.
+        // -> visibility march
+        // We start from a random face.
+        FaceIterator face_it = mesh.faces_begin();
+        size_t rand_face_ind = rand() % mesh.get_nb_faces();
+        for (size_t i = 0; i < rand_face_ind; ++i) {
+            ++face_it;
+        }
+        //std::advance(face_it, rand() % mesh->get_nb_faces());
+        while (mesh.is_face_fictive(*face_it)) ++face_it;
+        Face *face = &*face_it;
+        do {
+            previous_face = face;
+            face = take_step_visibility_march(&mesh, *face, p);
+        } while (face != nullptr); // We arrived in the correct triangle
+        new_vtx = split_triangle(&mesh, p, previous_face);
+        rearrange_around_vertex(&mesh, new_vtx);
     }
-    //std::advance(face_it, rand() % mesh->get_nb_faces());
-    while (mesh->is_face_fictive(*face_it)) ++face_it;
-    Face *face = &*face_it;
-    do {
-        previous_face = face;
-        face = take_step_visibility_march(mesh, *face, p);
-    } while (face != nullptr); // We arrived in the correct triangle
-    new_vtx = split_triangle(mesh, p, previous_face);
-    rearrange_around_vertex(mesh, new_vtx);
     return new_vtx;
 }
 

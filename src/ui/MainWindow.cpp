@@ -16,9 +16,12 @@ MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
     ui()
 {
+    std::cout << "start constructor main window" << std::endl;
     ui.setupUi(this);
+    std::cout << "ui setup" << std::endl;
 
     MeshConfig mesh_config;
+    std::cout << "mesh config" << std::endl;
     mesh_config.dimension = Dimension::D2;
     mesh_config.mesh_display_type = MeshDisplayType::PlainFaces;
     mesh_config.algorithm_2d_type = Algorithm2DType::Delaunay;
@@ -26,16 +29,24 @@ MainWindow::MainWindow(QWidget *parent) :
     mesh_config.parabola_type = ParabolaType::EllipticParaboloid;
     mesh_config.color_display_type = ColorDisplayType::MeanCurvature;
     mesh_config.mesh_3d_type = Mesh3DType::Tetrahedron;
+    std::cout << "parameters" << std::endl;
     m_mesh_config = std::make_shared<MeshConfig>(mesh_config);    
 
+    std::cout << "config shared ptr" << std::endl;
     ui.d3_groupbox->hide();
     ui.parabola_widget->hide();
     ui.ruppert_widget->hide();
 
-    set_mesh(Mesh2D());
+    std::cout << "hide widgets" << std::endl;
+    set_mesh(std::make_shared<Mesh2D>());
+    std::cout << "set mesh" << std::endl;
     build_convex_hull();
+    std::cout << "build convex hull mesh" << std::endl;
     update_voronoi_vertices();
+    std::cout << *m_mesh << std::endl;
+    std::cout << "update voronoi vertices" << std::endl;
     ui.scene->set_mesh_config(m_mesh_config);
+    std::cout << "set mesh config" << std::endl;
 }
 
 MainWindow::~MainWindow() {}
@@ -53,7 +64,7 @@ void MainWindow::switch_dimension() {
             ui.ruppert_widget->hide();
             m_mesh_config->algorithm_2d_type = Algorithm2DType::Delaunay;
             m_mesh_config->show_voronoi_display = false;
-            set_mesh(Mesh2D());
+            set_mesh(std::make_shared<Mesh2D>());
             build_convex_hull();
             update_voronoi_vertices();
         }
@@ -61,7 +72,7 @@ void MainWindow::switch_dimension() {
             ui.d2_groupbox->hide();
             m_mesh_config->show_voronoi_display = false;
             m_mesh_config->mesh_3d_type = Mesh3DType::Tetrahedron;
-            set_mesh(Tetrahedron());
+            set_mesh(std::make_shared<Tetrahedron>());
             compute_laplacians((Mesh3D*)m_mesh.get());
             set_curvature_colors(
                 (Mesh3D*)m_mesh.get(), m_mesh_config->color_display_type
@@ -78,16 +89,27 @@ void MainWindow::update_voronoi_vertices() {
     ui.scene->set_voronoi_points(m_voronoi_pts);
 }
 
-void MainWindow::set_mesh(const Mesh &mesh) {
-    m_mesh = std::make_shared<Mesh>(mesh);
+void MainWindow::set_mesh(const std::shared_ptr<Mesh>& mesh) {
+    std::cout << "inside set mesh" << std::endl;
+    m_mesh = mesh;
     ui.scene->set_mesh(m_mesh);
+    std::cout << "end inside set mesh" << std::endl;
 }
 
 void MainWindow::build_convex_hull() {
-    Mesh2D *mesh = (Mesh2D*)m_mesh.get();
-    delaunay::insert_vertex(mesh, glm::vec3(-1, -1, 0));
-    delaunay::insert_vertex(mesh, glm::vec3( 1, -1, 0));
-    delaunay::insert_vertex(mesh, glm::vec3( 0,  1, 0));
+    std::cout << "inside build convex hull" << std::endl;
+    std::shared_ptr<Mesh2D> sp_mesh = std::dynamic_pointer_cast<Mesh2D>(m_mesh);
+    std::cout << *sp_mesh << std::endl;
+    Mesh2D *mesh = sp_mesh.get();
+    std::cout << *mesh << std::endl;
+    std::cout << *sp_mesh << std::endl;
+    std::cout << "..." << std::endl;
+    delaunay::insert_vertex(*sp_mesh, glm::vec3(-1, -1, 0));
+    std::cout << "b" << std::endl;
+    delaunay::insert_vertex(*mesh, glm::vec3( 1, -1, 0));
+    std::cout << "c" << std::endl;
+    delaunay::insert_vertex(*mesh, glm::vec3( 0,  1, 0));
+    std::cout << "end inside build convex hull" << std::endl;
 }
 
 void MainWindow::on_radio_button_2d_released() {
@@ -116,23 +138,23 @@ void MainWindow::on_algorithm_type_combobox_currentIndexChanged(int index) {
     if (m_mesh_config->algorithm_2d_type == Algorithm2DType::Delaunay) {
         ui.parabola_widget->hide();
         ui.ruppert_widget->hide();
-        set_mesh(Mesh2D());
+        set_mesh(std::make_shared<Mesh2D>());
         build_convex_hull();
     }
     else if (m_mesh_config->algorithm_2d_type == Algorithm2DType::Crust) {
         ui.parabola_widget->hide();
         ui.ruppert_widget->hide();
-        set_mesh(MeshCrust());
+        set_mesh(std::make_shared<MeshCrust>());
     }
     else if (m_mesh_config->algorithm_2d_type == Algorithm2DType::Ruppert) {
         ui.parabola_widget->hide();
         ui.ruppert_widget->show();
-        set_mesh(MeshRuppert());
+        set_mesh(std::make_shared<MeshRuppert>());
     }
     else if (m_mesh_config->algorithm_2d_type == Algorithm2DType::Parabola) {
         ui.parabola_widget->show();
         ui.ruppert_widget->hide();
-        set_mesh(MeshParabola());
+        set_mesh(std::make_shared<MeshParabola>());
     }
     update_voronoi_vertices();
 }
@@ -148,11 +170,12 @@ void MainWindow::on_voronoi_display_push_button_released() {
 void MainWindow::on_insert_points_push_button_released() {
     size_t nb_pts = ui.insert_points_line_edit->text().toInt();
     if (nb_pts == 0) return;
+    std::shared_ptr<Mesh2D> sp_mesh = std::dynamic_pointer_cast<Mesh2D>(m_mesh);
     for (size_t i = 0; i < nb_pts; ++i) {
         float rand_x = -2.f + (((float) rand()) / (float) RAND_MAX) * 4.f;
         float rand_y = -2.f + (((float) rand()) / (float) RAND_MAX) * 4.f;
         glm::vec3 p(rand_x, rand_y, 0);
-        delaunay::insert_vertex((Mesh2D*)m_mesh.get(), p);
+        delaunay::insert_vertex(*sp_mesh, p);
     }
     compute_laplacians((Mesh3D*)m_mesh.get());
     set_curvature_colors((Mesh3D*)m_mesh.get(), m_mesh_config->color_display_type);

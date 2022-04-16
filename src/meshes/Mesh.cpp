@@ -9,6 +9,8 @@
 
 Mesh::Mesh() {}
 
+Mesh::~Mesh() {}
+
 int Mesh::get_nb_vertices() {
     return m_vertices.size();
 }

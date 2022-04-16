@@ -16,6 +16,7 @@ class MainWindow : public QMainWindow {
     Q_OBJECT
 
 public:
+    std::shared_ptr<Mesh> m_mesh;
     explicit MainWindow(QWidget *parent = 0);
     ~MainWindow();
 
@@ -40,12 +41,11 @@ private:
     Ui::MainWindow ui;
     std::shared_ptr<MeshConfig> m_mesh_config;
 
-    std::shared_ptr<Mesh> m_mesh;
     std::shared_ptr<std::unordered_map<Face_Hash, glm::vec3>> m_voronoi_pts;
 
     void switch_dimension();
     void update_voronoi_vertices();
-    void set_mesh(const Mesh &mesh);
+    void set_mesh(const std::shared_ptr<Mesh>& mesh);
     // Insert vertices forming a bounding triangle. They will surround vertices
     // that will be inserted afterwards.
     void build_convex_hull();

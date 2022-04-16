@@ -3,8 +3,9 @@
 
 #include <glm/glm.hpp>
 
+#include "meshes/Mesh2D.h"
 
-class Mesh2D;
+
 class Face;
 class Vertex;
 
@@ -14,7 +15,7 @@ namespace delaunay {
     // Split a triangle in three triangles, with the new point inserted inside
     Vertex* split_triangle(Mesh2D *mesh, glm::vec3 &point, Face *face);
     void rearrange_around_vertex(Mesh2D *mesh, Vertex *vtx);
-    Vertex* insert_vertex(Mesh2D *mesh, glm::vec3 p);
+    Vertex* insert_vertex(Mesh2D &mesh, glm::vec3 p);
 }
 
 #endif  // DELAUNAY_H
