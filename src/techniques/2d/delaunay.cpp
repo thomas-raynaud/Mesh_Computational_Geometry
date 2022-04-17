@@ -128,7 +128,7 @@ void rearrange_around_vertex(Mesh2D *mesh, Vertex *vtx) {
             if (*(face_vts[i]) == *vtx) {
                 // bc = applicant edge for flip
                 b = face_vts[(i + 1) % 3]->get_position();
-                c = face_vts[(i + 1) % 3]->get_position();
+                c = face_vts[(i + 2) % 3]->get_position();
                 // f2 = triangle opposite to a
                 f2 = f1->get_adjacent_faces()[i];
                 break;

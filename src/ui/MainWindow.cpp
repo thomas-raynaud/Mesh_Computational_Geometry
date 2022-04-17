@@ -11,17 +11,13 @@
 #include "techniques/3d/curvature.h"
 
 
-#include <iostream>
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
     ui()
 {
-    std::cout << "start constructor main window" << std::endl;
     ui.setupUi(this);
-    std::cout << "ui setup" << std::endl;
 
     MeshConfig mesh_config;
-    std::cout << "mesh config" << std::endl;
     mesh_config.dimension = Dimension::D2;
     mesh_config.mesh_display_type = MeshDisplayType::PlainFaces;
     mesh_config.algorithm_2d_type = Algorithm2DType::Delaunay;
@@ -29,24 +25,16 @@ MainWindow::MainWindow(QWidget *parent) :
     mesh_config.parabola_type = ParabolaType::EllipticParaboloid;
     mesh_config.color_display_type = ColorDisplayType::MeanCurvature;
     mesh_config.mesh_3d_type = Mesh3DType::Tetrahedron;
-    std::cout << "parameters" << std::endl;
     m_mesh_config = std::make_shared<MeshConfig>(mesh_config);    
 
-    std::cout << "config shared ptr" << std::endl;
     ui.d3_groupbox->hide();
     ui.parabola_widget->hide();
     ui.ruppert_widget->hide();
 
-    std::cout << "hide widgets" << std::endl;
     set_mesh(std::make_shared<Mesh2D>());
-    std::cout << "set mesh" << std::endl;
     build_convex_hull();
-    std::cout << "build convex hull mesh" << std::endl;
     update_voronoi_vertices();
-    std::cout << *m_mesh << std::endl;
-    std::cout << "update voronoi vertices" << std::endl;
     ui.scene->set_mesh_config(m_mesh_config);
-    std::cout << "set mesh config" << std::endl;
 }
 
 MainWindow::~MainWindow() {}
@@ -90,26 +78,16 @@ void MainWindow::update_voronoi_vertices() {
 }
 
 void MainWindow::set_mesh(const std::shared_ptr<Mesh>& mesh) {
-    std::cout << "inside set mesh" << std::endl;
     m_mesh = mesh;
     ui.scene->set_mesh(m_mesh);
-    std::cout << "end inside set mesh" << std::endl;
 }
 
 void MainWindow::build_convex_hull() {
-    std::cout << "inside build convex hull" << std::endl;
     std::shared_ptr<Mesh2D> sp_mesh = std::dynamic_pointer_cast<Mesh2D>(m_mesh);
-    std::cout << *sp_mesh << std::endl;
     Mesh2D *mesh = sp_mesh.get();
-    std::cout << *mesh << std::endl;
-    std::cout << *sp_mesh << std::endl;
-    std::cout << "..." << std::endl;
     delaunay::insert_vertex(*sp_mesh, glm::vec3(-1, -1, 0));
-    std::cout << "b" << std::endl;
     delaunay::insert_vertex(*mesh, glm::vec3( 1, -1, 0));
-    std::cout << "c" << std::endl;
     delaunay::insert_vertex(*mesh, glm::vec3( 0,  1, 0));
-    std::cout << "end inside build convex hull" << std::endl;
 }
 
 void MainWindow::on_radio_button_2d_released() {
