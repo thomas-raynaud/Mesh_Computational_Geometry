@@ -50,6 +50,7 @@ void MainWindow::switch_dimension() {
             ui.d3_groupbox->hide();
             ui.parabola_widget->hide();
             ui.ruppert_widget->hide();
+            ui.d2_groupbox->show();
             m_mesh_config->algorithm_2d_type = Algorithm2DType::Delaunay;
             m_mesh_config->show_voronoi_display = false;
             set_mesh(std::make_shared<Mesh2D>());
@@ -58,6 +59,7 @@ void MainWindow::switch_dimension() {
         }
         else {
             ui.d2_groupbox->hide();
+            ui.d3_groupbox->show();
             m_mesh_config->show_voronoi_display = false;
             m_mesh_config->mesh_3d_type = Mesh3DType::Tetrahedron;
             set_mesh(std::make_shared<Tetrahedron>());

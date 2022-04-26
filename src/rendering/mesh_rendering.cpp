@@ -82,7 +82,7 @@ void draw_voronoi_wireframe(
             vtx_it != mesh->vertices_end();
             ++vtx_it
     ) {
-        if (mesh->is_vertex_fictive(*vtx_it)) continue;
+        if (!mesh->is_vertex_visible(*vtx_it)) continue;
         fc_begin = mesh->incident_faces(*vtx_it);
         fc = fc_begin;
         do {

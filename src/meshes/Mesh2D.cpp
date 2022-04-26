@@ -78,8 +78,8 @@ std::ostream& operator<<(std::ostream &strm, const Mesh2D &mesh) {
     std::string type_str;
     VertexConstIteratorType vertex_it;
     FaceConstIteratorType face_it;
-    Vertex v;
-    Face f;
+    const Vertex *v;
+    const Face *f;
     glm::vec3 pos;
     std::array<Vertex*, 3> face_vts;
     std::array<Face*, 3> adj_faces;
@@ -87,34 +87,34 @@ std::ostream& operator<<(std::ostream &strm, const Mesh2D &mesh) {
             vertex_it != mesh.m_vertices.end();
             ++vertex_it
     ) {
-        v = vertex_it->second;
-        if (mesh.is_vertex_fictive(v))
+        v = &vertex_it->second;
+        if (mesh.is_vertex_fictive(*v))
             type_str = " (fictive)";
-        else if (!mesh.is_vertex_visible(v))
+        else if (!mesh.is_vertex_visible(*v))
             type_str = " (hidden)";
         else
             type_str = "";
-        pos = v.get_position();
-        strm << v.get_hash() << ": ";
+        pos = v->get_position();
+        strm << v->get_hash() << ": ";
         strm << pos.x << " " << pos.y << " " << pos.z;
         strm << type_str;
-        strm << " - f=" << v.get_incident_face()->get_hash() << std::endl;
+        strm << " - f=" << v->get_incident_face()->get_hash() << std::endl;
     }
     strm << "Faces:" << std::endl;
     for (   face_it = mesh.m_faces.begin();
             face_it != mesh.m_faces.end();
             ++face_it
     ) {
-        f = face_it->second;
-        if (mesh.is_face_fictive(f))
+        f = &face_it->second;
+        if (mesh.is_face_fictive(*f))
             type_str = " (fictive)";
-        else if (!mesh.is_face_visible(f))
+        else if (!mesh.is_face_visible(*f))
             type_str = " (hidden)";
         else
             type_str = "";
-        face_vts = f.get_vertices();
-        adj_faces = f.get_adjacent_faces();
-        strm << f.get_hash()  << type_str << ": " << std::endl;
+        face_vts = f->get_vertices();
+        adj_faces = f->get_adjacent_faces();
+        strm << f->get_hash()  << type_str << ": " << std::endl;
         strm << "    v: "   << face_vts[0]->get_hash() << " "
                             << face_vts[1]->get_hash() << " "
                             << face_vts[2]->get_hash() << std::endl;

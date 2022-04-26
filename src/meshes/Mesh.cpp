@@ -185,11 +185,17 @@ FaceCirculator Mesh::incident_faces(const Vertex &v) {
         // Opposite vertex is the next index.
         if (current_face == nullptr) return FaceCirculator();
         face_vts = current_face->get_vertices();
+        opposite_vertex_ind = -1;
         for (size_t v_ind = 0; v_ind < 3; ++v_ind) {
             if (*face_vts[v_ind] == v) {
                 opposite_vertex_ind = (v_ind + 1) % 3;
                 break;
             }
+        }
+        if (opposite_vertex_ind == -1) {
+            std::cerr   << "Error in Mesh::incident_faces: "
+                        << "mesh data is incorrect." << std::endl;
+            exit(0);
         }
         incident_faces.push_back(current_face);
         current_face = current_face->get_adjacent_faces()[opposite_vertex_ind];
@@ -271,8 +277,8 @@ std::ostream& operator<<(std::ostream &strm, const Mesh &mesh) {
     strm << "Vertices:" << std::endl;
     VertexConstIteratorType vertex_it;
     FaceConstIteratorType face_it;
-    Vertex v;
-    Face f;
+    const Vertex *v;
+    const Face *f;
     glm::vec3 pos;
     std::array<Vertex*, 3> face_vts;
     std::array<Face*, 3> adj_faces;
@@ -280,21 +286,21 @@ std::ostream& operator<<(std::ostream &strm, const Mesh &mesh) {
             vertex_it != mesh.m_vertices.end();
             ++vertex_it
     ) {
-        v = vertex_it->second;
-        pos = v.get_position();
-        strm << v.get_hash() << ": ";
+        v = &vertex_it->second;
+        pos = v->get_position();
+        strm << v->get_hash() << ": ";
         strm << pos.x << " " << pos.y << " " << pos.z;
-        strm << " - f=" << v.get_incident_face()->get_hash() << std::endl;
+        strm << " - f=" << v->get_incident_face()->get_hash() << std::endl;
     }
     strm << "Faces:" << std::endl;
     for (   face_it = mesh.m_faces.begin();
             face_it != mesh.m_faces.end();
             ++face_it
     ) {
-        f = face_it->second;
-        face_vts = f.get_vertices();
-        adj_faces = f.get_adjacent_faces();
-        strm << f.get_hash() << std::endl;
+        f = &face_it->second;
+        face_vts = f->get_vertices();
+        adj_faces = f->get_adjacent_faces();
+        strm << f->get_hash() << std::endl;
         strm << "    v: "   << face_vts[0]->get_hash() << " "
                             << face_vts[1]->get_hash() << " "
                             << face_vts[2]->get_hash() << std::endl;

@@ -87,7 +87,7 @@ Vertex* split_triangle(Mesh2D *mesh, glm::vec3 &point, Face *face) {
         if (*adj_face_vts[i] != *face_vts[1] &&
             *adj_face_vts[i] != *face_vts[2]
         ) {
-            adj_faces[2]->set_adjacent_face(i, fb);
+            adj_faces[0]->set_adjacent_face(i, fb);
             break;
         }
     }
@@ -250,7 +250,7 @@ Vertex* insert_vertex(Mesh2D &mesh, glm::vec3 p) {
         for (size_t i = 0; i < rand_face_ind; ++i) {
             ++face_it;
         }
-        //std::advance(face_it, rand() % mesh->get_nb_faces());
+        // TODO: std::advance(face_it, rand() % mesh.get_nb_faces());
         while (mesh.is_face_fictive(*face_it)) ++face_it;
         Face *face = &*face_it;
         do {
