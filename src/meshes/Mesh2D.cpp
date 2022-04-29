@@ -12,40 +12,41 @@ Mesh2D::Mesh2D() {
     Vertex *vc = add_vertex(glm::vec3( MAX_DIST,  MAX_DIST, 0.f));
     Vertex *inf_vtx = add_vertex(glm::vec3(0.f, 0.f, -1.f));
     m_infinite_vertex = inf_vtx->get_hash();
-    m_hidden_vertices.insert({
-        va->get_hash(),
-        vb->get_hash(),
-        vc->get_hash(),
-        inf_vtx->get_hash()
-    });
-    Face *fa = Mesh::add_face({ va, vb,         vc      });
-    Face *fb = Mesh::add_face({ vb, inf_vtx,    vc      });
-    Face *fc = Mesh::add_face({ va, vc,         inf_vtx });
-    Face *fd = Mesh::add_face({ va, inf_vtx,    vb      });
+    Face *fa = add_face({ va, vb,         vc      });
+    Face *fb = add_face({ vb, inf_vtx,    vc      });
+    Face *fc = add_face({ va, vc,         inf_vtx });
+    Face *fd = add_face({ va, inf_vtx,    vb      });
     va->set_incident_face(fa);
     vb->set_incident_face(fa);
     vc->set_incident_face(fa);
     inf_vtx->set_incident_face(fb);
     connect_adjacent_faces();
+    update_hidden_vertices();
 }
 
 Mesh2D::~Mesh2D() {}
 
 
+void Mesh2D::update_hidden_vertices() {
+    Vertex inf_vtx = m_vertices[m_infinite_vertex];
+    FaceCirculator fc_begin = incident_faces(inf_vtx);
+    FaceCirculator fc = fc_begin;
+    std::array<Vertex*, 3> vts;
+    m_hidden_vertices.clear();
+    m_hidden_vertices.insert(m_infinite_vertex);
+    do {
+        vts = fc->get_vertices();
+        for (int i = 0; i < 3; ++i) {
+            m_hidden_vertices.insert(vts[i]->get_hash());
+        }
+        ++fc;
+    } while (fc_begin != fc);
+
+}
+
 Vertex* Mesh2D::get_infinite_vertex() {
     return &m_vertices[m_infinite_vertex];
 }
-
-Face* Mesh2D::add_face(std::array<Vertex*, 3> face_vts) {
-    // Order the vertices in the trigonometrical direction
-    glm::vec3 a = face_vts[0]->get_position();
-    glm::vec3 b = face_vts[1]->get_position();
-    glm::vec3 c = face_vts[2]->get_position();
-    if (test_orientation(a, b, c) < 0.f)
-        std::swap(face_vts[0], face_vts[1]);
-    return Mesh::add_face(face_vts);
-}
-
 
 bool Mesh2D::is_vertex_fictive(const Vertex &vtx) const {
     return m_infinite_vertex == vtx.get_hash();

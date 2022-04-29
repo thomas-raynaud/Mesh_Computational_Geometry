@@ -1,6 +1,7 @@
 #include "Scene.h"
 
 #include <glm/gtc/matrix_transform.hpp>
+#include <GL/glu.h>
 
 #include "rendering/mesh_rendering.h"
 
@@ -9,9 +10,7 @@ Scene::Scene(QWidget *parent) : QGLWidget(parent) {
     // Update the scene
     connect(&m_timer, SIGNAL(timeout()), this, SLOT(updateGL()));
     m_timer.start(16);
-    m_x = 0.f;
-    m_y = 0.f;
-    m_z = 0.f;
+    m_zoom = 0.f;
     m_x_angle = 0.f;
     m_y_angle = 0.f;
 }
@@ -35,10 +34,14 @@ void Scene::paintGL() {
     // Center the camera
     glMatrixMode(GL_MODELVIEW);
     glLoadIdentity();
-    glm::lookAt(glm::vec3(0,0,5), glm::vec3(0,0,0), glm::vec3(0,1,0));
+    gluLookAt(
+        0,0,5,
+        0,0,0,
+        0,1,0
+    );
 
     // Translation
-    glTranslated(m_x, m_y, m_z);
+    glTranslated(m_center.x, m_center.y, m_center.z + m_zoom);
 
     // Rotation
     glRotatef(m_y_angle, 1.0, 0.0, 0.0f);
@@ -65,7 +68,16 @@ void Scene::paintGL() {
                             break;
                     }
                 case Algorithm2DType::Crust:
-                    draw_mesh_wireframe_faces_color((MeshCrust*)&*mesh);
+                    switch(mesh_config->mesh_display_type) {
+                            case MeshDisplayType::PlainFaces:
+                                draw_mesh_faces_colors((Mesh2D*)&*mesh);
+                                break;
+                            case MeshDisplayType::Wireframe:
+                                draw_mesh_wireframe_faces_color(
+                                    (MeshCrust*)&*mesh
+                                );
+                                break;
+                    }
                     break;
                 case Algorithm2DType::Ruppert:
                     draw_mesh_wireframe_faces_color((MeshRuppert*)&*mesh);
@@ -76,7 +88,10 @@ void Scene::paintGL() {
                             draw_mesh_faces_colors((Mesh2D*)&*mesh);
                             break;
                         case MeshDisplayType::Wireframe:
-                            draw_mesh_wireframe_faces_color((Mesh2D*)&*mesh);
+                            draw_mesh_wireframe_faces_color(
+                                (Mesh2D*)&*mesh,
+                                mesh_config->show_voronoi_display
+                            );
                             break;
                     }
             }
@@ -105,13 +120,7 @@ void Scene::resizeGL(int width, int height) {
     glViewport(0, 0, width, height);
     glMatrixMode(GL_PROJECTION);
     glLoadIdentity();
-    glm::perspective(
-        glm::radians(45.0f),
-        (GLfloat)width/(GLfloat)height,
-        0.1f,
-        100.0f
-    );
-
+    gluPerspective(45.0f, (GLfloat)width/(GLfloat)height, 0.1f, 100.0f);
     updateGL();
 }
 
@@ -158,8 +167,8 @@ void Scene::wheelEvent(QWheelEvent *event) {
     QPoint numDegrees = event->angleDelta();
     double step_zoom = 0.25;
     if (!numDegrees.isNull()) {
-      m_z = (numDegrees.x() > 0 || numDegrees.y() > 0) ? 
-                m_z + step_zoom :
-                m_z - step_zoom;
+      m_zoom = (numDegrees.x() > 0 || numDegrees.y() > 0) ? 
+                m_zoom + step_zoom :
+                m_zoom - step_zoom;
     }
 }

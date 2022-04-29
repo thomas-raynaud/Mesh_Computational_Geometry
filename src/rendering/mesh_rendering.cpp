@@ -78,6 +78,7 @@ void draw_voronoi_wireframe(
     glm::vec3 color(1, 0, 0);
     glm::vec3 p;
     Face *f1, *f2;
+    glColor3d(0.9, 0.1, 0.6);
     for (   vtx_it = mesh->vertices_begin();
             vtx_it != mesh->vertices_end();
             ++vtx_it
@@ -89,8 +90,9 @@ void draw_voronoi_wireframe(
             f1 = &*fc;
             ++fc;
             f2 = &*fc;
-            if (!mesh->is_face_visible(*f1) || !mesh->is_face_visible(*f2))
+            if (!mesh->is_face_visible(*f1) || !mesh->is_face_visible(*f2)) {
                 continue;
+            }
             glBegin(GL_LINE_STRIP);
             p = voronoi_pts[f1->get_hash()];
             glVertex3f(p.x, p.y, p.z);
@@ -133,11 +135,34 @@ void draw_mesh_faces_colors(Mesh2D *mesh) {
     }
 }
 
-void draw_mesh_wireframe_faces_color(Mesh2D *mesh) {
+void draw_mesh_faces_color(MeshCrust *mesh) {
     FaceIterator face_it;
+    std::array<Vertex*, 3> face_vts;
+    Vertex *v1, *v2;
+    bool skip_face;
     for (face_it = mesh->faces_begin(); face_it != mesh->faces_end(); ++face_it) {
         if (!mesh->is_face_visible(*face_it)) continue;
+        skip_face = false;
+        face_vts = face_it->get_vertices();
+        for (size_t i = 0; i < 3; ++i) {
+            if (mesh->is_voronoi_vertex(*face_vts[i])) {
+                skip_face = true;
+                break;
+            }
+        }
+        if (skip_face) continue;
         draw_wireframe_face(*face_it, face_it->get_color());
+    }
+}
+
+void draw_mesh_wireframe_faces_color(Mesh2D *mesh, bool show_voronoi) {
+    FaceIterator face_it;
+    glm::vec3 color = glm::vec3(0, 1, 0);
+    for (face_it = mesh->faces_begin(); face_it != mesh->faces_end(); ++face_it) {
+        if (!mesh->is_face_visible(*face_it)) continue;
+        if (!show_voronoi)
+            color = face_it->get_color();
+        draw_wireframe_face(*face_it, color);
     }
 }
 

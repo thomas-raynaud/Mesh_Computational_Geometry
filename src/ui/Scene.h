@@ -31,6 +31,8 @@ public:
     );
     void set_mesh_config(std::shared_ptr<MeshConfig> &mesh_config);
 
+    void center_camera();
+
 
     // Display plain faces or wireframe
     void switch_display_type();
@@ -61,8 +63,9 @@ protected:
 
 private:
     QTimer m_timer;             // Timer to update the scene
-    float m_x, m_y, m_z;        // Translation
+    float m_zoom;               // Distance to the center point
     float m_x_angle, m_y_angle; // Rotation
+    glm::vec3 m_center;         // Center of the orbit-camera
 
     QPoint m_last_mouse_pos;    // To keep the last position of the mouse
 

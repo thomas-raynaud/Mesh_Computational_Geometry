@@ -29,7 +29,8 @@ void draw_mesh_faces_colors(Mesh *mesh);
 void draw_mesh_wireframe_vertices_color(Mesh *mesh);
 void draw_mesh_wireframe_faces_color(Mesh *mesh);
 void draw_mesh_faces_colors(Mesh2D *mesh);
-void draw_mesh_wireframe_faces_color(Mesh2D *mesh);
+void draw_mesh_faces_colors(MeshCrust *mesh);
+void draw_mesh_wireframe_faces_color(Mesh2D *mesh, bool show_voronoi=false);
 void draw_mesh_wireframe_faces_color(MeshCrust *mesh);
 void draw_mesh_wireframe_faces_color(MeshRuppert *mesh);
 

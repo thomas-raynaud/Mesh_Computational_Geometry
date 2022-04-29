@@ -72,6 +72,8 @@ find_package(OpenGL COMPONENTS ${OpenGL_COMPONENT} REQUIRED)
 # Configure GLM
 find_package(glm REQUIRED)
 
+find_package(GLU REQUIRED)
+
 # Configure Qt
 set(QT_VERSION 5.12.8)
 set(QT_COMPONENT
@@ -106,6 +108,8 @@ foreach(_comp ${OpenGL_COMPONENT})
 endforeach()
 
 target_link_libraries(${PROJECT_NAME} PRIVATE glm::glm)
+
+target_link_libraries(${PROJECT_NAME} PRIVATE GLU)
 
 foreach(_comp ${QT_COMPONENT})
     target_link_libraries(${PROJECT_NAME} PRIVATE Qt5::${_comp} )

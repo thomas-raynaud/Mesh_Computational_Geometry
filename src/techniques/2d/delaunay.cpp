@@ -180,6 +180,7 @@ Vertex* insert_vertex(Mesh2D &mesh, glm::vec3 p) {
     } while (fc != fc_begin && face_split == nullptr);
 
     if (face_split != nullptr) {    // Outside the convex hull
+        // TODO: update hidden vertices
         new_vtx = split_triangle(&mesh, p, face_split);
         // Flip fictive edges if they are incident to another fictive face.
         fc_begin = mesh.incident_faces(*inf_vtx);
@@ -240,6 +241,7 @@ Vertex* insert_vertex(Mesh2D &mesh, glm::vec3 p) {
             }
             else edge_visible = false;
         }
+        mesh.update_hidden_vertices();
     }
     else {
         // The point is in the convex hull. Find in which face it is located.

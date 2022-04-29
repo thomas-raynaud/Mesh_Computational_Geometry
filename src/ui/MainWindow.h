@@ -43,6 +43,7 @@ private:
 
     std::shared_ptr<std::unordered_map<Face_Hash, glm::vec3>> m_voronoi_pts;
 
+    void set_voronoi_display(bool display);
     void switch_dimension();
     void update_voronoi_vertices();
     void set_mesh(const std::shared_ptr<Mesh>& mesh);

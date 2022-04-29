@@ -10,6 +10,8 @@ std::unordered_map<Face_Hash, glm::vec3> build_voronoi(Mesh2D *mesh) {
     std::array<Vertex*, 3> face_vts;
     glm::vec3 face_center;
     for (face_it = mesh->faces_begin(); face_it != mesh->faces_end(); ++face_it) {
+        if (!mesh->is_face_visible(*face_it))
+            continue;
         face_vts = face_it->get_vertices();
         face_center = compute_circumcenter(
             face_vts[0]->get_position(),

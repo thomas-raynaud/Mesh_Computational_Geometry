@@ -23,6 +23,7 @@ MeshCrust::MeshCrust() : Mesh2D() {
         m_is_voronoi_vertex[vtx->get_hash()] = false;
         iss.clear();
     }
+    update_hidden_vertices();
 
     // Insert the Voronoi centers in the mesh
     std::unordered_map<Face_Hash, glm::vec3> voronoi_vts = build_voronoi(this);

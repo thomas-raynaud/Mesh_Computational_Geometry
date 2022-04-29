@@ -30,6 +30,7 @@ MainWindow::MainWindow(QWidget *parent) :
     ui.d3_groupbox->hide();
     ui.parabola_widget->hide();
     ui.ruppert_widget->hide();
+    ui.voronoi_display_push_button->setDisabled(true);
 
     set_mesh(std::make_shared<Mesh2D>());
     build_convex_hull();
@@ -92,6 +93,14 @@ void MainWindow::build_convex_hull() {
     delaunay::insert_vertex(*mesh, glm::vec3( 0,  1, 0));
 }
 
+void MainWindow::set_voronoi_display(bool display) {
+    m_mesh_config->show_voronoi_display = display;
+    if (m_mesh_config->show_voronoi_display) 
+        ui.voronoi_display_push_button->setText("Hide Voronoi wireframe");
+    else
+        ui.voronoi_display_push_button->setText("Show Voronoi wireframe");
+}
+
 void MainWindow::on_radio_button_2d_released() {
     switch_dimension();
 }
@@ -107,9 +116,12 @@ void MainWindow::on_display_type_push_button_released() {
     );
     if (m_mesh_config->mesh_display_type == MeshDisplayType::PlainFaces) {
         ui.display_type_push_button->setText("Show wireframe");
+        ui.voronoi_display_push_button->setDisabled(true);
+        set_voronoi_display(false);
     }
     else {
         ui.display_type_push_button->setText("Show plain faces");
+        ui.voronoi_display_push_button->setDisabled(false);
     }
 }
 
@@ -140,11 +152,7 @@ void MainWindow::on_algorithm_type_combobox_currentIndexChanged(int index) {
 }
 
 void MainWindow::on_voronoi_display_push_button_released() {
-    m_mesh_config->show_voronoi_display = !m_mesh_config->show_voronoi_display;
-    if (m_mesh_config->show_voronoi_display) 
-        ui.voronoi_display_push_button->setText("Hide Voronoi wireframe");
-    else
-        ui.voronoi_display_push_button->setText("Show Voronoi wireframe");
+    set_voronoi_display(!m_mesh_config->show_voronoi_display);
 }
 
 void MainWindow::on_insert_points_push_button_released() {
@@ -157,8 +165,7 @@ void MainWindow::on_insert_points_push_button_released() {
         glm::vec3 p(rand_x, rand_y, 0);
         delaunay::insert_vertex(*sp_mesh, p);
     }
-    compute_laplacians((Mesh3D*)m_mesh.get());
-    set_curvature_colors((Mesh3D*)m_mesh.get(), m_mesh_config->color_display_type);
+    update_voronoi_vertices();
 }
 
 void MainWindow::on_parabola_type_combobox_currentIndexChanged(int index) {
