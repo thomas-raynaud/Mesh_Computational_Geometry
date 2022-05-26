@@ -70,6 +70,29 @@ bool Mesh2D::is_face_visible(const Face &face) const {
             is_vertex_visible(*face_vts[2]);
 }
 
+BoundingBox Mesh2D::get_bounding_box() {
+    BoundingBox bb;
+    std::unordered_map<Vertex_Hash, Vertex>::iterator vtx_it;
+    vtx_it = m_vertices.begin();
+    while (vtx_it != m_vertices.end() && !is_vertex_visible(vtx_it->second)) {
+        ++vtx_it;
+    }
+    if (vtx_it == m_vertices.end()) {
+        return Mesh::get_bounding_box();
+    }
+    else {
+        bb.min = vtx_it->second.get_position();
+        bb.max = vtx_it->second.get_position();
+        for (vtx_it = m_vertices.begin(); vtx_it != m_vertices.end(); ++vtx_it) {
+            if (!is_vertex_visible(vtx_it->second))
+                continue;
+            bb.min = glm::min(bb.min, vtx_it->second.get_position());
+            bb.max = glm::max(bb.max, vtx_it->second.get_position());
+        }
+        return bb;
+    }
+}
+
 
 std::ostream& operator<<(std::ostream &strm, const Mesh2D &mesh) {
     strm << "===============" << std::endl;

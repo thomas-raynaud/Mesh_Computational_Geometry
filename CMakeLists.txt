@@ -23,6 +23,10 @@ set(
     ${CMAKE_SOURCE_DIR}/src/meshes/Mesh3D.cpp
 )
 set(
+    CAMERA_SOURCES
+    ${CMAKE_SOURCE_DIR}/src/camera/OrbitCamera.cpp
+)
+set(
     RENDERING_SOURCES
     ${CMAKE_SOURCE_DIR}/src/rendering/mesh_rendering.cpp
 )
@@ -48,6 +52,7 @@ set(SOURCES
     ${CMAKE_SOURCE_DIR}/src/ui/MainWindow.cpp
     ${CMAKE_SOURCE_DIR}/src/ui/Scene.cpp
     ${MESH_SOURCES}
+    ${CAMERA_SOURCES}
     ${RENDERING_SOURCES}
     ${TECHNIQUES_SOURCES}
     ${UTIL_SOURCES}
@@ -71,8 +76,6 @@ find_package(OpenGL COMPONENTS ${OpenGL_COMPONENT} REQUIRED)
 
 # Configure GLM
 find_package(glm REQUIRED)
-
-find_package(GLU REQUIRED)
 
 # Configure Qt
 set(QT_VERSION 5.12.8)
@@ -108,8 +111,6 @@ foreach(_comp ${OpenGL_COMPONENT})
 endforeach()
 
 target_link_libraries(${PROJECT_NAME} PRIVATE glm::glm)
-
-target_link_libraries(${PROJECT_NAME} PRIVATE GLU)
 
 foreach(_comp ${QT_COMPONENT})
     target_link_libraries(${PROJECT_NAME} PRIVATE Qt5::${_comp} )

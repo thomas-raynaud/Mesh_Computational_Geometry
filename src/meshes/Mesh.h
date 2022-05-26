@@ -6,6 +6,7 @@
 
 #include "Vertex.h"
 #include "Face.h"
+#include "utils/BoundingBox.h"
 
 
 class FaceIterator;
@@ -30,6 +31,7 @@ public:
 
     int get_nb_vertices();
     int get_nb_faces();
+    virtual BoundingBox get_bounding_box();
 
     Vertex* add_vertex(glm::vec3 pos);
     virtual Face* add_face(std::array<Vertex*, 3> face_vts);

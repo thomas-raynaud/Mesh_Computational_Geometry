@@ -10,6 +10,9 @@
 #include "meshes/Vertex.h"
 #include "meshes/Mesh.h"
 #include "MeshConfig.h"
+#include "camera/OrbitCamera.h"
+
+#define   ZOOM_SENSITIVITY 0.25 // Zoom sensitivity
 
 
 class Mesh;
@@ -63,11 +66,13 @@ protected:
 
 private:
     QTimer m_timer;             // Timer to update the scene
-    float m_zoom;               // Distance to the center point
-    float m_x_angle, m_y_angle; // Rotation
-    glm::vec3 m_center;         // Center of the orbit-camera
+    float m_height;
+    float m_width;
+    float m_fov;
+    glm::mat4 m_projection;
+    OrbitCamera m_camera;
 
-    QPoint m_last_mouse_pos;    // To keep the last position of the mouse
+    QPoint m_last_mouse_pos;    // Used to compute the rotation of the camera
 
     /**
      * The object to be displayed, may be replaced by a scene if there
@@ -76,6 +81,8 @@ private:
     std::weak_ptr<Mesh> m_mesh;
     std::weak_ptr<std::unordered_map<Face_Hash, glm::vec3>> m_voronoi_pts;
     std::weak_ptr<MeshConfig> m_mesh_config;
+
+    void update_view_matrix();
 };
 
 #endif  // SCENE_H

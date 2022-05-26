@@ -20,6 +20,19 @@ int Mesh::get_nb_faces() {
     return m_faces.size();
 }
 
+BoundingBox Mesh::get_bounding_box() {
+    BoundingBox bb;
+    std::unordered_map<Vertex_Hash, Vertex>::iterator vtx_it;
+    vtx_it = m_vertices.begin();
+    bb.min = vtx_it->second.get_position();
+    bb.max = vtx_it->second.get_position();
+    for (vtx_it = m_vertices.begin(); vtx_it != m_vertices.end(); ++vtx_it) {
+        bb.min = glm::min(bb.min, vtx_it->second.get_position());
+        bb.max = glm::max(bb.max, vtx_it->second.get_position());
+    }
+    return bb;
+}
+
 
 void Mesh::connect_adjacent_faces() {
     std::unordered_map<Edge_Hash, Edge> edges; // Edges of the mesh

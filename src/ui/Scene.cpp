@@ -1,7 +1,6 @@
 #include "Scene.h"
 
 #include <glm/gtc/matrix_transform.hpp>
-#include <GL/glu.h>
 
 #include "rendering/mesh_rendering.h"
 
@@ -10,9 +9,8 @@ Scene::Scene(QWidget *parent) : QGLWidget(parent) {
     // Update the scene
     connect(&m_timer, SIGNAL(timeout()), this, SLOT(updateGL()));
     m_timer.start(16);
-    m_zoom = 0.f;
-    m_x_angle = 0.f;
-    m_y_angle = 0.f;
+    m_projection = glm::mat4(1.0);
+    m_fov = 90.f;
 }
 
 Scene::~Scene() {}
@@ -30,23 +28,6 @@ void Scene::initializeGL() {
 
 void Scene::paintGL() {
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-
-    // Center the camera
-    glMatrixMode(GL_MODELVIEW);
-    glLoadIdentity();
-    gluLookAt(
-        0,0,5,
-        0,0,0,
-        0,1,0
-    );
-
-    // Translation
-    glTranslated(m_center.x, m_center.y, m_center.z + m_zoom);
-
-    // Rotation
-    glRotatef(m_y_angle, 1.0, 0.0, 0.0f);
-    glRotatef(m_x_angle, 0.0, 1.0, 0.0f);
-    glRotatef(0, 0.0, 1.0, 0.0f);
 
     // Color for your mesh
     glColor3f(0, 1 ,0);
@@ -117,15 +98,36 @@ void Scene::paintGL() {
 
 
 void Scene::resizeGL(int width, int height) {
+    m_width = width;
+    m_height = height;
     glViewport(0, 0, width, height);
     glMatrixMode(GL_PROJECTION);
-    glLoadIdentity();
-    gluPerspective(45.0f, (GLfloat)width/(GLfloat)height, 0.1f, 100.0f);
+    glm::perspective(m_fov / 2.f, (float)width/height, 0.1f, 100.0f);
+    glLoadMatrixf(&m_projection[0].x);
     updateGL();
 }
 
 void Scene::set_mesh(std::shared_ptr<Mesh> &mesh) {
     m_mesh = mesh;
+    BoundingBox bb = mesh->get_bounding_box();
+
+    // Place camera and ensure the mesh's bounding box is entirely visible.
+    glm::vec3 pivot_point(
+        -(bb.min.x + bb.max.x) / 2.f,
+        -(bb.min.x + bb.max.x) / 2.f,
+        -(bb.min.x + bb.max.x) / 2.f
+    );
+
+    float bb_width = bb.max.x - bb.min.x;
+    float bb_height = bb.max.y - bb.min.y;
+    float dist;
+    if (m_height * bb_height > m_width * bb_width)
+        dist = (bb_height / 2.f) / (m_fov / 2.f);
+    else
+        dist = (bb_width / 2.f) / (m_fov / 2.f);
+
+    m_camera.initialize_position(pivot_point, dist);
+    update_view_matrix();
 }
 
 void Scene::set_voronoi_points(
@@ -136,6 +138,12 @@ void Scene::set_voronoi_points(
 
 void Scene::set_mesh_config(std::shared_ptr<MeshConfig> &mesh_config) {
     m_mesh_config = mesh_config;
+}
+
+void Scene::update_view_matrix() {
+    glMatrixMode(GL_MODELVIEW);
+    glm::mat4 view = m_camera.get_view_matrix();
+    glLoadMatrixf(&view[0].x);
 }
 
 
@@ -152,23 +160,25 @@ void Scene::mouseMoveEvent(QMouseEvent *event) {
     int dx = event->x() - m_last_mouse_pos.x();
     int dy = event->y() - m_last_mouse_pos.y();
 
-    if( event != NULL )
-    {
-        m_x_angle += dx;
-        m_y_angle += dy;
+    if( event != NULL ) {
         m_last_mouse_pos = event->pos();
+        m_camera.rotate(dx, dy);
+        update_view_matrix();
         updateGL();
     }
 }
 
 
-// Mouse Management for the zoom
+// Mouse management for the zoom
 void Scene::wheelEvent(QWheelEvent *event) {
-    QPoint numDegrees = event->angleDelta();
-    double step_zoom = 0.25;
-    if (!numDegrees.isNull()) {
-      m_zoom = (numDegrees.x() > 0 || numDegrees.y() > 0) ? 
-                m_zoom + step_zoom :
-                m_zoom - step_zoom;
+    QPoint num_degrees = event->angleDelta();
+    float zoom = ZOOM_SENSITIVITY;
+    if (!num_degrees.isNull()) {
+        if (num_degrees.x() < 0 && num_degrees.y() < 0) {
+            zoom *= -1;
+        }
+        m_camera.zoom(zoom);
+        update_view_matrix();
+        updateGL();
     }
 }
