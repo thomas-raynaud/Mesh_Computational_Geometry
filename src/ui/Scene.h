@@ -12,7 +12,8 @@
 #include "MeshConfig.h"
 #include "camera/OrbitCamera.h"
 
-#define   ZOOM_SENSITIVITY 0.25 // Zoom sensitivity
+#define   ZOOM_SENSITIVITY 0.25
+#define   MOVE_SENSITIVITY 0.25
 
 
 class Mesh;
@@ -81,8 +82,6 @@ private:
     std::weak_ptr<Mesh> m_mesh;
     std::weak_ptr<std::unordered_map<Face_Hash, glm::vec3>> m_voronoi_pts;
     std::weak_ptr<MeshConfig> m_mesh_config;
-
-    void update_view_matrix();
 };
 
 #endif  // SCENE_H

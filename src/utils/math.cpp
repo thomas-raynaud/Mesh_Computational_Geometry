@@ -45,3 +45,20 @@ float cos(const glm::vec3 &a, const glm::vec3 &b, const glm::vec3 &c) {
     else
         return glm::dot(ba, bc) / (glm::length(ba) * glm::length(bc));
 }
+
+void compute_rotation_matrix(
+    const glm::vec2 &a,
+    const glm::vec2 &b,
+    glm::mat4 &rotation_matrix
+) {
+    // TODO
+}
+
+void map_point_to_ndc_coordinates(
+    const glm::vec2 &p2,
+    const int width,
+    const int height,
+    glm::vec3 &p3
+) {
+    // TODO
+}

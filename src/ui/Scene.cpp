@@ -10,7 +10,7 @@ Scene::Scene(QWidget *parent) : QGLWidget(parent) {
     connect(&m_timer, SIGNAL(timeout()), this, SLOT(updateGL()));
     m_timer.start(16);
     m_projection = glm::mat4(1.0);
-    m_fov = 90.f;
+    m_fov = 45.f;
 }
 
 Scene::~Scene() {}
@@ -102,7 +102,7 @@ void Scene::resizeGL(int width, int height) {
     m_height = height;
     glViewport(0, 0, width, height);
     glMatrixMode(GL_PROJECTION);
-    glm::perspective(m_fov / 2.f, (float)width/height, 0.1f, 100.0f);
+    glm::perspective(glm::radians(m_fov), (float)width/(float)height, 0.1f, 100.f);
     glLoadMatrixf(&m_projection[0].x);
     updateGL();
 }
@@ -122,12 +122,12 @@ void Scene::set_mesh(std::shared_ptr<Mesh> &mesh) {
     float bb_height = bb.max.y - bb.min.y;
     float dist;
     if (m_height * bb_height > m_width * bb_width)
-        dist = (bb_height / 2.f) / (m_fov / 2.f);
+        dist = (bb_height / 2.f) / m_fov;
     else
-        dist = (bb_width / 2.f) / (m_fov / 2.f);
+        dist = (bb_width / 2.f) / m_fov;
 
     m_camera.initialize_position(pivot_point, dist);
-    update_view_matrix();
+    m_camera.update_view_matrix();
 }
 
 void Scene::set_voronoi_points(
@@ -138,12 +138,6 @@ void Scene::set_voronoi_points(
 
 void Scene::set_mesh_config(std::shared_ptr<MeshConfig> &mesh_config) {
     m_mesh_config = mesh_config;
-}
-
-void Scene::update_view_matrix() {
-    glMatrixMode(GL_MODELVIEW);
-    glm::mat4 view = m_camera.get_view_matrix();
-    glLoadMatrixf(&view[0].x);
 }
 
 
@@ -157,13 +151,13 @@ void Scene::mousePressEvent(QMouseEvent *event) {
 
 // Mouse movement management
 void Scene::mouseMoveEvent(QMouseEvent *event) {
-    int dx = event->x() - m_last_mouse_pos.x();
-    int dy = event->y() - m_last_mouse_pos.y();
+    int dx = (event->x() - m_last_mouse_pos.x()) * MOVE_SENSITIVITY;
+    int dy = (event->y() - m_last_mouse_pos.y()) * MOVE_SENSITIVITY;
 
     if( event != NULL ) {
         m_last_mouse_pos = event->pos();
         m_camera.rotate(dx, dy);
-        update_view_matrix();
+        m_camera.update_view_matrix();
         updateGL();
     }
 }
@@ -178,7 +172,7 @@ void Scene::wheelEvent(QWheelEvent *event) {
             zoom *= -1;
         }
         m_camera.zoom(zoom);
-        update_view_matrix();
+        m_camera.update_view_matrix();
         updateGL();
     }
 }
