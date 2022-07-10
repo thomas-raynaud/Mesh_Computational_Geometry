@@ -53,24 +53,24 @@ void compute_rotation_matrix(
     const glm::vec3 &b,
     glm::mat4 &rotation_matrix
 ) {
-    float theta = acos(std::min(1.f, glm::dot(a, b) / (a.length() * b.length())));
+    float theta = acos(std::min(1.f, glm::dot(a, b) / (glm::length(a) * glm::length(b))));
     glm::vec3 u = glm::normalize(glm::cross(a, b));
 
     float cos_t = cos(theta);
     float sin_t = sin(theta);
     glm::vec3 u2(pow(u.x, 2.f), pow(u.y, 2.f), pow(u.z, 2.f));
     rotation_matrix = glm::mat4(
-        u2.x + (1 - u2.x) * cos_t,
-        u.x * u.y * (1 - cos_t) - u.z * sin_t,
-        u.x * u.z * (1 - cos_t) + u.y * sin_t,
+        u2.x + (1.f - u2.x) * cos_t,
+        u.x * u.y * (1.f - cos_t) - u.z * sin_t,
+        u.x * u.z * (1.f - cos_t) + u.y * sin_t,
         0,
-        u.y * u.x * (1 - cos_t) + u.z * sin_t,
+        u.y * u.x * (1.f - cos_t) + u.z * sin_t,
         u2.y + (1 - u2.y) * cos_t,
-        u.y * u.z * (1 - cos_t) - u.x * sin_t,
+        u.y * u.z * (1.f - cos_t) - u.x * sin_t,
         0,
-        u.z * u.x * (1 - cos_t) - u.y * sin_t,
-        u.z * u.y * (1 - cos_t) + u.x * sin_t,
-        u2.z + (1 - u2.z) * cos_t,
+        u.z * u.x * (1.f - cos_t) - u.y * sin_t,
+        u.z * u.y * (1.f - cos_t) + u.x * sin_t,
+        u2.z + (1.f - u2.z) * cos_t,
         0,
         0, 0, 0, 1
     );
