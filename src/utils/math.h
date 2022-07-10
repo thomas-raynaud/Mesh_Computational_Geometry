@@ -19,8 +19,8 @@ float cos(
 );
 // Compute the rotation matrix to go from vector a to vector b
 void compute_rotation_matrix(
-    const glm::vec2 &a,
-    const glm::vec2 &b,
+    const glm::vec3 &a,
+    const glm::vec3 &b,
     glm::mat4 &rotation_matrix
 );
 

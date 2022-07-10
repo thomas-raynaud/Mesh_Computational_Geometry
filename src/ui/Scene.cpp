@@ -105,6 +105,7 @@ void Scene::resizeGL(int width, int height) {
     glm::perspective(glm::radians(m_fov), (float)width/(float)height, 0.1f, 100.f);
     glLoadMatrixf(&m_projection[0].x);
     updateGL();
+    m_camera.set_screen_dimensions(m_width, m_height);
 }
 
 void Scene::set_mesh(std::shared_ptr<Mesh> &mesh) {
@@ -125,9 +126,6 @@ void Scene::set_mesh(std::shared_ptr<Mesh> &mesh) {
         dist = (bb_height / 2.f) / m_fov;
     else
         dist = (bb_width / 2.f) / m_fov;
-
-    m_camera.initialize_position(pivot_point, dist);
-    m_camera.update_view_matrix();
 }
 
 void Scene::set_voronoi_points(
@@ -140,32 +138,38 @@ void Scene::set_mesh_config(std::shared_ptr<MeshConfig> &mesh_config) {
     m_mesh_config = mesh_config;
 }
 
-
-// - - - - - - - - - - - - Mouse Management  - - - - - - - - - - - - - - - -
-// When you click, the position of your mouse is saved
-void Scene::mousePressEvent(QMouseEvent *event) {
-    if( event != NULL )
-        m_last_mouse_pos = event->pos();
+void Scene::update_view_matrix() {
+    glMatrixMode(GL_MODELVIEW);
+    glm::mat4 view = m_camera.get_current_rotation();
+    glLoadMatrixf(&view[0].x);
 }
 
 
-// Mouse movement management
-void Scene::mouseMoveEvent(QMouseEvent *event) {
-    int dx = (event->x() - m_last_mouse_pos.x()) * MOVE_SENSITIVITY;
-    int dy = (event->y() - m_last_mouse_pos.y()) * MOVE_SENSITIVITY;
+// - - - - - - - - - - - - Mouse Management  - - - - - - - - - - - - - - - -
+void Scene::mousePressEvent(QMouseEvent *event) {
+    if( event != NULL )
+        m_camera.mouse_click(glm::vec2(event->x(), event->y()));
+}
 
+void Scene::mouseMoveEvent(QMouseEvent *event) {
     if( event != NULL ) {
-        m_last_mouse_pos = event->pos();
-        m_camera.rotate(dx, dy);
-        m_camera.update_view_matrix();
+        m_camera.mouse_motion(glm::vec2(event->x(), event->y()));
+        update_view_matrix();
         updateGL();
+    }
+}
+
+// Mouse movement management
+void Scene::mouseReleaseEvent(QMouseEvent *event) {
+    if( event != NULL ) {
+        m_camera.mouse_release();
     }
 }
 
 
 // Mouse management for the zoom
 void Scene::wheelEvent(QWheelEvent *event) {
-    QPoint num_degrees = event->angleDelta();
+    /*QPoint num_degrees = event->angleDelta();
     float zoom = ZOOM_SENSITIVITY;
     if (!num_degrees.isNull()) {
         if (num_degrees.x() < 0 && num_degrees.y() < 0) {
@@ -174,5 +178,5 @@ void Scene::wheelEvent(QWheelEvent *event) {
         m_camera.zoom(zoom);
         m_camera.update_view_matrix();
         updateGL();
-    }
+    }*/
 }

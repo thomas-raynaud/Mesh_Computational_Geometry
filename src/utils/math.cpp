@@ -1,5 +1,7 @@
 #include "math.h"
 
+#include <algorithm>
+
 
 glm::vec3 phi(const glm::vec3 &a) {
     return glm::vec3(a.x, a.y, a.x * a.x + a.y * a.y);
@@ -47,11 +49,31 @@ float cos(const glm::vec3 &a, const glm::vec3 &b, const glm::vec3 &c) {
 }
 
 void compute_rotation_matrix(
-    const glm::vec2 &a,
-    const glm::vec2 &b,
+    const glm::vec3 &a,
+    const glm::vec3 &b,
     glm::mat4 &rotation_matrix
 ) {
-    // TODO
+    float theta = acos(std::min(1.f, glm::dot(a, b) / (a.length() * b.length())));
+    glm::vec3 u = glm::normalize(glm::cross(a, b));
+
+    float cos_t = cos(theta);
+    float sin_t = sin(theta);
+    glm::vec3 u2(pow(u.x, 2.f), pow(u.y, 2.f), pow(u.z, 2.f));
+    rotation_matrix = glm::mat4(
+        u2.x + (1 - u2.x) * cos_t,
+        u.x * u.y * (1 - cos_t) - u.z * sin_t,
+        u.x * u.z * (1 - cos_t) + u.y * sin_t,
+        0,
+        u.y * u.x * (1 - cos_t) + u.z * sin_t,
+        u2.y + (1 - u2.y) * cos_t,
+        u.y * u.z * (1 - cos_t) - u.x * sin_t,
+        0,
+        u.z * u.x * (1 - cos_t) - u.y * sin_t,
+        u.z * u.y * (1 - cos_t) + u.x * sin_t,
+        u2.z + (1 - u2.z) * cos_t,
+        0,
+        0, 0, 0, 1
+    );
 }
 
 void map_point_to_ndc_coordinates(
@@ -60,5 +82,16 @@ void map_point_to_ndc_coordinates(
     const int height,
     glm::vec3 &p3
 ) {
-    // TODO
+    p3.x = std::max(std::min(p2.x, (float)width), 0.f);
+    p3.y = std::max(std::min(p2.y, (float)height), 0.f);
+    p3.x = ((p3.x * 2.f) / width) - 1.f;
+    p3.y = ((p3.y * 2.f) / height) - 1.f;
+    float x2 = pow(p3.x, 2.f);
+    float y2 = pow(p3.y, 2.f);
+    if (x2 + y2 <= 1.f) {
+        p3.z = sqrt(1.f - x2 - y2);
+    }
+    else {
+        p3.z = 0;
+    }
 }

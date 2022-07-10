@@ -18,7 +18,7 @@ void ArcballCamera::mouse_click(glm::vec2 p) {
 void ArcballCamera::mouse_motion(glm::vec2 p) {
 	map_point_to_ndc_coordinates(p, m_screen_width, m_screen_height, m_p_current);
 	compute_rotation_matrix(m_p_start, m_p_current, m_current_rotation);
-}
+	}
 
 void ArcballCamera::mouse_release() {
 	m_last_rotation = m_current_rotation * m_last_rotation;

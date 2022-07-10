@@ -24,7 +24,7 @@ set(
 )
 set(
     CAMERA_SOURCES
-    ${CMAKE_SOURCE_DIR}/src/camera/OrbitCamera.cpp
+    ${CMAKE_SOURCE_DIR}/src/camera/ArcballCamera.cpp
 )
 set(
     RENDERING_SOURCES

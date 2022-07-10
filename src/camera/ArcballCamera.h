@@ -5,6 +5,7 @@
 
 // Arcball algorithm:
 // http://courses.cms.caltech.edu/cs171/assignments/hw3/hw3-notes/notes-hw3.html
+// Paper: https://www.talisman.org/~erlkonig/misc/shoemake92-arcball.pdf
 
 class ArcballCamera {
 

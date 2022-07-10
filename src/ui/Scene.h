@@ -10,10 +10,7 @@
 #include "meshes/Vertex.h"
 #include "meshes/Mesh.h"
 #include "MeshConfig.h"
-#include "camera/OrbitCamera.h"
-
-#define   ZOOM_SENSITIVITY 0.25
-#define   MOVE_SENSITIVITY 0.25
+#include "camera/ArcballCamera.h"
 
 
 class Mesh;
@@ -35,17 +32,10 @@ public:
     );
     void set_mesh_config(std::shared_ptr<MeshConfig> &mesh_config);
 
-    void center_camera();
-
-
     // Display plain faces or wireframe
     void switch_display_type();
 
-    /**
-     * Change the type of mesh to display: current mesh is destroyed
-     * and a new one is built.
-    */
-    void switchMesh(int index);
+    void update_view_matrix();
 
     /**
      * Modify mesh colors based on the type of selected curvature: mean
@@ -63,6 +53,7 @@ protected:
     // Mouse Management
     void mousePressEvent(QMouseEvent *event);
     void mouseMoveEvent(QMouseEvent *event);
+    void mouseReleaseEvent(QMouseEvent *event);
     void wheelEvent(QWheelEvent *event);
 
 private:
@@ -71,9 +62,7 @@ private:
     float m_width;
     float m_fov;
     glm::mat4 m_projection;
-    OrbitCamera m_camera;
-
-    QPoint m_last_mouse_pos;    // Used to compute the rotation of the camera
+    ArcballCamera m_camera;
 
     /**
      * The object to be displayed, may be replaced by a scene if there
