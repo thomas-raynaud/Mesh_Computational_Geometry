@@ -12,6 +12,8 @@
 #include "MeshConfig.h"
 #include "camera/ArcballCamera.h"
 
+#define ZOOM_SENSITIVITY 0.25
+
 
 class Mesh;
 

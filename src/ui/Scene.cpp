@@ -138,9 +138,16 @@ void Scene::set_mesh_config(std::shared_ptr<MeshConfig> &mesh_config) {
     m_mesh_config = mesh_config;
 }
 
+//#include <iostream>
 void Scene::update_view_matrix() {
     glMatrixMode(GL_MODELVIEW);
     glm::mat4 view = m_camera.get_current_rotation();
+    glm::mat4 M = view;
+    /*std::cout << "-------" << std::endl;
+    std::cout << M[0][0] << " " << M[0][1] << " " << M[0][2] << " " << M[0][3] << std::endl;
+    std::cout << M[1][0] << " " << M[1][1] << " " << M[1][2] << " " << M[1][3] << std::endl;
+    std::cout << M[2][0] << " " << M[2][1] << " " << M[2][2] << " " << M[2][3] << std::endl;
+    std::cout << M[3][0] << " " << M[3][1] << " " << M[3][2] << " " << M[3][3] << std::endl;*/
     glLoadMatrixf(&view[0].x);
 }
 
@@ -166,17 +173,16 @@ void Scene::mouseReleaseEvent(QMouseEvent *event) {
     }
 }
 
-
 // Mouse management for the zoom
 void Scene::wheelEvent(QWheelEvent *event) {
-    /*QPoint num_degrees = event->angleDelta();
+    QPoint num_degrees = event->angleDelta();
     float zoom = ZOOM_SENSITIVITY;
     if (!num_degrees.isNull()) {
-        if (num_degrees.x() < 0 && num_degrees.y() < 0) {
+        if (num_degrees.x() <= 0 && num_degrees.y() <= 0) {
             zoom *= -1;
         }
         m_camera.zoom(zoom);
-        m_camera.update_view_matrix();
+        update_view_matrix();
         updateGL();
-    }*/
+    }
 }

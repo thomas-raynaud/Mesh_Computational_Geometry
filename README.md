@@ -40,6 +40,7 @@ Nous avons utilisé ces fonctions pour tester si notre application génère bien
 
 # Todo
 
+- Use arcball camera with quaternions
 - Show number of vertices + faces in UI
 - Pbrt-like rendering
 - Rendering with Vulkan
