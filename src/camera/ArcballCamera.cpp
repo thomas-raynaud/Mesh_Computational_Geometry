@@ -18,7 +18,7 @@ void ArcballCamera::mouse_click(glm::vec2 p) {
 
 void ArcballCamera::mouse_motion(glm::vec2 p) {
 	map_point_to_ndc_coordinates(p, m_screen_width, m_screen_height, m_p_current);
-	compute_rotation_matrix(m_p_start, m_p_current, m_current_rotation);
+	compute_quaternion_rotation(m_p_start, m_p_current, m_current_rotation);
 }
 
 void ArcballCamera::zoom(float dz) {
@@ -31,7 +31,8 @@ void ArcballCamera::mouse_release() {
 }
 
 glm::mat4 ArcballCamera::get_current_rotation() {
-	return m_current_rotation * m_last_rotation;
+	glm::quat r = m_current_rotation * m_last_rotation;
+	return get_rotation_matrix(r);
 }
 
 void ArcballCamera::set_screen_dimensions(int width, int height) {

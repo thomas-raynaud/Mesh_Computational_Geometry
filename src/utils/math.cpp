@@ -76,6 +76,35 @@ void compute_rotation_matrix(
     );
 }
 
+void compute_quaternion_rotation(
+    const glm::vec3 &a,
+    const glm::vec3 &b,
+    glm::quat &quaternion_rotation
+) {
+    float theta = acos(std::min(1.f, glm::dot(a, b) / (glm::length(a) * glm::length(b))));
+    glm::vec3 u = glm::normalize(glm::cross(a, b));
+
+    float sin_theta_2 = sin(theta / 2);
+    quaternion_rotation = glm::quat(
+        cos(theta / 2),
+        u.x * sin_theta_2,
+        u.y * sin_theta_2,
+        u.z * sin_theta_2
+    );
+}
+
+glm::mat4 get_rotation_matrix(glm::quat q) {
+    float qx2 = pow(q.x, 2.0);
+    float qy2 = pow(q.y, 2.0);
+    float qz2 = pow(q.z, 2.0);
+    return glm::mat4(
+        1 - 2 * qy2 - 2 * qz2,          2 * (q.x * q.y - q.z * q.w),    2 * (q.x * q.z + q.y * q.w),    0,
+        2 * (q.x * q.y - q.z * q.w),    1 - 2 * qx2 - 2 * qz2,          2 * (q.y * q.z - q.x *q.w),     0,
+        2 * (q.x * q.z - q.y * q.w),    2 * (q.y * q.z - q.x * q.w),    1 - 2 * qx2 - 2 * qy2,          0,
+        0,                              0,                              0,                              1
+    );
+}
+
 void map_point_to_ndc_coordinates(
     const glm::vec2 &p2,
     const int width,

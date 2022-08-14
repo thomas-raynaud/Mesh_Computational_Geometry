@@ -2,6 +2,7 @@
 #define MATH_H
 
 #include <glm/glm.hpp>
+#include<glm/gtc/quaternion.hpp>
 
 
 // Return a, with a.z = a.x^2 + a.y^2
@@ -23,6 +24,14 @@ void compute_rotation_matrix(
     const glm::vec3 &b,
     glm::mat4 &rotation_matrix
 );
+void compute_quaternion_rotation(
+    const glm::vec3 &a,
+    const glm::vec3 &b,
+    glm::qua<float> &quaternion_rotation
+);
+
+// Convert a unit quaternion to a rotation matrix
+glm::mat4 get_rotation_matrix(glm::quat q);
 
 // Map a point from screen coordinates to normalized device coordinates
 void map_point_to_ndc_coordinates(

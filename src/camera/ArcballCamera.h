@@ -2,6 +2,7 @@
 #define ARCBALL_CAMERA_H
 
 #include <glm/glm.hpp>
+#include<glm/gtc/quaternion.hpp>
 
 // Arcball algorithm:
 // http://courses.cms.caltech.edu/cs171/assignments/hw3/hw3-notes/notes-hw3.html
@@ -20,8 +21,8 @@ public:
     void set_screen_dimensions(int width, int height);
 
 private:
-    glm::mat4 m_last_rotation;
-    glm::mat4 m_current_rotation;
+    glm::quat m_last_rotation;
+    glm::quat m_current_rotation;
     glm::vec3 m_p_start;
     glm::vec3 m_p_current;
     float m_zoom;
