@@ -31,11 +31,11 @@ void ArcballCamera::mouse_release() {
 }
 
 glm::mat4 ArcballCamera::get_current_rotation() {
-	glm::quat r = m_current_rotation * m_last_rotation;
+	const glm::quat r = m_current_rotation * m_last_rotation;
 	return get_rotation_matrix(r);
 }
 
-void ArcballCamera::set_screen_dimensions(int width, int height) {
+void ArcballCamera::set_screen_dimensions(const int width, const int height) {
 	m_screen_width = width;
 	m_screen_height = height;
 }

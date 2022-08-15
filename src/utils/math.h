@@ -35,7 +35,7 @@ glm::mat4 get_rotation_matrix(glm::quat q);
 
 // Map a point from screen coordinates to normalized device coordinates
 void map_point_to_ndc_coordinates(
-    const glm::vec2 &p2,
+    glm::vec2 p2,
     const int width,
     const int height,
     glm::vec3 &p3

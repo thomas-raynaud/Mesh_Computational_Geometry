@@ -40,8 +40,8 @@ glm::vec3 compute_circumcenter(
 }
 
 float cos(const glm::vec3 &a, const glm::vec3 &b, const glm::vec3 &c) {
-    glm::vec3 ba = a - b;
-    glm::vec3 bc = c - b;
+    const glm::vec3 ba = a - b;
+    const glm::vec3 bc = c - b;
     if (glm::dot(ba, bc) > glm::length(ba) * glm::length(bc))
         return -1.f;
     else
@@ -53,11 +53,11 @@ void compute_rotation_matrix(
     const glm::vec3 &b,
     glm::mat4 &rotation_matrix
 ) {
-    float theta = acos(std::min(1.f, glm::dot(a, b) / (glm::length(a) * glm::length(b))));
-    glm::vec3 u = glm::normalize(glm::cross(a, b));
+    const float theta = acos(std::min(1.f, glm::dot(a, b) / (glm::length(a) * glm::length(b))));
+    const glm::vec3 u = glm::normalize(glm::cross(a, b));
 
-    float cos_t = cos(theta);
-    float sin_t = sin(theta);
+    const float cos_t = cos(theta);
+    const float sin_t = sin(theta);
     glm::vec3 u2(pow(u.x, 2.f), pow(u.y, 2.f), pow(u.z, 2.f));
     rotation_matrix = glm::mat4(
         u2.x + (1.f - u2.x) * cos_t,
@@ -81,10 +81,10 @@ void compute_quaternion_rotation(
     const glm::vec3 &b,
     glm::quat &quaternion_rotation
 ) {
-    float theta = acos(std::min(1.f, glm::dot(a, b) / (glm::length(a) * glm::length(b))));
-    glm::vec3 u = glm::normalize(glm::cross(a, b));
+    const float theta = acos(std::min(1.f, glm::dot(a, b) / (glm::length(a) * glm::length(b))));
+    const glm::vec3 u = glm::normalize(glm::cross(a, b));
 
-    float sin_theta_2 = sin(theta / 2);
+    const float sin_theta_2 = sin(theta / 2);
     quaternion_rotation = glm::quat(
         cos(theta / 2),
         u.x * sin_theta_2,
@@ -93,34 +93,22 @@ void compute_quaternion_rotation(
     );
 }
 
-glm::mat4 get_rotation_matrix(glm::quat q) {
-    float qx2 = pow(q.x, 2.0);
-    float qy2 = pow(q.y, 2.0);
-    float qz2 = pow(q.z, 2.0);
-    return glm::mat4(
-        1 - 2 * qy2 - 2 * qz2,          2 * (q.x * q.y - q.z * q.w),    2 * (q.x * q.z + q.y * q.w),    0,
-        2 * (q.x * q.y - q.z * q.w),    1 - 2 * qx2 - 2 * qz2,          2 * (q.y * q.z - q.x *q.w),     0,
-        2 * (q.x * q.z - q.y * q.w),    2 * (q.y * q.z - q.x * q.w),    1 - 2 * qx2 - 2 * qy2,          0,
-        0,                              0,                              0,                              1
-    );
+glm::mat4 get_rotation_matrix(const glm::quat q) {
+    return glm::mat4_cast(q);
 }
 
 void map_point_to_ndc_coordinates(
-    const glm::vec2 &p2,
+    glm::vec2 p2,
     const int width,
     const int height,
     glm::vec3 &p3
 ) {
-    p3.x = std::max(std::min(p2.x, (float)width), 0.f);
-    p3.y = std::max(std::min(p2.y, (float)height), 0.f);
-    p3.x = ((p3.x * 2.f) / width) - 1.f;
-    p3.y = ((p3.y * 2.f) / height) - 1.f;
-    float x2 = pow(p3.x, 2.f);
-    float y2 = pow(p3.y, 2.f);
-    if (x2 + y2 <= 1.f) {
-        p3.z = sqrt(1.f - x2 - y2);
-    }
-    else {
-        p3.z = 0;
+    p2 = glm::clamp(p2, glm::vec2(0, 0), glm::vec2(width, height));
+    p3.x = ((p2.x * 2.f) / width) - 1.f;
+    p3.y = ((p2.y * 2.f) / height) - 1.f;
+    p3.z = 0.f;
+    const float dist = glm::dot(p3, p3);
+    if (dist <= 1.f) {
+        p3.z = sqrt(1.f - dist);
     }
 }
