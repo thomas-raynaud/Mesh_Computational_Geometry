@@ -12,6 +12,7 @@ Scene::Scene(QWidget *parent) : QGLWidget(parent) {
     m_timer.start(16);
     m_projection = glm::mat4(1.0);
     m_fov = 45.f;
+    b_center_camera_after_resize = true;
 }
 
 Scene::~Scene() {}
@@ -102,31 +103,45 @@ void Scene::resizeGL(int width, int height) {
     m_height = height;
     glViewport(0, 0, width, height);
     glMatrixMode(GL_PROJECTION);
-    compute_perspective_matrix(m_projection, 45.f, width, height, 0.1f, 100.f);
+    compute_perspective_matrix(m_projection, m_fov, width, height, 0.1f, 100.f);
     glLoadMatrixf(&m_projection[0].x);
     m_camera.set_screen_dimensions(m_width, m_height);
+    if (b_center_camera_after_resize) {
+        center_camera();
+        b_center_camera_after_resize = false;
+    }
     update_view_matrix();
     updateGL();
 }
 
+
 void Scene::set_mesh(std::shared_ptr<Mesh> &mesh) {
     m_mesh = mesh;
+    center_camera();
+    update_view_matrix();
+    updateGL();
+}
+
+void Scene::center_camera() {
+    std::shared_ptr<Mesh> mesh = m_mesh.lock();
     BoundingBox bb = mesh->get_bounding_box();
 
-    // Place camera and ensure the mesh's bounding box is entirely visible.
     glm::vec3 pivot_point(
-        -(bb.min.x + bb.max.x) / 2.f,
-        -(bb.min.x + bb.max.x) / 2.f,
-        -(bb.min.x + bb.max.x) / 2.f
+        (bb.min.x + bb.max.x) / 2.f,
+        (bb.min.y + bb.max.y) / 2.f,
+        (bb.min.z + bb.max.z) / 2.f
     );
 
     float bb_width = bb.max.x - bb.min.x;
     float bb_height = bb.max.y - bb.min.y;
     float dist;
-    if (m_height * bb_height > m_width * bb_width)
-        dist = (bb_height / 2.f) / m_fov;
+    if (bb_height * (float)m_width / bb_width > (float)m_height)
+        dist = ((bb_height / 2.f) * 1.2f) / tan(glm::radians(m_fov) / 2.f);
     else
-        dist = (bb_width / 2.f) / m_fov;
+        dist = ((bb_width / 2.f) * 1.2f) / tan(glm::radians(m_fov) / 2.f);
+
+    m_camera.set_center(pivot_point);
+    m_camera.set_distance_to_center(dist);
 }
 
 void Scene::set_voronoi_points(

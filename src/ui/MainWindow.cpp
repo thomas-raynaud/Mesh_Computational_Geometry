@@ -125,6 +125,12 @@ void MainWindow::on_display_type_push_button_released() {
     }
 }
 
+void MainWindow::on_center_camera_push_button_released() {
+    ui.scene->center_camera();
+    ui.scene->update_view_matrix();
+    ui.scene->updateGL();
+}
+
 void MainWindow::on_algorithm_type_combobox_currentIndexChanged(int index) {
     m_mesh_config->algorithm_2d_type = (Algorithm2DType)index;
     if (m_mesh_config->algorithm_2d_type == Algorithm2DType::Delaunay) {

@@ -56,3 +56,8 @@ void ArcballCamera::set_center(glm::vec3 center) {
     m_translation = glm::translate(glm::vec3(0.f, 0.f, -glm::length(view_dir)));
     m_last_rotation = glm::normalize(glm::quat_cast(glm::transpose(glm::mat3(x_axis, y_axis, -z_axis))));
 }
+
+
+void ArcballCamera::set_distance_to_center(float dist) {
+	m_translation = glm::translate(glm::vec3(0.f, 0.f, -glm::length(dist)));
+}

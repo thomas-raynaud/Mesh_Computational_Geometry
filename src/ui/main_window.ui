@@ -36,7 +36,7 @@
       <x>0</x>
       <y>0</y>
       <width>266</width>
-      <height>520</height>
+      <height>560</height>
      </rect>
     </property>
     <layout class="QVBoxLayout" name="setup_layout">
@@ -82,6 +82,13 @@
          <widget class="QPushButton" name="display_type_push_button">
           <property name="text">
            <string>Show wireframe</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QPushButton" name="center_camera_push_button">
+          <property name="text">
+           <string>Center camera</string>
           </property>
          </widget>
         </item>

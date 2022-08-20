@@ -21,6 +21,7 @@ public:
     glm::mat4 get_transform();
     void set_screen_dimensions(int width, int height);
     void set_center(glm::vec3 center);
+    void set_distance_to_center(float dist);
 
 private:
     glm::quat m_last_rotation;

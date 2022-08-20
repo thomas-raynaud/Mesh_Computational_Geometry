@@ -25,6 +25,7 @@ private slots:
     void on_radio_button_2d_released();
     void on_radio_button_3d_released();
     void on_display_type_push_button_released();
+    void on_center_camera_push_button_released();
     // 2D
     void on_algorithm_type_combobox_currentIndexChanged(int index);
     void on_voronoi_display_push_button_released();

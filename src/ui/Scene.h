@@ -34,8 +34,8 @@ public:
     );
     void set_mesh_config(std::shared_ptr<MeshConfig> &mesh_config);
 
-    // Display plain faces or wireframe
-    void switch_display_type();
+    // Place camera and ensure the mesh's bounding box is entirely visible.
+    void center_camera();
 
     void update_view_matrix();
 
@@ -65,6 +65,7 @@ private:
     float m_fov;
     glm::mat4 m_projection;
     ArcballCamera m_camera;
+    bool b_center_camera_after_resize; // After first resizeGL call, center camera
 
     /**
      * The object to be displayed, may be replaced by a scene if there
