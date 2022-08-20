@@ -18,14 +18,17 @@ public:
     void mouse_release();
     void zoom(float dz);
     glm::mat4 get_current_rotation();
+    glm::mat4 get_transform();
     void set_screen_dimensions(int width, int height);
+    void set_center(glm::vec3 center);
 
 private:
     glm::quat m_last_rotation;
     glm::quat m_current_rotation;
+    glm::mat4 m_center_translation;
+    glm::mat4 m_translation;
     glm::vec3 m_p_start;
     glm::vec3 m_p_current;
-    float m_zoom;
     int m_screen_width;
     int m_screen_height;
 };

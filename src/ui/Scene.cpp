@@ -3,6 +3,7 @@
 #include <glm/gtc/matrix_transform.hpp>
 
 #include "rendering/mesh_rendering.h"
+#include "utils/math.h"
 
 
 Scene::Scene(QWidget *parent) : QGLWidget(parent) {
@@ -96,16 +97,16 @@ void Scene::paintGL() {
     }
 }
 
-
 void Scene::resizeGL(int width, int height) {
     m_width = width;
     m_height = height;
     glViewport(0, 0, width, height);
     glMatrixMode(GL_PROJECTION);
-    glm::perspective(glm::radians(m_fov), (float)width/(float)height, 0.1f, 100.f);
+    compute_perspective_matrix(m_projection, 45.f, width, height, 0.1f, 100.f);
     glLoadMatrixf(&m_projection[0].x);
-    updateGL();
     m_camera.set_screen_dimensions(m_width, m_height);
+    update_view_matrix();
+    updateGL();
 }
 
 void Scene::set_mesh(std::shared_ptr<Mesh> &mesh) {
@@ -138,16 +139,9 @@ void Scene::set_mesh_config(std::shared_ptr<MeshConfig> &mesh_config) {
     m_mesh_config = mesh_config;
 }
 
-//#include <iostream>
 void Scene::update_view_matrix() {
     glMatrixMode(GL_MODELVIEW);
-    glm::mat4 view = m_camera.get_current_rotation();
-    glm::mat4 M = view;
-    /*std::cout << "-------" << std::endl;
-    std::cout << M[0][0] << " " << M[0][1] << " " << M[0][2] << " " << M[0][3] << std::endl;
-    std::cout << M[1][0] << " " << M[1][1] << " " << M[1][2] << " " << M[1][3] << std::endl;
-    std::cout << M[2][0] << " " << M[2][1] << " " << M[2][2] << " " << M[2][3] << std::endl;
-    std::cout << M[3][0] << " " << M[3][1] << " " << M[3][2] << " " << M[3][3] << std::endl;*/
+    glm::mat4 view = m_camera.get_transform();
     glLoadMatrixf(&view[0].x);
 }
 

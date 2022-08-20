@@ -1,6 +1,7 @@
 #include "math.h"
 
 #include <algorithm>
+#include<glm/gtc/quaternion.hpp>
 
 
 glm::vec3 phi(const glm::vec3 &a) {
@@ -53,7 +54,11 @@ void compute_rotation_matrix(
     const glm::vec3 &b,
     glm::mat4 &rotation_matrix
 ) {
-    const float theta = acos(std::min(1.f, glm::dot(a, b) / (glm::length(a) * glm::length(b))));
+    const float theta = acos(
+        std::min(   1.f,
+                    glm::dot(a, b) / (glm::length(a) * glm::length(b))
+        )
+    );
     const glm::vec3 u = glm::normalize(glm::cross(a, b));
 
     const float cos_t = cos(theta);
@@ -81,7 +86,11 @@ void compute_quaternion_rotation(
     const glm::vec3 &b,
     glm::quat &quaternion_rotation
 ) {
-    const float theta = acos(std::min(1.f, glm::dot(a, b) / (glm::length(a) * glm::length(b))));
+    const float theta = acos(
+        std::min(   1.f,
+                    glm::dot(a, b) / (glm::length(a) * glm::length(b))
+        )
+    );
     const glm::vec3 u = glm::normalize(glm::cross(a, b));
 
     const float sin_theta_2 = sin(theta / 2);
@@ -91,10 +100,6 @@ void compute_quaternion_rotation(
         u.y * sin_theta_2,
         u.z * sin_theta_2
     );
-}
-
-glm::mat4 get_rotation_matrix(const glm::quat q) {
-    return glm::mat4_cast(q);
 }
 
 void map_point_to_ndc_coordinates(
@@ -111,4 +116,23 @@ void map_point_to_ndc_coordinates(
     if (dist <= 1.f) {
         p3.z = sqrt(1.f - dist);
     }
+}
+
+void compute_perspective_matrix(
+    glm::mat4 &projection,
+    float fov,
+    float width, float height,
+    float z_near, float z_far
+) {
+    float f = tan(glm::radians(fov) / 2.f);
+    float aspect = width / height;
+    float zNear = 0.1f;
+    float zFar = 100.f;
+    projection = glm::identity<glm::mat4>();
+    projection[0][0] = 1.f / (f * aspect);
+    projection[1][1] = 1.f / f;
+    projection[2][2] = (z_far + z_near) / (z_near - z_far);
+    projection[3][2] = (2 * z_far *z_near) / (z_near - z_far);
+    projection[2][3] = -1;
+    projection[3][3] = 0;
 }
