@@ -13,6 +13,7 @@ public:
     virtual ~MeshCrust() {}
 
     bool is_voronoi_vertex(const Vertex &vtx);
+    virtual BoundingBox get_bounding_box();
 };
 
 #endif  // MESH_CRUST_H

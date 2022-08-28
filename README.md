@@ -1,12 +1,52 @@
-# TP1 - maillage
+# Mesh and Computational Geometry
 
-# Étudiants
-* Jan AALMOES 11804741
-* Thomas RAYNAUD 11402517
+This repository regroups the practical works related to the subject *Mesh and
+Computational Geometry* I've been following during my studies at
+Université Lyon 1.
 
-# Courbures
+## Contributors
+* Jan Aalmoes
+* Thomas Raynaud
+
+## Teacher
+* Raphaëlle Chaine
+
+## 2D
+
+### Delaunay
+...
+
+### Voronoi
+...
+
+### Crust
+
+The [Crust algorithm](https://web.mit.edu/manoli/crust/www/crust.html) is used
+to reconstruct the surface of an object from a set of 2D/3D points.
+
+**Idea :**
+The skeleton of a shape regroups the centers of maximal balls contained in the
+object. The Crust algorithm consists in destroying any Delanay edge crossing the
+skeleton. The points of the samples are completed with new points whose
+insertion in Delaunay will kill the target edges. Those new points are the
+Voronoi centers. Edges of the curve to be reconstructed should be preserved by
+this insertion. In the new Delaunay triangulation, retain the edges joining two
+points from the entry sample only.
+
+**Algorithm :**
+- Construct the Delaunay triangulation with the points from the entry sample.
+- Add the Voronoi vertices inside the Delaunay triangulation.
+- Draw edges between two points in the Delaunay triangle only if they belong
+to the entry sample.
+
+## 3D
+
+### Curvatures
 
 Nous avons analysé la courbure de trois maillages 3D différents : le tetrahèdre, la pyramide, la boîte de collision 2D et la statue (*queen.off*). La boîte de collision possède un sommet infini qui n'est pas affiché. Implémentation dans *meshcurvature.cpp*.
+
+### Mesh simplificaton
+...
 
 # Delaunay & Voronoi
 
@@ -40,9 +80,11 @@ Nous avons utilisé ces fonctions pour tester si notre application génère bien
 
 # Todo
 
+- Restore stable state (remove crashes, bugs)
+- Rendering with OpenGL: use vertex array objects, shaders, ...
+- Use QOpenGLWidget instead of QWidget
 - Show number of vertices + faces in UI
 - Pbrt-like rendering
 - Rendering with Vulkan
-- Rendering with OpenGL: use vertex array objects, shaders, ...
 - flat shading
 - implicit surfaces
