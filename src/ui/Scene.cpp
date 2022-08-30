@@ -44,35 +44,35 @@ void Scene::paintGL() {
                 case Algorithm2DType::Parabola:
                     switch(mesh_config->mesh_display_type) {
                         case MeshDisplayType::PlainFaces:
-                            draw_mesh_vertices_colors(&*mesh);
+                            draw_mesh((Mesh2D*)&*mesh, true);
                             break;
                         case MeshDisplayType::Wireframe:
-                            draw_mesh_wireframe_vertices_color(&*mesh);
+                            draw_mesh_wireframe((Mesh2D*)&*mesh, true);
                             break;
                     }
+                    break;
                 case Algorithm2DType::Crust:
                     switch(mesh_config->mesh_display_type) {
                             case MeshDisplayType::PlainFaces:
-                                draw_mesh_faces_colors((Mesh2D*)&*mesh);
+                                draw_mesh((Mesh2D*)&*mesh);
                                 break;
                             case MeshDisplayType::Wireframe:
-                                draw_mesh_wireframe_faces_color(
-                                    (MeshCrust*)&*mesh
-                                );
+                                draw_mesh_wireframe((MeshCrust*)&*mesh);
                                 break;
                     }
                     break;
                 case Algorithm2DType::Ruppert:
-                    draw_mesh_wireframe_faces_color((MeshRuppert*)&*mesh);
+                    draw_mesh_wireframe((MeshRuppert*)&*mesh);
                     break;
                 default:
                     switch(mesh_config->mesh_display_type) {
                         case MeshDisplayType::PlainFaces:
-                            draw_mesh_faces_colors((Mesh2D*)&*mesh);
+                            draw_mesh((Mesh2D*)&*mesh);
                             break;
                         case MeshDisplayType::Wireframe:
-                            draw_mesh_wireframe_faces_color(
+                            draw_mesh_wireframe(
                                 (Mesh2D*)&*mesh,
+                                false,
                                 mesh_config->show_voronoi_display
                             );
                             break;
@@ -82,10 +82,10 @@ void Scene::paintGL() {
         case Dimension::D3:
             switch(mesh_config->mesh_display_type) {
                 case MeshDisplayType::PlainFaces:
-                    draw_mesh_vertices_colors(&*mesh);
+                    draw_mesh(&*mesh, true);
                     break;
                 case MeshDisplayType::Wireframe:
-                    draw_mesh_wireframe_vertices_color(&*mesh);
+                    draw_mesh_wireframe(&*mesh, true);
                     break;
             }
             break;
@@ -117,7 +117,6 @@ void Scene::resizeGL(int width, int height) {
 
 void Scene::set_mesh(std::shared_ptr<Mesh> &mesh) {
     m_mesh = mesh;
-    center_camera();
     update_view_matrix();
     updateGL();
 }

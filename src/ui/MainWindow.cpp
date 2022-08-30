@@ -155,6 +155,9 @@ void MainWindow::on_algorithm_type_combobox_currentIndexChanged(int index) {
         set_mesh(std::make_shared<MeshParabola>());
     }
     update_voronoi_vertices();
+    ui.scene->center_camera();
+    ui.scene->update_view_matrix();
+    ui.scene->updateGL();
 }
 
 void MainWindow::on_voronoi_display_push_button_released() {
@@ -176,8 +179,11 @@ void MainWindow::on_insert_points_push_button_released() {
 
 void MainWindow::on_parabola_type_combobox_currentIndexChanged(int index) {
     m_mesh_config->parabola_type = (ParabolaType)index;
-    m_mesh = std::make_shared<Mesh>(MeshParabola(m_mesh_config->parabola_type));
+    set_mesh(std::make_shared<MeshParabola>(m_mesh_config->parabola_type));
     update_voronoi_vertices();
+    ui.scene->center_camera();
+    ui.scene->update_view_matrix();
+    ui.scene->updateGL();
 }
 
 void MainWindow::on_refine_push_button_released() {

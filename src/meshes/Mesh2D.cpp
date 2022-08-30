@@ -10,7 +10,7 @@ Mesh2D::Mesh2D() {
     Vertex *va = add_vertex(glm::vec3(-MAX_DIST,       0.f, 0.f));
     Vertex *vb = add_vertex(glm::vec3( MAX_DIST, -MAX_DIST, 0.f));
     Vertex *vc = add_vertex(glm::vec3( MAX_DIST,  MAX_DIST, 0.f));
-    Vertex *inf_vtx = add_vertex(glm::vec3(0.f, 0.f, -1.f));
+    Vertex *inf_vtx = add_vertex(glm::vec3(0.f, 0.f, -MAX_DIST));
     m_infinite_vertex = inf_vtx->get_hash();
     Face *fa = add_face({ va, vb,         vc      });
     Face *fb = add_face({ vb, inf_vtx,    vc      });

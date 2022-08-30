@@ -13,57 +13,41 @@ void draw_vertex(const Vertex &vtx) {
     glVertex3f(pos.x, pos.y, pos.z);
 }
 
-void draw_face(const Face &face) {
+void draw_face(const Face &face, const glm::vec3 *color) {
     std::array<Vertex*, 3> face_vts = face.get_vertices();
-    glm::vec3 color;
+    glm::vec3 color_vt;
+    if (color != nullptr)
+        glColor3d(color->r, color->g, color->b);
     glBegin(GL_TRIANGLES);
     for (size_t i = 0; i < 3; ++i) {
-        color = face_vts[i]->get_color();
-        glColor3d(color.r, color.g, color.b);
+        if (color == nullptr) {
+            color_vt = face_vts[i]->get_color();
+            glColor3d(color_vt.r, color_vt.g, color_vt.b);
+        }
         draw_vertex(*face_vts[i]);
     }
     glEnd();
 }
 
-void draw_face(const Face &face, const glm::vec3 &color) {
-    std::array<Vertex*, 3> face_vts = face.get_vertices();
-    glColor3d(color.r, color.g, color.b);
-    glBegin(GL_TRIANGLES);
-    for (size_t i = 0; i < 3; ++i) {
-        glColor3d(color.r, color.g, color.b);
-        draw_vertex(*face_vts[i]);
-    }
-    glEnd();
-}
-
-void draw_wireframe_face(const Face &face) {
-    std::array<Vertex*, 3> face_vts = face.get_vertices();
-    Vertex v1, v2;
+void draw_wireframe_face(const Face &face, const glm::vec3 *color) {
+    if (color != nullptr)
+        glColor3d(color->r, color->g, color->b);
     glm::vec3 c1, c2;
-    for (size_t i = 0; i < 3; ++i) {
-        v1 = *face_vts[i];
-        v2 = *face_vts[(i + 1) % 3];
-        c1 = v1.get_color();
-        c2 = v2.get_color();
-        glBegin(GL_LINE_STRIP);
-        glColor3d(c1.r, c1.g, c1.b);
-        draw_vertex(v1);
-        glColor3d(c2.r, c2.g, c2.b);
-        draw_vertex(v2);
-        glEnd();
-    }
-}
-
-void draw_wireframe_face(const Face &face, const glm::vec3 &color) {
     std::array<Vertex*, 3> face_vts = face.get_vertices();
     Vertex v1, v2;
     for (size_t i = 0; i < 3; ++i) {
         v1 = *face_vts[i];
         v2 = *face_vts[(i + 1) % 3];
+        if (color == nullptr) {
+            c1 = v1.get_color();
+            c2 = v2.get_color();
+        }
         glBegin(GL_LINE_STRIP);
-        glColor3d(color.r, color.g, color.b);
+        if (color == nullptr)
+            glColor3d(c1.r, c1.g, c1.b);
         draw_vertex(v1);
-        glColor3d(color.r, color.g, color.b);
+        if (color == nullptr)
+            glColor3d(c2.r, c2.g, c2.b);
         draw_vertex(v2);
         glEnd();
     }
@@ -103,42 +87,39 @@ void draw_voronoi_wireframe(
     }
 }
 
-void draw_mesh_vertices_colors(Mesh *mesh) {
+void draw_mesh(Mesh *mesh, bool use_vertices_colors) {
     FaceIterator face_it;
-    for (face_it = mesh->faces_begin(); face_it != mesh->faces_end(); ++face_it)
-        draw_face(*face_it);
-}
-
-void draw_mesh_faces_colors(Mesh *mesh) {
-    FaceIterator face_it;
-    for (face_it = mesh->faces_begin(); face_it != mesh->faces_end(); ++face_it)
-        draw_face(*face_it, face_it->get_color());
-}
-
-void draw_mesh_wireframe_vertices_color(Mesh *mesh) {
-    FaceIterator face_it;
-    for (face_it = mesh->faces_begin(); face_it != mesh->faces_end(); ++face_it)
-        draw_wireframe_face(*face_it);
-}
-
-void draw_mesh_wireframe_faces_color(Mesh *mesh) {
-    FaceIterator face_it;
-    for (face_it = mesh->faces_begin(); face_it != mesh->faces_end(); ++face_it)
-        draw_wireframe_face(*face_it, face_it->get_color());
-}
-
-void draw_mesh_faces_colors(Mesh2D *mesh) {
-    FaceIterator face_it;
+    glm::vec3 face_color;
     for (face_it = mesh->faces_begin(); face_it != mesh->faces_end(); ++face_it) {
-        if (!mesh->is_face_visible(*face_it)) continue;
-        draw_face(*face_it, face_it->get_color());
+        face_color = face_it->get_color();
+        draw_face(*face_it, (use_vertices_colors ? nullptr : &face_color));
     }
 }
 
-void draw_mesh_faces_color(MeshCrust *mesh) {
+void draw_mesh_wireframe(Mesh *mesh, bool use_vertices_colors) {
+    FaceIterator face_it;
+    glm::vec3 face_color;
+    for (face_it = mesh->faces_begin(); face_it != mesh->faces_end(); ++face_it) {
+        face_color = face_it->get_color();
+        draw_wireframe_face(*face_it, (use_vertices_colors ? nullptr : &face_color));
+    }
+}
+
+void draw_mesh(Mesh2D *mesh, bool use_vertices_colors) {
+    FaceIterator face_it;
+    glm::vec3 face_color;
+    for (face_it = mesh->faces_begin(); face_it != mesh->faces_end(); ++face_it) {
+        if (!mesh->is_face_visible(*face_it)) continue;
+        face_color = face_it->get_color();
+        draw_face(*face_it, (use_vertices_colors ? nullptr : &face_color));
+    }
+}
+
+void draw_mesh(MeshCrust *mesh, bool use_vertices_colors) {
     FaceIterator face_it;
     std::array<Vertex*, 3> face_vts;
     Vertex *v1, *v2;
+    glm::vec3 face_color;
     bool skip_face;
     for (face_it = mesh->faces_begin(); face_it != mesh->faces_end(); ++face_it) {
         if (!mesh->is_face_visible(*face_it)) continue;
@@ -151,22 +132,27 @@ void draw_mesh_faces_color(MeshCrust *mesh) {
             }
         }
         if (skip_face) continue;
-        draw_wireframe_face(*face_it, face_it->get_color());
+        face_color = face_it->get_color();
+        draw_wireframe_face(*face_it, (use_vertices_colors ? nullptr : &face_color));
     }
 }
 
-void draw_mesh_wireframe_faces_color(Mesh2D *mesh, bool show_voronoi) {
+void draw_mesh_wireframe(
+    Mesh2D *mesh,
+    bool use_vertices_colors,
+    bool show_voronoi
+) {
     FaceIterator face_it;
     glm::vec3 color = glm::vec3(0, 1, 0);
     for (face_it = mesh->faces_begin(); face_it != mesh->faces_end(); ++face_it) {
         if (!mesh->is_face_visible(*face_it)) continue;
         if (!show_voronoi)
             color = face_it->get_color();
-        draw_wireframe_face(*face_it, color);
+        draw_wireframe_face(*face_it, (use_vertices_colors ? nullptr : &color));
     }
 }
 
-void draw_mesh_wireframe_faces_color(MeshCrust *mesh) {
+void draw_mesh_wireframe(MeshCrust *mesh) {
     FaceIterator face_it;
     std::array<Vertex*, 3> face_vts;
     Vertex *v1, *v2;
@@ -189,7 +175,7 @@ void draw_mesh_wireframe_faces_color(MeshCrust *mesh) {
     }
 }
 
-void draw_mesh_wireframe_faces_color(MeshRuppert *mesh) {
+void draw_mesh_wireframe(MeshRuppert *mesh) {
     FaceIterator face_it;
     std::array<Vertex*, 3> face_vts;
     Vertex *v1, *v2;

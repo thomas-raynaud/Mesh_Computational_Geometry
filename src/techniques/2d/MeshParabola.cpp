@@ -13,6 +13,8 @@ MeshParabola::MeshParabola(ParabolaType parabola_type)
         : Mesh2D(), m_parabola_type(parabola_type)
 {
     float x, y, z;
+    float a = 1.f;
+    float b = 100.f;
 
     // Simulate the function
     for(size_t i = 0; i < MESH_PRECISION; ++i) {
@@ -22,8 +24,6 @@ MeshParabola::MeshParabola(ParabolaType parabola_type)
         if (parabola_type == ParabolaType::EllipticParaboloid)
             z = pow(x, 2) + pow(y, 2);
         else if (parabola_type == ParabolaType::Rosenbrock) {
-            float a = 1.f;
-            float b = 100.f;
             z = pow(a - x, 2.0) + b * pow(y - x * x, 2.0);
             z = z / 150.f;
         }

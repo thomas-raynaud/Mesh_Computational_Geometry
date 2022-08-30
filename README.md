@@ -1,8 +1,6 @@
 # Mesh and Computational Geometry
 
-This repository regroups the practical works related to the subject *Mesh and
-Computational Geometry* I've been following during my studies at
-Université Lyon 1.
+This repository regroups the practical works related to the subject *Mesh and Computational Geometry* I've been following during my studies at Université Lyon 1.
 
 ## Contributors
 * Jan Aalmoes
@@ -21,23 +19,15 @@ Université Lyon 1.
 
 ### Crust
 
-The [Crust algorithm](https://web.mit.edu/manoli/crust/www/crust.html) is used
-to reconstruct the surface of an object from a set of 2D/3D points.
+The [Crust algorithm](https://web.mit.edu/manoli/crust/www/crust.html) is used to reconstruct the surface of an object from a set of 2D/3D points.
 
 **Idea :**
-The skeleton of a shape regroups the centers of maximal balls contained in the
-object. The Crust algorithm consists in destroying any Delanay edge crossing the
-skeleton. The points of the samples are completed with new points whose
-insertion in Delaunay will kill the target edges. Those new points are the
-Voronoi centers. Edges of the curve to be reconstructed should be preserved by
-this insertion. In the new Delaunay triangulation, retain the edges joining two
-points from the entry sample only.
+The skeleton of a shape regroups the centers of maximal balls contained in the object. The Crust algorithm consists in destroying any Delanay edge crossing the skeleton. The points of the samples are completed with new points whose insertion in Delaunay will kill the target edges. Those new points are the Voronoi centers. Edges of the curve to be reconstructed should be preserved by this insertion. In the new Delaunay triangulation, retain the edges joining two points from the entry sample only.
 
 **Algorithm :**
 - Construct the Delaunay triangulation with the points from the entry sample.
 - Add the Voronoi vertices inside the Delaunay triangulation.
-- Draw edges between two points in the Delaunay triangle only if they belong
-to the entry sample.
+- Draw edges between two points in the Delaunay triangle only if they belong to the entry sample.
 
 ## 3D
 
@@ -81,6 +71,7 @@ Nous avons utilisé ces fonctions pour tester si notre application génère bien
 # Todo
 
 - Restore stable state (remove crashes, bugs)
+- Put algorithms in different Qt Windows
 - Rendering with OpenGL: use vertex array objects, shaders, ...
 - Use QOpenGLWidget instead of QWidget
 - Show number of vertices + faces in UI

@@ -14,24 +14,28 @@ class MeshRuppert;
 
 void draw_vertex(const Vertex &vtx);
 
-void draw_face(const Face &face);
-void draw_face(const Face &face, const glm::vec3 &color);
-void draw_wireframe_face(const Face &face);
-void draw_wireframe_face(const Face &face, const glm::vec3 &color);
+// Draw a plain face. If the color of the face is not defined, color each
+// vertex of the face with its own color.
+void draw_face(const Face &face, const glm::vec3 *color=nullptr);
+// Draw a face in wireframe. If the color of the face is not defined, color each
+// vertex of the face with its own color.
+void draw_wireframe_face(const Face &face, const glm::vec3 *color=nullptr);
 
 void draw_voronoi_wireframe(
     Mesh2D *mesh,
     std::unordered_map<Face_Hash, glm::vec3> &voronoi_pts
 );
 
-void draw_mesh_vertices_colors(Mesh *mesh);
-void draw_mesh_faces_colors(Mesh *mesh);
-void draw_mesh_wireframe_vertices_color(Mesh *mesh);
-void draw_mesh_wireframe_faces_color(Mesh *mesh);
-void draw_mesh_faces_colors(Mesh2D *mesh);
-void draw_mesh_faces_colors(MeshCrust *mesh);
-void draw_mesh_wireframe_faces_color(Mesh2D *mesh, bool show_voronoi=false);
-void draw_mesh_wireframe_faces_color(MeshCrust *mesh);
-void draw_mesh_wireframe_faces_color(MeshRuppert *mesh);
+void draw_mesh(Mesh *mesh, bool use_vertices_colors=false);
+void draw_mesh_wireframe(Mesh *mesh, bool use_vertices_colors=false);
+void draw_mesh(Mesh2D *mesh, bool use_vertices_colors=false);
+void draw_mesh(MeshCrust *mesh, bool use_vertices_colors=false);
+void draw_mesh_wireframe(
+    Mesh2D *mesh,
+    bool use_vertices_colors=false,
+    bool show_voronoi=false
+);
+void draw_mesh_wireframe(MeshCrust *mesh);
+void draw_mesh_wireframe(MeshRuppert *mesh);
 
 #endif  // MESH_RENDERING_H
