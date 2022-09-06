@@ -136,3 +136,7 @@ void compute_perspective_matrix(
     projection[2][3] = -1;
     projection[3][3] = 0;
 }
+
+float get_random_value(const float min, const float max) {
+    return min + (((float) rand()) / (float) RAND_MAX) * (max - min);
+}

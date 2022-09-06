@@ -19,6 +19,7 @@ public:
     Vertex* get_infinite_vertex();
 
     virtual BoundingBox get_bounding_box();
+    virtual glm::vec2 get_random_point();
 
     int take_step_visibility_march(const Face &face, const Vertex &vtx);
     // Rearrange the triangles of the mesh after the insertion of vtx,

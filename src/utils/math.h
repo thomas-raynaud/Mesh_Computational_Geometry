@@ -44,4 +44,6 @@ void compute_perspective_matrix(
     float z_near, float z_far
 );
 
+float get_random_value(const float min, const float max);
+
 #endif  // MATH_H

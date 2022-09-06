@@ -3,6 +3,7 @@
 #include <iostream>
 
 #include "techniques/predicate.h"
+#include "utils/math.h"
 
 
 Mesh2D::Mesh2D() {
@@ -91,6 +92,13 @@ BoundingBox Mesh2D::get_bounding_box() {
         }
         return bb;
     }
+}
+
+glm::vec2 Mesh2D::get_random_point() {
+    return glm::vec2(
+        get_random_value(-2.f, 2.f),
+        get_random_value(-2.f, 2.f)
+    );
 }
 
 

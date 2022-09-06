@@ -2,11 +2,11 @@
 
 This repository regroups the practical works related to the subject *Mesh and Computational Geometry* I've been following during my studies at Université Lyon 1.
 
-## Contributors
+**Contributors:**
 * Jan Aalmoes
 * Thomas Raynaud
 
-## Teacher
+**Teacher:**
 * Raphaëlle Chaine
 
 ## 2D

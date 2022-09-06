@@ -167,12 +167,28 @@ void MainWindow::on_voronoi_display_push_button_released() {
 void MainWindow::on_insert_points_push_button_released() {
     size_t nb_pts = ui.insert_points_line_edit->text().toInt();
     if (nb_pts == 0) return;
+    glm::vec2 p2;
+    glm::vec3 p3;
+    float z;
+    Vertex *v;
     std::shared_ptr<Mesh2D> sp_mesh = std::dynamic_pointer_cast<Mesh2D>(m_mesh);
+    std::shared_ptr<MeshParabola> sp_mesh_parabola;
+    if (m_mesh_config->algorithm_2d_type == Algorithm2DType::Parabola) {
+        sp_mesh_parabola = std::dynamic_pointer_cast<MeshParabola>(m_mesh);
+    }
     for (size_t i = 0; i < nb_pts; ++i) {
-        float rand_x = -2.f + (((float) rand()) / (float) RAND_MAX) * 4.f;
-        float rand_y = -2.f + (((float) rand()) / (float) RAND_MAX) * 4.f;
-        glm::vec3 p(rand_x, rand_y, 0);
-        delaunay::insert_vertex(*sp_mesh, p);
+        p2 = sp_mesh->get_random_point();
+        if (m_mesh_config->algorithm_2d_type == Algorithm2DType::Parabola) {
+            z = sp_mesh_parabola->compute_z_coordinate(p2.x, p2.y);
+        }
+        else {
+            z = 0.f;
+        }
+        p3 = glm::vec3(p2, z);
+        delaunay::insert_vertex(*sp_mesh, p3);
+    }
+    if (m_mesh_config->algorithm_2d_type == Algorithm2DType::Parabola) {
+        sp_mesh_parabola->color_vertices();
     }
     update_voronoi_vertices();
 }
