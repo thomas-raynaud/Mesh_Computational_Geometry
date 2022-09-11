@@ -37,10 +37,11 @@ MeshRuppert::MeshRuppert() : Mesh2D() {
         Edge(v1, v2),
         Edge(v2, v4),
     };
-    Edge *e;
     for (size_t i = 0; i < edge_constraints_vec.size(); ++i) {
-        e = &edge_constraints_vec[i];
-        m_edge_constraints[e->get_hash()] = *e;
+        m_edge_constraints.insert({
+            edge_constraints_vec[i].get_hash(),
+            edge_constraints_vec[i]
+        });
     }
 }
 

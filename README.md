@@ -2,6 +2,21 @@
 
 This repository regroups the practical works related to the subject *Mesh and Computational Geometry* I've been following during my studies at Université Lyon 1.
 
+## Installation
+
+- Install cmake
+- Install glm, Catch2, Qt5 and OpenGL
+- Create a script to populate the cmake cache when building the project. The one I use contains these lines :
+```
+set(CMAKE_INSTALL_PREFIX "[PROJECT_LOCATION]/build/install" CACHE PATH "Install directory")
+set(glm_DIR "[GLM_LOCATION]/build/install/lib/cmake/glm" CACHE PATH "Path to the GLM library's cmake files")
+set(Catch2_DIR "[CATCH2_LOCATION]/build/install/lib/cmake/Catch2" CACHE PATH "Path to the Catch2 library's cmake files")
+set(CMAKE_BUILD_TYPE "Debug")
+```
+- Build the project : `cmake -C [PROJECT_LOCATION]/user_init_cache.txt -S [PROJECT_LOCATION] -B [PROJECT_LOCATION]/build`
+- `cd [PROJECT_LOCATION]/build`
+- Run the program: `./Mesh_Computational_Geometry`
+
 **Contributors:**
 * Jan Aalmoes
 * Thomas Raynaud
@@ -28,6 +43,10 @@ The skeleton of a shape regroups the centers of maximal balls contained in the o
 - Construct the Delaunay triangulation with the points from the entry sample.
 - Add the Voronoi vertices inside the Delaunay triangulation.
 - Draw edges between two points in the Delaunay triangle only if they belong to the entry sample.
+
+### Ruppert
+
+...
 
 ## 3D
 
