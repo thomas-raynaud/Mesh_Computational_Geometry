@@ -4,6 +4,7 @@
 #include <string>
 #include <vector>
 #include <array>
+#include <cmath>
 
 struct ObjData {
     std::vector<std::array<float, 4>> vertices;
@@ -16,14 +17,33 @@ int read_obj(std::istream& data, struct ObjData* objData);
 
 
 template <class T>
-int number_to_string(const std::string &str, T& number) {
-    int res = 0;
+int string_to_number(const std::string& str, T& number) {
+    int pos_comma;
+    int floating_part;
+    bool is_positive;
+    pos_comma = str.find(".");
+    if (pos_comma == std::string::npos)
+        pos_comma = str.find(",");
     try {
-        number = (T)std::stof(str);
+        number = std::stoi(str.substr(0, pos_comma));
     }
-    catch(std::invalid_argument e)  { res = -1; }
-    catch(std::out_of_range e)      { res = -1; }
-    return res;
+    catch(std::invalid_argument e)  { return -1; }
+    catch(std::out_of_range e)      { return -1; }
+    is_positive = str[0] != '-';
+    if (pos_comma != std::string::npos) {
+        try {
+            floating_part = std::stoi(str.substr(pos_comma + 1, std::string::npos));
+        }
+        catch(std::invalid_argument e)  { return -1; }
+        catch(std::out_of_range e)      { return -1; }
+        int size_floating_part = str.size() - (pos_comma + 1);
+        double d_floating_part = floating_part * pow(0.1, size_floating_part);
+        if (number >= 0 && is_positive)
+            number += d_floating_part;
+        else
+            number -= d_floating_part;
+    }
+    return 0;
 }
 
 template <class T>
@@ -43,7 +63,7 @@ int get_numbers_from_line(
     pos_end = line.find(" ", pos_start + 1);
     while (pos_end != std::string::npos) {
         param_str = line.substr(pos_start, pos_end - pos_start);
-        res = number_to_string<T>(param_str, param);
+        res = string_to_number<T>(param_str, param);
         if (res != 0 || nb_params_read >= max_nb_params)
             return -1;
         params.push_back(param);
@@ -52,7 +72,7 @@ int get_numbers_from_line(
         pos_end = line.find(" ", pos_start);
     }
     param_str = line.substr(pos_start);
-    res = number_to_string<T>(param_str, param);
+    res = string_to_number<T>(param_str, param);
     if (res != 0 || nb_params_read >= max_nb_params)
         return -1;
     params.push_back(param);

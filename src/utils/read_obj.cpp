@@ -12,7 +12,6 @@ int read_obj(const std::string filename, struct ObjData* objData) {
     return status;
 }
 
-#include <iostream>
 int read_obj(std::istream& data, struct ObjData* objData) {
     std::vector<float> vertex_vec;
     std::vector<int> face_vec, polyline_vec;
@@ -27,8 +26,12 @@ int read_obj(std::istream& data, struct ObjData* objData) {
     while(read_status == 0) {
         // If the line is empty, go to the next one
         if (line == "" || line.find_first_not_of(' ') == std::string::npos) {
-            std::getline(data, line);
-            continue;
+            if (data.eof())
+                break;
+            else {
+                std::getline(data, line);
+                continue;
+            }
         }
         switch(line[0]) {
             case 'v':
@@ -100,9 +103,9 @@ int read_obj(std::istream& data, struct ObjData* objData) {
                 read_status = -1;
                 break;
         }
-        std::getline(data, line);
         if (data.eof())
             break;
+        std::getline(data, line);
     }
     return read_status;
 }

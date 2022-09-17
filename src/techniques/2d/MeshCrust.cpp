@@ -2,26 +2,29 @@
 
 #include <fstream>
 #include <sstream>
+#include <iostream>
 
 #include "delaunay.h"
 #include "voronoi.h"
+#include "utils/read_obj.h"
 
 
 MeshCrust::MeshCrust() : Mesh2D() {
-    // Insert points in the file.
-    std::ifstream file("resources/points_courbe.txt");
-    if(!file) return;
-    std::string line;
+    ObjData crust_data;
+    std::string filename = "resources/crust.obj";
     float x, y;
-    std::istringstream iss;
     Vertex *vtx;
-    while (!file.eof()) {
-        std::getline(file, line);
-        iss.str(line);
-        iss >> x >> y;
-        vtx = delaunay::insert_vertex(*this, glm::vec3(x, y, 0.f));
+    // Read OBJ file
+    if (read_obj(filename, &crust_data) != 0) {
+        std::cerr << "Error: could not read obj file at " << filename << std::endl;
+        return;
+    }
+    // Insert vertices from OBJ data
+    for (size_t i = 0; i < crust_data.vertices.size(); ++i) {
+        vtx = delaunay::insert_vertex(
+            *this, glm::vec3(crust_data.vertices[i][0], crust_data.vertices[i][1], 0.f)
+        );
         m_is_voronoi_vertex[vtx->get_hash()] = false;
-        iss.clear();
     }
     update_hidden_vertices();
 

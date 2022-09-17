@@ -18,6 +18,25 @@ TEST_CASE( "Find the center of 3 points", "[utils]" ) {
     ));
 }
 
+TEST_CASE ( "Read a number from a string", "[utils]") {
+    std::string str;
+    int i_number;
+    float f_number;
+    double d_number;
+    str = "str";
+    REQUIRE(string_to_number(str, i_number) != 0);
+    str = "751.25";
+    REQUIRE(string_to_number(str, i_number) == 0);
+    REQUIRE(string_to_number(str, f_number) == 0);
+    REQUIRE(string_to_number(str, d_number) == 0);
+    REQUIRE(i_number == 751);
+    REQUIRE(f_number == 751.25f);
+    REQUIRE(d_number == 751.25);
+    str = "751,25856315";
+    REQUIRE(string_to_number(str, f_number) == 0);
+    REQUIRE(f_number == Approx(751.2585));
+}
+
 TEST_CASE( "Read a OBJ file", "[utils]" ) {
     ObjData obj_data1, obj_data2;
     std::ostringstream oss;
@@ -66,11 +85,11 @@ TEST_CASE( "Read a OBJ file", "[utils]" ) {
     oss.str("");
 
     // Correct OBJ
-    oss << "v 0.1 0.2 0" << std::endl;
+    oss << "v 0.152468428 -1.83673 0" << std::endl;
     oss << "# comment" << std::endl;
     oss << " " << std::endl;
     oss << std::endl;
-    oss << "v 0 0.2 0.3 0" << std::endl;
+    oss << "v 0 -0.2 -0.3 0" << std::endl;
     oss << "v 0.4 0 0.3" << std::endl;
     oss << "f 1 2 3" << std::endl;
     oss << "l 1 2 3" << std::endl;
@@ -78,12 +97,12 @@ TEST_CASE( "Read a OBJ file", "[utils]" ) {
     res = read_obj((std::istream&)iss, &obj_data2);
     REQUIRE(res == 0);
     REQUIRE(obj_data2.vertices.size() == 3);
-    REQUIRE(obj_data2.vertices[0][0] == 0.1f);
-    REQUIRE(obj_data2.vertices[0][1] == 0.2f);
+    REQUIRE(obj_data2.vertices[0][0] == 0.152468428f);
+    REQUIRE(obj_data2.vertices[0][1] == -1.83673f);
     REQUIRE(obj_data2.vertices[0][2] == 0);
     REQUIRE(obj_data2.vertices[1][0] == 0);
-    REQUIRE(obj_data2.vertices[1][1] == 0.2f);
-    REQUIRE(obj_data2.vertices[1][2] == 0.3f);
+    REQUIRE(obj_data2.vertices[1][1] == -0.2f);
+    REQUIRE(obj_data2.vertices[1][2] == -0.3f);
     REQUIRE(obj_data2.faces.size() == 1);
     REQUIRE(obj_data2.faces[0][0] == 1);
     REQUIRE(obj_data2.faces[0][1] == 2);
