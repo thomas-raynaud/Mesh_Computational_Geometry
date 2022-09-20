@@ -147,7 +147,8 @@ void MainWindow::on_algorithm_type_combobox_currentIndexChanged(int index) {
     else if (m_mesh_config->algorithm_2d_type == Algorithm2DType::Ruppert) {
         ui.parabola_widget->hide();
         ui.ruppert_widget->show();
-        set_mesh(std::make_shared<MeshRuppert>());
+        float alpha = 15.f;
+        set_mesh(std::make_shared<MeshRuppert>(alpha));
     }
     else if (m_mesh_config->algorithm_2d_type == Algorithm2DType::Parabola) {
         ui.parabola_widget->show();

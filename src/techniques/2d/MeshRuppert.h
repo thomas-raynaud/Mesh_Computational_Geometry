@@ -4,22 +4,33 @@
 #include "meshes/Mesh2D.h"
 #include "meshes/Edge.h"
 
+struct PlanarStraightLineGraph {
+    std::vector<glm::vec3> m_vertices;
+    std::vector<std::array<int, 2>> m_edges;
+};
 
 class MeshRuppert : public Mesh2D {
 protected:
-    std::unordered_map<Edge_Hash, Edge> m_edge_constraints;
+    PlanarStraightLineGraph m_graph;
+    std::vector<Edge> m_constraint_edges;
 
 public:
-    MeshRuppert();
+    MeshRuppert(const float alpha);
 
-    bool is_constraint(Vertex &a, Vertex &b);
-    // Returns the constraints that do not exist as edges of the mesh.
-    std::vector<Edge_Hash> constraint_edges_encroached_upon();
-    void split_edge(const Edge_Hash &edge_hash);
-    // Split constraint edges in half until all of them are part of the Delaunay
-    // triangulation.
-    void split_encroached_constraint_edges();
+    bool is_constraint(const Vertex &a, const Vertex &b);
+
     Face* find_worst_aspect_ratio_triangle(float alpha);
+
+    bool is_segment_encroached_upon_by_point(
+        const int edge_ind,
+        const glm::vec3 p
+    );
+    void split_segment(const int edge_ind);
+    int get_one_segment_encroached_upon();
+    std::vector<int> get_segments_encroached_upon_point(
+        const glm::vec3 p
+    );
+
     void refine(float alpha);
 };
 

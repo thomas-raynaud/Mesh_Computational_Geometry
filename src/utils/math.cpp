@@ -140,3 +140,15 @@ void compute_perspective_matrix(
 float get_random_value(const float min, const float max) {
     return min + (((float) rand()) / (float) RAND_MAX) * (max - min);
 }
+
+bool is_point_in_diametral_circle_of_segment(
+    const glm::vec3 p,
+    const glm::vec3 s1,
+    const glm::vec3 s2
+) {
+    float a = glm::length(s1 - p);
+    float b = glm::length(s2 - s1);
+    float c = glm::length(p - s2);
+    float angle_p = std::acos((a * a + c * c - b * b) / (2 * a * c));
+    return glm::degrees(angle_p) <= 90.f;
+}

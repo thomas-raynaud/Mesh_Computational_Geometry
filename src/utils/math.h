@@ -46,4 +46,10 @@ void compute_perspective_matrix(
 
 float get_random_value(const float min, const float max);
 
+bool is_point_in_diametral_circle_of_segment(
+    const glm::vec3 p,
+    const glm::vec3 s1,
+    const glm::vec3 s2
+);
+
 #endif  // MATH_H

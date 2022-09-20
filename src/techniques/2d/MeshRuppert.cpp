@@ -2,99 +2,52 @@
 
 #include "delaunay.h"
 #include "utils/math.h"
+#include "utils/read_obj.h"
+
+#include <iostream>
 
 
-MeshRuppert::MeshRuppert() : Mesh2D() {
-    // Vertices
-    Vertex * v1  = delaunay::insert_vertex(*this, glm::vec3( -1, -1, 0));
-    Vertex * v2  = delaunay::insert_vertex(*this, glm::vec3(  1, -1, 0));
-    Vertex * v3  = delaunay::insert_vertex(*this, glm::vec3(  0,  1, 0));
-    Vertex * v4  = delaunay::insert_vertex(*this, glm::vec3(  3,  3, 0));
-    Vertex * v5  = delaunay::insert_vertex(*this, glm::vec3( -2,  4, 0));
-    Vertex * v6  = delaunay::insert_vertex(*this, glm::vec3(  1,  8, 0));
-    Vertex * v7  = delaunay::insert_vertex(*this, glm::vec3( -1,  9, 0));
-    Vertex * v8  = delaunay::insert_vertex(*this, glm::vec3( -7, 12, 0));
-    Vertex * v9  = delaunay::insert_vertex(*this, glm::vec3(-10,  5, 0));
-    Vertex * v10 = delaunay::insert_vertex(*this, glm::vec3( -4,  3, 0));
-    Vertex * v11 = delaunay::insert_vertex(*this, glm::vec3( -4,  2, 0));
-    Vertex * v12 = delaunay::insert_vertex(*this, glm::vec3( -7,  1, 0));
-    Vertex * v13 = delaunay::insert_vertex(*this, glm::vec3( -3, -1, 0));
-    Vertex * v14 = delaunay::insert_vertex(*this, glm::vec3(  2,  7, 0));
-    // Constraints
-    std::vector<Edge> edge_constraints_vec = {
-        Edge(v4, v14),
-        Edge(v14, v3),
-        Edge(v3, v5),
-        Edge(v5, v6),
-        Edge(v6, v7),
-        Edge(v7, v8),
-        Edge(v8, v9),
-        Edge(v9, v10),
-        Edge(v10, v11),
-        Edge(v11, v12),
-        Edge(v12, v13),
-        Edge(v13, v1),
-        Edge(v1, v2),
-        Edge(v2, v4),
-    };
-    for (size_t i = 0; i < edge_constraints_vec.size(); ++i) {
-        m_edge_constraints.insert({
-            edge_constraints_vec[i].get_hash(),
-            edge_constraints_vec[i]
-        });
+MeshRuppert::MeshRuppert(const float alpha) : Mesh2D() {
+    ObjData ruppert_data;
+    std::string filename = "resources/ruppert.obj";
+    // Read OBJ file
+    if (read_obj(filename, &ruppert_data) != 0) {
+        std::cerr << "Error: could not read obj file at " << filename << std::endl;
+        return;
     }
-}
-
-
-bool MeshRuppert::is_constraint(Vertex &a, Vertex &b){
-    Edge e(&a, &b);
-    return (m_edge_constraints.find(e.get_hash()) != m_edge_constraints.end());
-}
-
-
-std::vector<Edge_Hash> MeshRuppert::constraint_edges_encroached_upon() {
-    std::vector<Edge_Hash> encroached_edges;
-    std::unordered_map<Edge_Hash, Edge>::iterator edge_it;
-    VertexCirculator vc, vc_begin;
-    bool edge_exists;
-    for (
-            edge_it = m_edge_constraints.begin();
-            edge_it != m_edge_constraints.end();
-            ++edge_it
-    ) {
-        vc_begin = neighbour_vertices(*(edge_it->second.v1));
-        vc = vc_begin;
-        edge_exists = false;
-        do {
-            edge_exists = *(edge_it->second.v2) == *vc;
-            ++vc;
-        } while (vc != vc_begin && !edge_exists);
-        if (!edge_exists)
-            encroached_edges.push_back(edge_it->first);
+    // Fill the graph the OBJ structure
+    std::array<float, 4> vt_data;
+    for (size_t i = 0; i < ruppert_data.vertices.size(); ++i) {
+        vt_data = ruppert_data.vertices[i];
+        m_graph.m_vertices.push_back(
+            glm::vec3(vt_data[0], vt_data[1], vt_data[2])
+        );
     }
-    return encroached_edges;
-}
-
-
-void MeshRuppert::split_edge(const Edge_Hash &edge_hash) {
-    Edge e = m_edge_constraints[edge_hash];
-    glm::vec3 a = e.v1->get_position();
-    glm::vec3 b = e.v2->get_position();
-    Vertex *new_vtx = delaunay::insert_vertex(*this, (a + b) * 0.5f);
-    m_edge_constraints.erase(edge_hash);
-    Edge e1(e.v1, new_vtx);
-    Edge e2(new_vtx, e.v2);
-    m_edge_constraints[e1.get_hash()] = e1;
-    m_edge_constraints[e2.get_hash()] = e2;
-}
-
-
-void MeshRuppert::split_encroached_constraint_edges() {
-    std::vector<Edge_Hash> encroached_edges = constraint_edges_encroached_upon();
-    while (encroached_edges.size()) {
-        split_edge(encroached_edges[0]);
-        encroached_edges = constraint_edges_encroached_upon();
+    int vtx_ind, vtx_ind2;
+    for (size_t i = 0; i < ruppert_data.polylines.size(); ++i) {
+        vtx_ind = ruppert_data.polylines[i][0] - 1;
+        for (size_t j = 1; j < ruppert_data.polylines[i].size(); ++j) {
+            vtx_ind2 = ruppert_data.polylines[i][j] - 1;
+            m_graph.m_edges.push_back({ vtx_ind, vtx_ind2 });
+            vtx_ind = vtx_ind2;
+        }
     }
+    // Refine
+    refine(alpha);
+}
+
+bool MeshRuppert::is_constraint(const Vertex &a, const Vertex &b) {
+    Edge *e;
+    Vertex_Hash a_hash = a.get_hash();
+    Vertex_Hash b_hash = b.get_hash();
+    for (size_t i = 0; i < m_constraint_edges.size(); ++i) {
+        e = &m_constraint_edges[i];
+        if (    (e->v1->get_hash() == a_hash && e->v2->get_hash() == b_hash)
+            ||  (e->v1->get_hash() == b_hash && e->v2->get_hash() == a_hash)) {
+            return true;
+        }
+    }
+    return false;
 }
 
 
@@ -119,33 +72,96 @@ Face* MeshRuppert::find_worst_aspect_ratio_triangle(float alpha) {
 }
 
 
-void MeshRuppert::refine(float alpha) {
-    split_encroached_constraint_edges();
-    Face *face = find_worst_aspect_ratio_triangle(alpha);
-    std::array<Vertex*, 3> face_vts;
-    glm::vec3 a, b, c, q;
-    std::vector<Edge_Hash> encroached_edges;
-    while (face != nullptr) {
-        face_vts = face->get_vertices();
-        a = face_vts[0]->get_position();
-        b = face_vts[1]->get_position();
-        c = face_vts[2]->get_position();
-        // Insert the Voronoi center in a temp mesh
-        q = compute_circumcenter(a, b, c);
-        MeshRuppert mesh_tmp = *this;
-        delaunay::insert_vertex(mesh_tmp, q);
-        encroached_edges = mesh_tmp.constraint_edges_encroached_upon();
-        if (encroached_edges.size() == 0) {
-            delaunay::insert_vertex(*this, q);
-        }
-        else {
-            // Split the constraint edges that q encroaches upon
-            for (   size_t edge_ind = 0;
-                    edge_ind < encroached_edges.size();
-                    ++edge_ind
-            ) {
-                split_edge(encroached_edges[edge_ind]);
+void MeshRuppert::split_segment(const int edge_ind) {
+    Edge e = m_constraint_edges[edge_ind];
+    glm::vec3 a = e.v1->get_position();
+    glm::vec3 b = e.v2->get_position();
+    Vertex *new_vtx = delaunay::insert_vertex(*this, (a + b) * 0.5f);
+    m_constraint_edges[edge_ind] = Edge(e.v1, new_vtx);
+    m_constraint_edges.push_back(Edge(new_vtx, e.v2));
+}
+
+bool MeshRuppert::is_segment_encroached_upon_by_point(
+    const int edge_ind,
+    const glm::vec3 p
+) {
+    const glm::vec3 v1 = m_constraint_edges[edge_ind].v1->get_position();
+    const glm::vec3 v2 = m_constraint_edges[edge_ind].v2->get_position();
+    return is_point_in_diametral_circle_of_segment(p, v1, v2);
+}
+
+int MeshRuppert::get_one_segment_encroached_upon() {
+    Edge *e;
+    for (size_t i = 0; i < m_constraint_edges.size(); ++i) {
+        e = &m_constraint_edges[i];
+        for (VertexIteratorType vtx_it = m_vertices.begin(); vtx_it != m_vertices.end(); ++vtx_it) {
+            if (vtx_it->first == e->v1->get_hash() || vtx_it->first == e->v2->get_hash()) {
+                continue;
             }
+            if (is_segment_encroached_upon_by_point(i, vtx_it->second.get_position()))
+                return i;
         }
     }
+    // No constraint edges encroached upon
+    return -1;
+}
+
+std::vector<int> MeshRuppert::get_segments_encroached_upon_point(
+    const glm::vec3 p
+) {
+    Edge *e;
+    std::vector<int> encroached_segments;
+    for (size_t i = 0; i < m_constraint_edges.size(); ++i) {
+        if (is_segment_encroached_upon_by_point(i, p))
+            encroached_segments.push_back(i);
+    }
+    return encroached_segments;
+}
+
+void MeshRuppert::refine(const float alpha) {
+    float smallest_angle;
+    int segment_encroached_upon;
+    std::vector<int> segments_encroached_upon_p;
+    Face *triangle;
+    // Compute initial Delaunay triangulation
+    m_faces.clear();
+    m_vertices.clear();
+    m_constraint_edges.clear();
+    Mesh2D();
+    std::vector<Vertex*> inserted_vts;
+    Vertex* inserted_vtx;
+    std::array<int, 2> constraint_edge;
+    for (size_t i = 0; i < m_graph.m_vertices.size(); ++i) {
+        inserted_vtx = delaunay::insert_vertex(*this, m_graph.m_vertices[i]);
+        inserted_vts.push_back(inserted_vtx);
+    }
+    for (size_t i = 0; i < m_graph.m_edges.size(); ++i) {
+        constraint_edge = m_graph.m_edges[i];
+        m_constraint_edges.push_back(
+            Edge(inserted_vts[constraint_edge[0]], inserted_vts[constraint_edge[1]])
+        );
+    }
+    segment_encroached_upon = get_one_segment_encroached_upon();
+    do {
+        while (segment_encroached_upon != -1) {
+            split_segment(segment_encroached_upon);
+            segment_encroached_upon = get_one_segment_encroached_upon();
+        }
+        triangle = find_worst_aspect_ratio_triangle(alpha);
+        glm::vec3 p = compute_circumcenter(
+            triangle->get_vertices()[0]->get_position(),
+            triangle->get_vertices()[1]->get_position(),
+            triangle->get_vertices()[2]->get_position()
+        );
+        segments_encroached_upon_p = get_segments_encroached_upon_point(p);
+        if (segments_encroached_upon_p.size() > 0) {
+            for (size_t i = 0; i < segments_encroached_upon_p.size(); ++i) {
+                split_segment(segments_encroached_upon_p[i]);
+            }
+        }
+        else {
+            delaunay::split_triangle(this, p, triangle);
+        }
+        segment_encroached_upon = get_one_segment_encroached_upon();
+    } while(segment_encroached_upon != -1 && smallest_angle > alpha);
 }
