@@ -31,3 +31,19 @@ TEST_CASE( "Test if points are in the circumscribed circle of a triangle", "[pre
     REQUIRE(is_in_circle(a, b, c, e) == true);
     REQUIRE(is_in_circle(a, b, c, f) == false);
 }
+
+TEST_CASE ( "Is a point in the diametral circle of a segment", "[predicate]" ) {
+    glm::vec3 p, s1, s2;
+    s1 = glm::vec3(-1, 1, 0);
+    s2 = glm::vec3(1, 1, 0);
+    p = glm::vec3(0, 0.5, 0);
+    REQUIRE(is_point_in_diametral_circle_of_segment(p, s1, s2) == true);
+    p = glm::vec3(0, -0.5, 0);
+    REQUIRE(is_point_in_diametral_circle_of_segment(p, s1, s2) == false);
+    p = s1;
+    REQUIRE(is_point_in_diametral_circle_of_segment(p, s1, s2) == true);
+    p = glm::vec3(0, 1.5, 0);
+    REQUIRE(is_point_in_diametral_circle_of_segment(p, s1, s2) == true);
+    p = glm::vec3(0, 2.5, 0);
+    REQUIRE(is_point_in_diametral_circle_of_segment(p, s1, s2) == false);
+}

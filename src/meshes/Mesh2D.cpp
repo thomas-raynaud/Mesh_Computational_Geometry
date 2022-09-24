@@ -7,7 +7,13 @@
 
 
 Mesh2D::Mesh2D() {
-    // Create an invisible tetrahedron that wraps up the 2D mesh.
+    create_mesh_wrapper();
+}
+
+Mesh2D::~Mesh2D() {}
+
+
+void Mesh2D::create_mesh_wrapper() {
     Vertex *va = add_vertex(glm::vec3(-MAX_DIST,       0.f, 0.f));
     Vertex *vb = add_vertex(glm::vec3( MAX_DIST, -MAX_DIST, 0.f));
     Vertex *vc = add_vertex(glm::vec3( MAX_DIST,  MAX_DIST, 0.f));
@@ -24,9 +30,6 @@ Mesh2D::Mesh2D() {
     connect_adjacent_faces();
     update_hidden_vertices();
 }
-
-Mesh2D::~Mesh2D() {}
-
 
 void Mesh2D::update_hidden_vertices() {
     Vertex inf_vtx = m_vertices[m_infinite_vertex];

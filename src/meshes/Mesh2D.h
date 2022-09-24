@@ -16,6 +16,9 @@ public:
     Mesh2D();
     virtual ~Mesh2D();
 
+    // Create an invisible tetrahedron that wraps up the 2D mesh.
+    void create_mesh_wrapper();
+
     Vertex* get_infinite_vertex();
 
     virtual BoundingBox get_bounding_box();

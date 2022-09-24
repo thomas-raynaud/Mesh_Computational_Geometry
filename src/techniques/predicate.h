@@ -27,4 +27,10 @@ bool is_in_circle(
     const glm::vec3 &d
 );
 
+bool is_point_in_diametral_circle_of_segment(
+    const glm::vec3 p,
+    const glm::vec3 s1,
+    const glm::vec3 s2
+);
+
 #endif  // PREDICATE_H

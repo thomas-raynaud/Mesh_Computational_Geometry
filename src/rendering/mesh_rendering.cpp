@@ -179,6 +179,7 @@ void draw_mesh_wireframe(MeshRuppert *mesh) {
     FaceIterator face_it;
     std::array<Vertex*, 3> face_vts;
     Vertex *v1, *v2;
+    glColor3d(0, 1, 0);
     for (face_it = mesh->faces_begin(); face_it != mesh->faces_end(); ++face_it) {
         if (!mesh->is_face_visible(*face_it)) continue;
         face_vts = face_it->get_vertices();
@@ -186,13 +187,22 @@ void draw_mesh_wireframe(MeshRuppert *mesh) {
             v1 = face_vts[i];
             v2 = face_vts[(i + 1) % 3];
             if (mesh->is_constraint(*v1, *v2))
-                glColor3d(1, 0, 0);
-            else
-                glColor3d(0, 1, 0);
+                continue;
             glBegin(GL_LINE_STRIP);
             draw_vertex(*v1);
             draw_vertex(*v2);
             glEnd();
         }
+    }
+    // Draw constraints
+    glColor3d(1, 0, 0);
+    std::vector<Edge> constraint_edges = mesh->get_constraint_edges();
+    for (size_t i = 0; i < constraint_edges.size(); ++i) {
+        v1 = constraint_edges[i].v1;
+        v2 = constraint_edges[i].v2;
+        glBegin(GL_LINE_STRIP);
+        draw_vertex(*v1);
+        draw_vertex(*v2);
+        glEnd();
     }
 }

@@ -19,7 +19,7 @@ public:
 
     bool is_constraint(const Vertex &a, const Vertex &b);
 
-    Face* find_worst_aspect_ratio_triangle(float alpha);
+    float find_worst_aspect_ratio_triangle(float alpha, Face * worst_triangle);
 
     bool is_segment_encroached_upon_by_point(
         const int edge_ind,
@@ -32,6 +32,8 @@ public:
     );
 
     void refine(float alpha);
+
+    std::vector<Edge> get_constraint_edges();
 };
 
 #endif  // RUPPERT_H

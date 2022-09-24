@@ -53,3 +53,26 @@ bool is_in_circle(
     float res = -(glm::dot(glm::cross(q - p, r - p), s - p));
     return res > 0;
 }
+
+bool is_point_in_diametral_circle_of_segment(
+    const glm::vec3 p,
+    const glm::vec3 s1,
+    const glm::vec3 s2
+) {
+    glm::vec3 a, b;
+    float angle_p;
+    float orientation_s1_s2_p = test_orientation(s1, s2, p);
+    if (orientation_s1_s2_p > 0.f) {
+        a = s1;
+        b = s2;
+    }
+    else if (orientation_s1_s2_p < 0.f) {
+        a = s2;
+        b = s1;
+    }
+    else {
+        return true;
+    }
+    angle_p = std::acos(cos(s1, p, s2));
+    return glm::degrees(angle_p) >= 90.f;
+}

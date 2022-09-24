@@ -7,7 +7,7 @@
 #include <iostream>
 
 
-MeshRuppert::MeshRuppert(const float alpha) : Mesh2D() {
+MeshRuppert::MeshRuppert(const float alpha) {
     ObjData ruppert_data;
     std::string filename = "resources/ruppert.obj";
     // Read OBJ file
@@ -26,8 +26,9 @@ MeshRuppert::MeshRuppert(const float alpha) : Mesh2D() {
     int vtx_ind, vtx_ind2;
     for (size_t i = 0; i < ruppert_data.polylines.size(); ++i) {
         vtx_ind = ruppert_data.polylines[i][0] - 1;
-        for (size_t j = 1; j < ruppert_data.polylines[i].size(); ++j) {
-            vtx_ind2 = ruppert_data.polylines[i][j] - 1;
+        for (size_t j = 0; j < ruppert_data.polylines[i].size(); ++j) {
+            vtx_ind = ruppert_data.polylines[i][j] - 1;
+            vtx_ind2 = ruppert_data.polylines[i][(j + 1) % ruppert_data.polylines[i].size()] - 1;
             m_graph.m_edges.push_back({ vtx_ind, vtx_ind2 });
             vtx_ind = vtx_ind2;
         }
@@ -51,8 +52,8 @@ bool MeshRuppert::is_constraint(const Vertex &a, const Vertex &b) {
 }
 
 
-Face* MeshRuppert::find_worst_aspect_ratio_triangle(float alpha) {
-    Face *worst_triangle = nullptr;
+float MeshRuppert::find_worst_aspect_ratio_triangle(float alpha, Face * worst_triangle) {
+    worst_triangle = nullptr;
     float angle_max = -1.f;
     float angle_max_face;
     FaceIterator face_it;
@@ -68,7 +69,7 @@ Face* MeshRuppert::find_worst_aspect_ratio_triangle(float alpha) {
             worst_triangle = &*face_it;
         }
     }
-    return worst_triangle;
+    return std::acos(angle_max_face);
 }
 
 
@@ -79,6 +80,7 @@ void MeshRuppert::split_segment(const int edge_ind) {
     Vertex *new_vtx = delaunay::insert_vertex(*this, (a + b) * 0.5f);
     m_constraint_edges[edge_ind] = Edge(e.v1, new_vtx);
     m_constraint_edges.push_back(Edge(new_vtx, e.v2));
+    int last_ind = m_constraint_edges.size() - 1;
 }
 
 bool MeshRuppert::is_segment_encroached_upon_by_point(
@@ -119,6 +121,7 @@ std::vector<int> MeshRuppert::get_segments_encroached_upon_point(
 }
 
 void MeshRuppert::refine(const float alpha) {
+    float alpha_rad = glm::radians(alpha);
     float smallest_angle;
     int segment_encroached_upon;
     std::vector<int> segments_encroached_upon_p;
@@ -127,7 +130,7 @@ void MeshRuppert::refine(const float alpha) {
     m_faces.clear();
     m_vertices.clear();
     m_constraint_edges.clear();
-    Mesh2D();
+    create_mesh_wrapper();
     std::vector<Vertex*> inserted_vts;
     Vertex* inserted_vtx;
     std::array<int, 2> constraint_edge;
@@ -147,7 +150,7 @@ void MeshRuppert::refine(const float alpha) {
             split_segment(segment_encroached_upon);
             segment_encroached_upon = get_one_segment_encroached_upon();
         }
-        triangle = find_worst_aspect_ratio_triangle(alpha);
+        smallest_angle = find_worst_aspect_ratio_triangle(alpha_rad, triangle);
         glm::vec3 p = compute_circumcenter(
             triangle->get_vertices()[0]->get_position(),
             triangle->get_vertices()[1]->get_position(),
@@ -163,5 +166,9 @@ void MeshRuppert::refine(const float alpha) {
             delaunay::split_triangle(this, p, triangle);
         }
         segment_encroached_upon = get_one_segment_encroached_upon();
-    } while(segment_encroached_upon != -1 && smallest_angle > alpha);
+    } while(segment_encroached_upon != -1 && smallest_angle > alpha_rad);
+}
+
+std::vector<Edge> MeshRuppert::get_constraint_edges() {
+    return m_constraint_edges;
 }
