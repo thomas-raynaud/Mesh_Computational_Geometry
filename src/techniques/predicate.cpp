@@ -61,6 +61,7 @@ bool is_point_in_diametral_circle_of_segment(
 ) {
     glm::vec3 a, b;
     float angle_p;
+    float angle_p_deg;
     float orientation_s1_s2_p = test_orientation(s1, s2, p);
     if (orientation_s1_s2_p > 0.f) {
         a = s1;
@@ -70,9 +71,7 @@ bool is_point_in_diametral_circle_of_segment(
         a = s2;
         b = s1;
     }
-    else {
-        return true;
-    }
     angle_p = std::acos(cos(s1, p, s2));
-    return glm::degrees(angle_p) >= 90.f;
+    angle_p_deg = glm::degrees(angle_p);
+    return angle_p_deg >= 90.f && angle_p_deg != 180;
 }

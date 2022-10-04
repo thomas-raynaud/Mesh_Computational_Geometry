@@ -140,3 +140,7 @@ void compute_perspective_matrix(
 float get_random_value(const float min, const float max) {
     return min + (((float) rand()) / (float) RAND_MAX) * (max - min);
 }
+
+bool are_points_close(const glm::vec3 a, const glm::vec3 b) {
+    return glm::length(a - b) < 0.1;
+}

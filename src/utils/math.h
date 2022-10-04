@@ -52,4 +52,6 @@ bool is_point_in_diametral_circle_of_segment(
     const glm::vec3 s2
 );
 
+bool are_points_close(const glm::vec3 a, const glm::vec3 b);
+
 #endif  // MATH_H

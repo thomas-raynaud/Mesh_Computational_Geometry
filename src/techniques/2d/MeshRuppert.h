@@ -19,7 +19,7 @@ public:
 
     bool is_constraint(const Vertex &a, const Vertex &b);
 
-    float find_worst_aspect_ratio_triangle(float alpha, Face * worst_triangle);
+    float find_worst_aspect_ratio_triangle(float alpha, Face*& worst_triangle);
 
     bool is_segment_encroached_upon_by_point(
         const int edge_ind,

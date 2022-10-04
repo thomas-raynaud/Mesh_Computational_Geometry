@@ -52,7 +52,7 @@ bool MeshRuppert::is_constraint(const Vertex &a, const Vertex &b) {
 }
 
 
-float MeshRuppert::find_worst_aspect_ratio_triangle(float alpha, Face * worst_triangle) {
+float MeshRuppert::find_worst_aspect_ratio_triangle(float alpha, Face*& worst_triangle) {
     worst_triangle = nullptr;
     float angle_max = -1.f;
     float angle_max_face;
@@ -69,7 +69,10 @@ float MeshRuppert::find_worst_aspect_ratio_triangle(float alpha, Face * worst_tr
             worst_triangle = &*face_it;
         }
     }
-    return std::acos(angle_max_face);
+    if (angle_max == -1.f)
+        return -1.f;
+    else
+        return std::acos(angle_max);
 }
 
 
@@ -97,11 +100,18 @@ int MeshRuppert::get_one_segment_encroached_upon() {
     for (size_t i = 0; i < m_constraint_edges.size(); ++i) {
         e = &m_constraint_edges[i];
         for (VertexIteratorType vtx_it = m_vertices.begin(); vtx_it != m_vertices.end(); ++vtx_it) {
-            if (vtx_it->first == e->v1->get_hash() || vtx_it->first == e->v2->get_hash()) {
+            if (!is_vertex_visible(vtx_it->second))
                 continue;
-            }
-            if (is_segment_encroached_upon_by_point(i, vtx_it->second.get_position()))
+            if (vtx_it->first == e->v1->get_hash() || vtx_it->first == e->v2->get_hash())
+                continue;
+            if (are_points_close(e->v1->get_position(), e->v2->get_position()))
+                continue;
+            if (is_segment_encroached_upon_by_point(i, vtx_it->second.get_position())) {
+                glm::vec3 p = vtx_it->second.get_position();
+                glm::vec3 s1 = e->v1->get_position();
+                glm::vec3 s2 = e->v2->get_position();
                 return i;
+            }
         }
     }
     // No constraint edges encroached upon
@@ -125,7 +135,7 @@ void MeshRuppert::refine(const float alpha) {
     float smallest_angle;
     int segment_encroached_upon;
     std::vector<int> segments_encroached_upon_p;
-    Face *triangle;
+    Face *worst_triangle;
     // Compute initial Delaunay triangulation
     m_faces.clear();
     m_vertices.clear();
@@ -134,6 +144,7 @@ void MeshRuppert::refine(const float alpha) {
     std::vector<Vertex*> inserted_vts;
     Vertex* inserted_vtx;
     std::array<int, 2> constraint_edge;
+    glm::vec3 p;
     for (size_t i = 0; i < m_graph.m_vertices.size(); ++i) {
         inserted_vtx = delaunay::insert_vertex(*this, m_graph.m_vertices[i]);
         inserted_vts.push_back(inserted_vtx);
@@ -145,16 +156,20 @@ void MeshRuppert::refine(const float alpha) {
         );
     }
     segment_encroached_upon = get_one_segment_encroached_upon();
-    do {
+    smallest_angle = find_worst_aspect_ratio_triangle(alpha_rad, worst_triangle);
+
+    while (segment_encroached_upon != -1 || (worst_triangle != nullptr && smallest_angle < alpha_rad)) {
         while (segment_encroached_upon != -1) {
             split_segment(segment_encroached_upon);
             segment_encroached_upon = get_one_segment_encroached_upon();
         }
-        smallest_angle = find_worst_aspect_ratio_triangle(alpha_rad, triangle);
-        glm::vec3 p = compute_circumcenter(
-            triangle->get_vertices()[0]->get_position(),
-            triangle->get_vertices()[1]->get_position(),
-            triangle->get_vertices()[2]->get_position()
+        smallest_angle = find_worst_aspect_ratio_triangle(alpha_rad, worst_triangle);
+        if (worst_triangle == nullptr)
+            continue;
+        p = compute_circumcenter(
+            worst_triangle->get_vertices()[0]->get_position(),
+            worst_triangle->get_vertices()[1]->get_position(),
+            worst_triangle->get_vertices()[2]->get_position()
         );
         segments_encroached_upon_p = get_segments_encroached_upon_point(p);
         if (segments_encroached_upon_p.size() > 0) {
@@ -163,10 +178,11 @@ void MeshRuppert::refine(const float alpha) {
             }
         }
         else {
-            delaunay::split_triangle(this, p, triangle);
+            delaunay::insert_vertex(*this, p);
         }
         segment_encroached_upon = get_one_segment_encroached_upon();
-    } while(segment_encroached_upon != -1 && smallest_angle > alpha_rad);
+        smallest_angle = find_worst_aspect_ratio_triangle(alpha_rad, worst_triangle);
+    }
 }
 
 std::vector<Edge> MeshRuppert::get_constraint_edges() {
