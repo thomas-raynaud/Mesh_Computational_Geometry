@@ -13,6 +13,7 @@ class MeshRuppert : public Mesh2D {
 protected:
     PlanarStraightLineGraph m_graph;
     std::vector<Edge> m_constraint_edges;
+    BoundingBox m_constraints_bb;
 
 public:
     MeshRuppert(const float alpha);

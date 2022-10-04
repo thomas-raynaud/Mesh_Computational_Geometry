@@ -147,7 +147,9 @@ void MainWindow::on_algorithm_type_combobox_currentIndexChanged(int index) {
     else if (m_mesh_config->algorithm_2d_type == Algorithm2DType::Ruppert) {
         ui.parabola_widget->hide();
         ui.ruppert_widget->show();
-        float alpha = 30.f;
+        float alpha = 50.f; // Default alpha parameter for Ruppert
+        QLocale eng(QLocale::English, QLocale::UnitedKingdom);
+        ui.alpha_ruppert_line_edit->setText(eng.toString(alpha, 'f', 2));
         set_mesh(std::make_shared<MeshRuppert>(alpha));
     }
     else if (m_mesh_config->algorithm_2d_type == Algorithm2DType::Parabola) {
@@ -204,7 +206,8 @@ void MainWindow::on_parabola_type_combobox_currentIndexChanged(int index) {
 }
 
 void MainWindow::on_refine_push_button_released() {
-    ((MeshRuppert*)m_mesh.get())->refine(0.85f);
+    float alpha = ui.alpha_ruppert_line_edit->text().toFloat();
+    ((MeshRuppert*)m_mesh.get())->refine(alpha);
     update_voronoi_vertices();
 }
 

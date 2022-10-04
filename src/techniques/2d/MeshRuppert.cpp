@@ -33,6 +33,27 @@ MeshRuppert::MeshRuppert(const float alpha) {
             vtx_ind = vtx_ind2;
         }
     }
+    // Compute the bounding box of the edges
+    glm::vec3 p1, p2;
+    if (m_graph.m_edges.size() > 0) {
+        vtx_ind = m_graph.m_edges[0][0];
+        m_constraints_bb.min.x = m_graph.m_vertices[vtx_ind].x;
+        m_constraints_bb.max.x = m_graph.m_vertices[vtx_ind].x;
+        m_constraints_bb.min.y = m_graph.m_vertices[vtx_ind].y;
+        m_constraints_bb.max.y = m_graph.m_vertices[vtx_ind].y;
+    }
+    for (size_t i = 0; i < m_graph.m_edges.size(); ++i) {
+        vtx_ind = m_graph.m_edges[i][0];
+        vtx_ind2 = m_graph.m_edges[i][1];
+        m_constraints_bb.min.x = std::min(m_constraints_bb.min.x, m_graph.m_vertices[vtx_ind].x);
+        m_constraints_bb.min.x = std::min(m_constraints_bb.min.x, m_graph.m_vertices[vtx_ind2].x);
+        m_constraints_bb.max.x = std::max(m_constraints_bb.max.x, m_graph.m_vertices[vtx_ind].x);
+        m_constraints_bb.max.x = std::max(m_constraints_bb.max.x, m_graph.m_vertices[vtx_ind2].x);
+        m_constraints_bb.min.y = std::min(m_constraints_bb.min.y, m_graph.m_vertices[vtx_ind].y);
+        m_constraints_bb.min.y = std::min(m_constraints_bb.min.y, m_graph.m_vertices[vtx_ind2].y);
+        m_constraints_bb.max.y = std::max(m_constraints_bb.max.y, m_graph.m_vertices[vtx_ind].y);
+        m_constraints_bb.max.y = std::max(m_constraints_bb.max.y, m_graph.m_vertices[vtx_ind2].y);
+    }
     // Refine
     refine(alpha);
 }
@@ -58,10 +79,22 @@ float MeshRuppert::find_worst_aspect_ratio_triangle(float alpha, Face*& worst_tr
     float angle_max_face;
     FaceIterator face_it;
     std::array<Vertex*, 3> face_vts;
-    glm::vec3 a, b, c;
-    float cos_bac, cos_abc, cos_bca;
+    glm::vec3 p;
+    bool is_in_bounding_box;
     for (face_it = faces_begin(); face_it != faces_end(); ++face_it) {
         if (!is_face_visible(*face_it))
+            continue;
+        // Check if the triangle is in the constraints'bounding box
+        is_in_bounding_box = true;
+        for (size_t vtx_ind = 0; vtx_ind < 3; ++vtx_ind) {
+            p = face_it->get_vertices()[vtx_ind]->get_position();
+            if (p.x < m_constraints_bb.min.x || p.y < m_constraints_bb.min.y
+                || p.x > m_constraints_bb.max.x || p.y > m_constraints_bb.max.y) {
+                is_in_bounding_box = false;
+                break;
+            }
+        }
+        if (!is_in_bounding_box)
             continue;
         angle_max_face = face_it->get_max_angle();
         if (angle_max_face > alpha && angle_max_face > angle_max) {
