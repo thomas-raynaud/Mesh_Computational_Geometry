@@ -147,7 +147,7 @@ void MainWindow::on_algorithm_type_combobox_currentIndexChanged(int index) {
     else if (m_mesh_config->algorithm_2d_type == Algorithm2DType::Ruppert) {
         ui.parabola_widget->hide();
         ui.ruppert_widget->show();
-        float alpha = 50.f; // Default alpha parameter for Ruppert
+        float alpha = 35.f; // Default alpha parameter for Ruppert
         QLocale eng(QLocale::English, QLocale::UnitedKingdom);
         ui.alpha_ruppert_line_edit->setText(eng.toString(alpha, 'f', 2));
         set_mesh(std::make_shared<MeshRuppert>(alpha));

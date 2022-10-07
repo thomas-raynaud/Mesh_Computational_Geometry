@@ -35,6 +35,7 @@ public:
     void refine(float alpha);
 
     std::vector<Edge> get_constraint_edges();
+    virtual BoundingBox get_bounding_box();
 };
 
 #endif  // RUPPERT_H

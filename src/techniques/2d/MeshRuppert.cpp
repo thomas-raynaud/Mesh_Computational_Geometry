@@ -84,17 +84,22 @@ float MeshRuppert::find_worst_aspect_ratio_triangle(float alpha, Face*& worst_tr
     for (face_it = faces_begin(); face_it != faces_end(); ++face_it) {
         if (!is_face_visible(*face_it))
             continue;
-        // Check if the triangle is in the constraints'bounding box
-        is_in_bounding_box = true;
+        // Check if the triangle is in the constraints' bounding box
+        is_in_bounding_box = false;
+        face_vts = face_it->get_vertices();
         for (size_t vtx_ind = 0; vtx_ind < 3; ++vtx_ind) {
-            p = face_it->get_vertices()[vtx_ind]->get_position();
-            if (p.x < m_constraints_bb.min.x || p.y < m_constraints_bb.min.y
-                || p.x > m_constraints_bb.max.x || p.y > m_constraints_bb.max.y) {
-                is_in_bounding_box = false;
+            p = face_vts[vtx_ind]->get_position();
+            if (p.x >= m_constraints_bb.min.x && p.y >= m_constraints_bb.min.y
+                && p.x <= m_constraints_bb.max.x && p.y <= m_constraints_bb.max.y) {
+                is_in_bounding_box = true;
                 break;
             }
         }
         if (!is_in_bounding_box)
+            continue;
+        if (are_points_close(face_vts[0]->get_position(), face_vts[1]->get_position())
+            && are_points_close(face_vts[1]->get_position(), face_vts[2]->get_position())
+            && are_points_close(face_vts[2]->get_position(), face_vts[0]->get_position()))
             continue;
         angle_max_face = face_it->get_max_angle();
         if (angle_max_face > alpha && angle_max_face > angle_max) {
@@ -220,4 +225,8 @@ void MeshRuppert::refine(const float alpha) {
 
 std::vector<Edge> MeshRuppert::get_constraint_edges() {
     return m_constraint_edges;
+}
+
+BoundingBox MeshRuppert::get_bounding_box() {
+    return m_constraints_bb;
 }
