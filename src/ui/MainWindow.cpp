@@ -219,11 +219,11 @@ void MainWindow::on_color_display_combobox_currentIndexChanged(int index) {
 void MainWindow::on_mesh_3d_type_combobox_currentIndexChanged(int index) {
     m_mesh_config->mesh_3d_type = (Mesh3DType)index;
     if (m_mesh_config->mesh_3d_type == Mesh3DType::Tetrahedron)
-        m_mesh = std::make_shared<Mesh>(Mesh3D("resources/tetrahedron.obj"));
+        set_mesh(std::make_shared<Mesh3D>("resources/tetrahedron.obj"));
     else if (m_mesh_config->mesh_3d_type == Mesh3DType::Pyramid)
-        m_mesh = std::make_shared<Mesh>(Mesh3D("resources/pyramid.obj"));
+        set_mesh(std::make_shared<Mesh3D>("resources/pyramid.obj"));
     else
-        m_mesh = std::make_shared<Mesh>(Mesh3D("resources/queen.off"));
+        set_mesh(std::make_shared<Mesh3D>("resources/queen.off"));
     compute_laplacians((Mesh3D*)m_mesh.get());
     set_curvature_colors((Mesh3D*)m_mesh.get(), m_mesh_config->color_display_type);
 }

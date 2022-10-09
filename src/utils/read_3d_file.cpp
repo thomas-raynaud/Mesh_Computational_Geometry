@@ -1,7 +1,6 @@
 #include "read_3d_file.h"
 
 #include <fstream>
-#include <sstream>
 #include <iostream>
 #include <algorithm>
 
@@ -41,7 +40,7 @@ int read_obj(std::istream& data, struct Data3D* obj_data) {
     std::vector<int> face_vec, polyline_vec;
     std::array<float, 4> vertex_array;
     std::array<int, 3> face_array;
-    std::string line;
+    std::string line, line_substr;
     int read_status = 0;
     int nb_params_read;
     if (data.eof())
@@ -61,8 +60,9 @@ int read_obj(std::istream& data, struct Data3D* obj_data) {
             case 'v':
                 // Read vertex data
                 vertex_vec.clear();
+                line_substr = line.substr(line.find(' '));
                 read_status = get_numbers_from_line<float>(
-                    line, 4, vertex_vec, nb_params_read
+                    line_substr, 4, vertex_vec, nb_params_read
                 );
                 if (nb_params_read < 3)
                     read_status = -1;
@@ -77,8 +77,9 @@ int read_obj(std::istream& data, struct Data3D* obj_data) {
             case 'f':
                 // Read face data
                 face_vec.clear();
+                line_substr = line.substr(line.find(' '));
                 read_status = get_numbers_from_line<int>(
-                    line, 3, face_vec, nb_params_read
+                    line_substr, 3, face_vec, nb_params_read
                 );
                 if (nb_params_read != 3)
                     read_status = -1;
@@ -93,7 +94,7 @@ int read_obj(std::istream& data, struct Data3D* obj_data) {
                     }
                     if (read_status == 0) {
                         for (size_t i = 0; i < face_vec.size(); ++i) {
-                            face_vec[i] -=1;
+                            face_vec[i] -= 1;
                         }
                         std::copy_n(
                             face_vec.begin(), nb_params_read, face_array.begin()
@@ -105,8 +106,9 @@ int read_obj(std::istream& data, struct Data3D* obj_data) {
             case 'l':
                 // Read polyline data
                 polyline_vec.clear();
+                line_substr = line.substr(line.find(' '));
                 read_status = get_numbers_from_line<int>(
-                    line, INT16_MAX, polyline_vec, nb_params_read
+                    line_substr, INT16_MAX, polyline_vec, nb_params_read
                 );
                 if (nb_params_read < 2)
                     read_status = -1;
@@ -141,21 +143,27 @@ int read_off(std::istream& data, struct Data3D* off_data) {
     std::string line;
     int nb_vertices, nb_faces;
     std::getline(data, line);
-    std::istringstream iss(line);
-    iss >> nb_vertices >> nb_faces;
+    std::vector<int> off_params;
+    int nb_params_read;
+    int read_status = 0;
+    read_status = get_numbers_from_line<int>(line, INT16_MAX, off_params, nb_params_read);
+    if (read_status != 0 || nb_params_read < 2)
+        return -1;
+    nb_vertices = off_params[0];
+    nb_faces = off_params[1];
 
     std::vector<float> vertex_vec;
     std::vector<int> face_vec;
     std::array<float, 4> vertex_array;
-    int nb_params_read;
-    int read_status = 0;
+    
     // Vertices
+    off_data->vertices.reserve(nb_vertices);
     for (int i = 0; i < nb_vertices; ++i) {
         std::getline(data, line);
         vertex_vec.clear();
         read_status = get_numbers_from_line<float>(line, 3, vertex_vec, nb_params_read);
         if (nb_params_read != 3)
-            read_status = -1;
+            return -1;
         if (read_status == 0) {
             vertex_array.fill(0);
             std::copy_n(
@@ -165,22 +173,21 @@ int read_off(std::istream& data, struct Data3D* off_data) {
         }
     }
     // Faces
+    off_data->faces.reserve(nb_faces);
     for (int i = 0; i < nb_faces; ++i) {
         std::getline(data, line);
         face_vec.clear();
         read_status = get_numbers_from_line<int>(line, INT16_MAX, face_vec, nb_params_read);
         if (nb_params_read != face_vec[0] + 1)
-            read_status = -1;
-        if (face_vec[0] != 3 || face_vec[0] != 4)
-            read_status = -1;
-        if (read_status == 0) {
-            if (face_vec[0] == 3) {
-                off_data->faces.push_back({ face_vec[1], face_vec[2], face_vec[3] });
-            }
-            else {
-                off_data->faces.push_back({ face_vec[1], face_vec[2], face_vec[3] });
-                off_data->faces.push_back({ face_vec[1], face_vec[3], face_vec[4] });
-            }
+            return -1;
+        if (face_vec[0] != 3 && face_vec[0] != 4)
+            return -1;
+        if (face_vec[0] == 3) {
+            off_data->faces.push_back({ face_vec[1], face_vec[2], face_vec[3] });
+        }
+        else {
+            off_data->faces.push_back({ face_vec[1], face_vec[2], face_vec[3] });
+            off_data->faces.push_back({ face_vec[1], face_vec[3], face_vec[4] });
         }
     }
     return read_status;

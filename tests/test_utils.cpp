@@ -36,6 +36,12 @@ TEST_CASE ( "Read a number from a string", "[utils]") {
     str = "751,25856315";
     REQUIRE(string_to_number(str, f_number) == 0);
     REQUIRE(f_number == Approx(751.2585));
+    str = "-2.7e-004";
+    REQUIRE(string_to_number(str, f_number) == 0);
+    REQUIRE(f_number == Approx(-0.00027f).epsilon(0.00001));
+    str = "-2.7e004";
+    REQUIRE(string_to_number(str, f_number) == 0);
+    REQUIRE(f_number == Approx(-27000.0f));
 }
 
 TEST_CASE( "Read a OBJ file", "[utils]" ) {
@@ -113,4 +119,42 @@ TEST_CASE( "Read a OBJ file", "[utils]" ) {
     REQUIRE(obj_data2.polylines[0][0] == 1);
     REQUIRE(obj_data2.polylines[0][1] == 2);
     REQUIRE(obj_data2.polylines[0][2] == 3);
+}
+
+TEST_CASE( "Read a OFF file", "[utils]" ) {
+    Data3D off_data;
+    std::ostringstream oss;
+    std::istringstream iss;
+    int res;
+
+    // Wrong syntax -> ERROR
+    oss << "wrong syntax" << std::endl;
+    iss = std::istringstream(oss.str());
+    res = read_off((std::istream&)iss, &off_data);
+    REQUIRE(res != 0);
+    oss.str("");
+
+    // Correct OFF
+    oss << "5 3 0" << std::endl;
+    oss << "-0.06939 0.04081 0.14433" << std::endl;
+    oss << "1 1 1" << std::endl;
+    oss << "1 1 3" << std::endl;
+    oss << "1 1 4" << std::endl;
+    oss << "1 1 5" << std::endl;
+    oss << "3 0 1 2" << std::endl;
+    oss << "3 1 3 4" << std::endl;
+    oss << "3 2 1 4" << std::endl;
+    oss << "3 0 3 2" << std::endl;
+    iss = std::istringstream(oss.str());
+    res = read_off((std::istream&)iss, &off_data);
+    REQUIRE(res == 0);
+    REQUIRE(off_data.vertices.size() == 5);
+    REQUIRE(off_data.vertices[0][0] == -0.06939f);
+    REQUIRE(off_data.vertices[0][1] == 0.04081f);
+    REQUIRE(off_data.vertices[0][2] == 0.14433f);
+    REQUIRE(off_data.vertices[0][3] == 0);
+    REQUIRE(off_data.faces.size() == 3);
+    REQUIRE(off_data.faces[0][0] == 0);
+    REQUIRE(off_data.faces[0][1] == 1);
+    REQUIRE(off_data.faces[0][2] == 2);
 }
