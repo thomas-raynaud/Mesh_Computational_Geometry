@@ -41,7 +41,7 @@ TEST_CASE ( "Is a point in the diametral circle of a segment", "[predicate]" ) {
     p = glm::vec3(0, -0.5, 0);
     REQUIRE(is_point_in_diametral_circle_of_segment(p, s1, s2) == false);
     p = s1;
-    REQUIRE(is_point_in_diametral_circle_of_segment(p, s1, s2) == true);
+    REQUIRE(is_point_in_diametral_circle_of_segment(p, s1, s2) == false);
     p = glm::vec3(0, 1.5, 0);
     REQUIRE(is_point_in_diametral_circle_of_segment(p, s1, s2) == true);
     p = glm::vec3(0, 2.5, 0);

@@ -47,7 +47,7 @@ set(
 set(UTIL_SOURCES
     ${CMAKE_SOURCE_DIR}/src/utils/color.cpp
     ${CMAKE_SOURCE_DIR}/src/utils/math.cpp
-    ${CMAKE_SOURCE_DIR}/src/utils/read_obj.cpp
+    ${CMAKE_SOURCE_DIR}/src/utils/read_3d_file.cpp
 )
 
 set(SOURCES

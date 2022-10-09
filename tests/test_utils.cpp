@@ -3,7 +3,8 @@
 #include <sstream>
 
 #include "utils/math.h"
-#include "utils/read_obj.h"
+#include "utils/read_3d_file.h"
+#include "utils/read_numbers.h"
 
 
 TEST_CASE( "Find the center of 3 points", "[utils]" ) {
@@ -38,7 +39,7 @@ TEST_CASE ( "Read a number from a string", "[utils]") {
 }
 
 TEST_CASE( "Read a OBJ file", "[utils]" ) {
-    ObjData obj_data1, obj_data2;
+    Data3D obj_data1, obj_data2;
     std::ostringstream oss;
     std::istringstream iss;
     int res;
@@ -60,7 +61,7 @@ TEST_CASE( "Read a OBJ file", "[utils]" ) {
     // Index of face < 1 -> ERROR
     oss << "v 0.1 0.2 0" << std::endl;
     oss << "v 0 0.2 0.3 0" << std::endl;
-    oss << "v 0.4 0 0.3" << std::endl;
+    oss << "v 0.4  0    0.3" << std::endl;
     oss << "f 0 1 2" << std::endl;
     iss = std::istringstream(oss.str());
     res = read_obj((std::istream&)iss, &obj_data1);
@@ -104,9 +105,9 @@ TEST_CASE( "Read a OBJ file", "[utils]" ) {
     REQUIRE(obj_data2.vertices[1][1] == -0.2f);
     REQUIRE(obj_data2.vertices[1][2] == -0.3f);
     REQUIRE(obj_data2.faces.size() == 1);
-    REQUIRE(obj_data2.faces[0][0] == 1);
-    REQUIRE(obj_data2.faces[0][1] == 2);
-    REQUIRE(obj_data2.faces[0][2] == 3);
+    REQUIRE(obj_data2.faces[0][0] == 0);
+    REQUIRE(obj_data2.faces[0][1] == 1);
+    REQUIRE(obj_data2.faces[0][2] == 2);
     REQUIRE(obj_data2.polylines.size() == 1);
     REQUIRE(obj_data2.polylines[0].size() == 3);
     REQUIRE(obj_data2.polylines[0][0] == 1);

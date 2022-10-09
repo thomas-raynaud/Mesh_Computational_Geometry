@@ -9,29 +9,10 @@ protected:
     // Stores a Laplacian for each vertex
     std::unordered_map<Vertex_Hash, glm::vec3> m_laplacians;
 public:
+    Mesh3D(const std::string filename);
+    virtual ~Mesh3D() {}
     std::unordered_map<Vertex_Hash, glm::vec3> & get_laplacians();
     virtual void pop_vertex(Vertex *v) override;
-};
-
-
-class Tetrahedron : public Mesh3D {
-public:
-    Tetrahedron();
-    virtual ~Tetrahedron() {}
-};
-
-
-class Pyramid : public Mesh3D {
-public:
-    Pyramid();
-    virtual ~Pyramid() {}
-};
-
-
-class MeshQueen : public Mesh3D { // Mesh loaded from an OFF file
-public:
-    MeshQueen();
-    virtual ~MeshQueen() {}
 };
 
 #endif  // MESH3D_H

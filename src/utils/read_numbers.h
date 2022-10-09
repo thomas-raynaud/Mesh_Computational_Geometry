@@ -1,20 +1,9 @@
-#ifndef READ_OBJ_H
-#define READ_OBJ_H
+#ifndef READ_NUMBERS_H
+#define READ_NUMBERS_H
 
-#include <string>
 #include <vector>
-#include <array>
+#include <string>
 #include <cmath>
-
-struct ObjData {
-    std::vector<std::array<float, 4>> vertices;
-    std::vector<std::array<int, 3>> faces;
-    std::vector<std::vector<int>> polylines;
-};
-
-int read_obj(const std::string filename, struct ObjData* objData);
-int read_obj(std::istream& data, struct ObjData* objData);
-
 
 template <class T>
 int string_to_number(const std::string& str, T& number) {
@@ -58,9 +47,9 @@ int get_numbers_from_line(
     int pos_start, pos_end;
     int res;
     nb_params_read = 0;
-    pos_start = line.find(" ", 0);
-    pos_start += 1;
-    pos_end = line.find(" ", pos_start + 1);
+    pos_start = line.find(' ', 0);
+    pos_start = line.find_first_not_of(' ', pos_start);
+    pos_end = line.find(' ', pos_start);
     while (pos_end != std::string::npos) {
         param_str = line.substr(pos_start, pos_end - pos_start);
         res = string_to_number<T>(param_str, param);
@@ -68,8 +57,8 @@ int get_numbers_from_line(
             return -1;
         params.push_back(param);
         nb_params_read++;
-        pos_start = pos_end + 1;
-        pos_end = line.find(" ", pos_start);
+        pos_start = line.find_first_not_of(' ', pos_end);
+        pos_end = line.find(' ', pos_start);
     }
     param_str = line.substr(pos_start);
     res = string_to_number<T>(param_str, param);
@@ -80,4 +69,4 @@ int get_numbers_from_line(
     return 0;
 }
 
-#endif  // READ_OBJ_H
+#endif  // READ_NUMBERS_H

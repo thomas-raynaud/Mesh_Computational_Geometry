@@ -1,18 +1,42 @@
-#include "read_obj.h"
+#include "read_3d_file.h"
 
 #include <fstream>
+#include <sstream>
+#include <iostream>
 #include <algorithm>
 
+#include "utils/read_numbers.h"
 
-int read_obj(const std::string filename, struct ObjData* objData) {
+
+int read_3d_file(const std::string filename, struct Data3D* data_3D) {
+    // Check file extension
+    size_t ext_pos = filename.find_last_of(".");
+    if (ext_pos == std::string::npos) {
+        std::cerr << "Error: file extension not found for filename "
+            << filename << std::endl;
+        return -1;
+    }
+    std::string ext_name = filename.substr(ext_pos + 1);
     std::ifstream file;
     file.open(filename);
-    int status = read_obj(file, objData);
+    if (file.fail()) {
+        return -1;
+    }
+    int status;
+    if (ext_name == "off")
+        status = read_off(file, data_3D);
+    else if (ext_name == "obj")
+        status = read_obj(file, data_3D);
+    else {
+        std::cerr << "Error: files with " << ext_name << " extension "
+            << "are not handled." << std::endl;
+        return -1;
+    }
     file.close();
     return status;
 }
 
-int read_obj(std::istream& data, struct ObjData* objData) {
+int read_obj(std::istream& data, struct Data3D* obj_data) {
     std::vector<float> vertex_vec;
     std::vector<int> face_vec, polyline_vec;
     std::array<float, 4> vertex_array;
@@ -47,7 +71,7 @@ int read_obj(std::istream& data, struct ObjData* objData) {
                     std::copy_n(
                         vertex_vec.begin(), nb_params_read, vertex_array.begin()
                     );
-                    objData->vertices.push_back(vertex_array);
+                    obj_data->vertices.push_back(vertex_array);
                 }
                 break;
             case 'f':
@@ -62,16 +86,19 @@ int read_obj(std::istream& data, struct ObjData* objData) {
                     // Check that all indexed vertices exist
                     for (size_t i = 0; i < 3; ++i) {
                         if (    face_vec[i] < 1
-                            ||  face_vec[i] > objData->vertices.size()) {
+                            ||  face_vec[i] > obj_data->vertices.size()) {
                             read_status = -1;
                             break;
                         }
                     }
                     if (read_status == 0) {
+                        for (size_t i = 0; i < face_vec.size(); ++i) {
+                            face_vec[i] -=1;
+                        }
                         std::copy_n(
                             face_vec.begin(), nb_params_read, face_array.begin()
                         );
-                        objData->faces.push_back(face_array);
+                        obj_data->faces.push_back(face_array);
                     }
                 }
                 break;
@@ -87,13 +114,13 @@ int read_obj(std::istream& data, struct ObjData* objData) {
                     // Check that all indexed vertices exist
                     for (size_t i = 0; i < nb_params_read; ++i) {
                         if (    polyline_vec[i] < 1
-                            ||  polyline_vec[i] > objData->vertices.size()) {
+                            ||  polyline_vec[i] > obj_data->vertices.size()) {
                             read_status = -1;
                             break;
                         }
                     }
                     if (read_status == 0) {
-                        objData->polylines.push_back(polyline_vec);
+                        obj_data->polylines.push_back(polyline_vec);
                     }
                 }
                 break;
@@ -106,6 +133,55 @@ int read_obj(std::istream& data, struct ObjData* objData) {
         if (data.eof())
             break;
         std::getline(data, line);
+    }
+    return read_status;
+}
+
+int read_off(std::istream& data, struct Data3D* off_data) {
+    std::string line;
+    int nb_vertices, nb_faces;
+    std::getline(data, line);
+    std::istringstream iss(line);
+    iss >> nb_vertices >> nb_faces;
+
+    std::vector<float> vertex_vec;
+    std::vector<int> face_vec;
+    std::array<float, 4> vertex_array;
+    int nb_params_read;
+    int read_status = 0;
+    // Vertices
+    for (int i = 0; i < nb_vertices; ++i) {
+        std::getline(data, line);
+        vertex_vec.clear();
+        read_status = get_numbers_from_line<float>(line, 3, vertex_vec, nb_params_read);
+        if (nb_params_read != 3)
+            read_status = -1;
+        if (read_status == 0) {
+            vertex_array.fill(0);
+            std::copy_n(
+                vertex_vec.begin(), nb_params_read, vertex_array.begin()
+            );
+            off_data->vertices.push_back(vertex_array);
+        }
+    }
+    // Faces
+    for (int i = 0; i < nb_faces; ++i) {
+        std::getline(data, line);
+        face_vec.clear();
+        read_status = get_numbers_from_line<int>(line, INT16_MAX, face_vec, nb_params_read);
+        if (nb_params_read != face_vec[0] + 1)
+            read_status = -1;
+        if (face_vec[0] != 3 || face_vec[0] != 4)
+            read_status = -1;
+        if (read_status == 0) {
+            if (face_vec[0] == 3) {
+                off_data->faces.push_back({ face_vec[1], face_vec[2], face_vec[3] });
+            }
+            else {
+                off_data->faces.push_back({ face_vec[1], face_vec[2], face_vec[3] });
+                off_data->faces.push_back({ face_vec[1], face_vec[3], face_vec[4] });
+            }
+        }
     }
     return read_status;
 }

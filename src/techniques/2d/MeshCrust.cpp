@@ -6,16 +6,16 @@
 
 #include "delaunay.h"
 #include "voronoi.h"
-#include "utils/read_obj.h"
+#include "utils/read_3d_file.h"
 
 
 MeshCrust::MeshCrust() : Mesh2D() {
-    ObjData crust_data;
+    Data3D crust_data;
     std::string filename = "resources/crust.obj";
     float x, y;
     Vertex *vtx;
     // Read OBJ file
-    if (read_obj(filename, &crust_data) != 0) {
+    if (read_3d_file(filename, &crust_data) != 0) {
         std::cerr << "Error: could not read obj file at " << filename << std::endl;
         return;
     }

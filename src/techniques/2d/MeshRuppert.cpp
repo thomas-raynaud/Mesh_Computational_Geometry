@@ -2,16 +2,16 @@
 
 #include "delaunay.h"
 #include "utils/math.h"
-#include "utils/read_obj.h"
+#include "utils/read_3d_file.h"
 
 #include <iostream>
 
 
 MeshRuppert::MeshRuppert(const float alpha) {
-    ObjData ruppert_data;
+    Data3D ruppert_data;
     std::string filename = "resources/ruppert.obj";
     // Read OBJ file
-    if (read_obj(filename, &ruppert_data) != 0) {
+    if (read_3d_file(filename, &ruppert_data) != 0) {
         std::cerr << "Error: could not read obj file at " << filename << std::endl;
         return;
     }
