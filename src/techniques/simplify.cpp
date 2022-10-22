@@ -1,6 +1,7 @@
 #include "simplify.h"
 
 #include <set>
+#include <algorithm>
 
 #include "meshes/Edge.h"
 
@@ -10,10 +11,11 @@ bool collapse_edge(
         Vertex *ve,
         Face *fe
     ) {
-    Vertex *v1, *v2;    // [v1-v2] is the edge to delete. v1-v2-ve corresponds to fe.
+    Vertex *v1, *v2;    // [v1-v2] is the edge to delete. fe = v1-v2-ve
+    Vertex *ve_opp;     // fe_opp = ve_opp-v2-v1
     Face *fe_opp;       // Face opposite to ve from the face fe.
     Face *fa1, *fa2;    // Adjacent faces to fe. fa1 & fa2 != fe_opp
-    Face *fa3, *fa4;   // Adjacent faces to fe_opp. fa3 & fa4 != fe
+    Face *fa3, *fa4;    // Adjacent faces to fe_opp. fa3 & fa4 != fe
 
     FaceCirculator fc; // Circulate on the faces of v1 and v2
 
@@ -31,10 +33,13 @@ bool collapse_edge(
         }
     }
     // Find fa3 and fa4
+    face_vts = fe_opp->get_vertices();
+    adj_faces = fe_opp->get_adjacent_faces();
     for (size_t v_ind = 0; v_ind < 3; ++v_ind) {
         if (face_vts[v_ind] == v1) {
             fa3 = adj_faces[v_ind];
             fa4 = adj_faces[(v_ind + 2) % 3];
+            ve_opp = face_vts[(v_ind + 1) % 3];
             break;
         }
     }
@@ -48,6 +53,7 @@ bool collapse_edge(
             return false;
         }
     }
+    // Update incident faces of v1
     fc = mesh.incident_faces(*v1, *fe);
     ++fc;
     while (*fc != *fe_opp) {
@@ -57,6 +63,28 @@ bool collapse_edge(
             if (face_vts[v_ind] == v1) {
                 fc->set_vertex(v_ind, v2);
             }
+            // Change the face attached by each vertex
+            face_vts[v_ind]->set_incident_face(&*fc);
+        }
+        ++fc;
+    }
+    // Update incident faces of v2
+    fc = mesh.incident_faces(*v2, *fe_opp);
+    ++fc;
+    while (*fc != *fe) {
+        face_vts = fc->get_vertices();
+        for (size_t v_ind = 0; v_ind < 3; ++v_ind) {
+            // Change the face attached by each vertex
+            face_vts[v_ind]->set_incident_face(&*fc);
+        }
+        ++fc;
+    }
+    // Update incident faces of ve_opp
+    fc = mesh.incident_faces(*ve_opp, *fe_opp);
+    ++fc;
+    while (*fc != *fe_opp) {
+        face_vts = fc->get_vertices();
+        for (size_t v_ind = 0; v_ind < 3; ++v_ind) {
             // Change the face attached by each vertex
             face_vts[v_ind]->set_incident_face(&*fc);
         }
@@ -92,6 +120,7 @@ void get_edges(Mesh &mesh, std::vector<Edge> &edges) {
     FaceIterator face_it;
     std::array<Vertex*, 3> face_vts;
     std::set<Edge_Hash> edge_hashes_set;
+    edges.clear();
     for(face_it = mesh.faces_begin(); face_it != mesh.faces_end(); ++face_it) {
         face_vts = face_it->get_vertices();
         for (size_t i = 0; i < 3; ++i) {
@@ -107,33 +136,46 @@ void get_edges(Mesh &mesh, std::vector<Edge> &edges) {
             }
         }
     }
+    std::sort(edges.begin(), edges.end());
 }
 
 
-void simplify(Mesh &mesh, int n) {
+#include <QElapsedTimer>
+#include <QtDebug>
+void simplify(Mesh &mesh, const int n) {
     // Don't simplify if the number of vertices is <= to n.
+    QElapsedTimer timer;
+    qint64 time_get_edges = 0;
+    qint64 time_collapse_edge = 0;
+    int n_tmp = n;
+    n_tmp = mesh.get_nb_vertices() - 10;
     if (mesh.get_nb_vertices() <= n) return;
 
     // Edges sorted based on their length
     std::vector<Edge> edges;
-    int nb_vertices = mesh.get_nb_vertices();
     bool edge_deleted;
     Edge *edge_to_delete;
     std::vector<Edge>::iterator edge_it;
     do {
+        timer.start();
         get_edges(mesh, edges);
+        time_get_edges += timer.elapsed();
         // Delete the smallest one.
         edge_it = edges.begin();
         edge_deleted = false;
 
-        while (!edge_deleted) {
+        while (!edge_deleted && edge_it != edges.end()) {
             edge_to_delete = &*edge_it;
+            timer.start();
             edge_deleted = collapse_edge(
                 mesh,
                 edge_to_delete->ve,
                 edge_to_delete->fe
             );
+            time_collapse_edge += timer.elapsed();
             ++edge_it;
         }
-    } while (n < nb_vertices && edges.size() > 0 && edge_deleted);
+    } while (n_tmp <= mesh.get_nb_vertices() && edges.size() > 0 && edge_deleted);
+    qDebug() << "time get edges = " << time_get_edges;
+    qDebug() << "time collapse = " << time_collapse_edge;
 }

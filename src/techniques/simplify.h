@@ -25,6 +25,6 @@ void get_edges(Mesh &mesh, std::vector<Edge> &edges);
  * Simplify the mesh by removing its smallest edges. n represents the number of
  * vertices in the mesh after the simplification.
  */
-void simplify(Mesh &mesh, int n);
+void simplify(Mesh &mesh, const int n);
 
 #endif  // SIMPLIFY_H
