@@ -22,7 +22,8 @@ enum struct Algorithm2DType {
 enum struct Mesh3DType {
     Tetrahedron,
     Pyramid,
-    QueenStatue
+    QueenStatue,
+    Monkey
 };
 
 enum struct ColorDisplayType {

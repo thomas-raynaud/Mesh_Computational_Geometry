@@ -295,6 +295,11 @@
               <string>Queen statue</string>
              </property>
             </item>
+            <item>
+             <property name="text">
+              <string>Monkey</string>
+             </property>
+            </item>
            </widget>
           </item>
          </layout>

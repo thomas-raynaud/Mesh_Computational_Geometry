@@ -48,20 +48,22 @@ TEST_CASE( "Read a OBJ file", "[utils]" ) {
     Data3D obj_data1, obj_data2;
     std::ostringstream oss;
     std::istringstream iss;
-    int res;
 
     // Wrong syntax -> ERROR
     oss << "wrong syntax" << std::endl;
     iss = std::istringstream(oss.str());
-    res = read_obj((std::istream&)iss, &obj_data1);
-    REQUIRE(res != 0);
+    REQUIRE_THROWS_AS([&](std::istringstream iss, Data3D obj_data1){
+        std::cout << "hello" << obj_data1.faces.size() << std::endl;
+        read_obj((std::istream&)iss, &obj_data1);
+    }, Parse3DFileException);
     oss.str("");
 
     // Undefined vertices -> ERROR
     oss << "f 1 2 3" << std::endl;
     iss = std::istringstream(oss.str());
-    res = read_obj((std::istream&)iss, &obj_data1);
-    REQUIRE(res != 0);
+    REQUIRE_THROWS_AS([&](){
+        read_obj((std::istream&)iss, &obj_data1);
+    }, Parse3DFileException);
     oss.str("");
 
     // Index of face < 1 -> ERROR
@@ -70,8 +72,9 @@ TEST_CASE( "Read a OBJ file", "[utils]" ) {
     oss << "v 0.4  0    0.3" << std::endl;
     oss << "f 0 1 2" << std::endl;
     iss = std::istringstream(oss.str());
-    res = read_obj((std::istream&)iss, &obj_data1);
-    REQUIRE(res != 0);
+    REQUIRE_THROWS_AS([&](){
+        read_obj((std::istream&)iss, &obj_data1);
+    }, Parse3DFileException);
     oss.str("");
 
     // Face with less than 3 vertices -> ERROR
@@ -79,16 +82,18 @@ TEST_CASE( "Read a OBJ file", "[utils]" ) {
     oss << "v 0.4 0 0.3" << std::endl;
     oss << "f 1 2" << std::endl;
     iss = std::istringstream(oss.str());
-    res = read_obj((std::istream&)iss, &obj_data1);
-    REQUIRE(res != 0);
+    REQUIRE_THROWS_AS([&](){
+        read_obj((std::istream&)iss, &obj_data1);
+    }, Parse3DFileException);
     oss.str("");
 
     // Polyline with less than 2 vertices -> ERROR
     oss << "v 0 0.2 0.3 0" << std::endl;
     oss << "l 1" << std::endl;
     iss = std::istringstream(oss.str());
-    res = read_obj((std::istream&)iss, &obj_data1);
-    REQUIRE(res != 0);
+    REQUIRE_THROWS_AS([&](){
+        read_obj((std::istream&)iss, &obj_data1);
+    }, Parse3DFileException);
     oss.str("");
 
     // Correct OBJ
@@ -101,8 +106,9 @@ TEST_CASE( "Read a OBJ file", "[utils]" ) {
     oss << "f 1 2 3" << std::endl;
     oss << "l 1 2 3" << std::endl;
     iss = std::istringstream(oss.str());
-    res = read_obj((std::istream&)iss, &obj_data2);
-    REQUIRE(res == 0);
+    REQUIRE_NOTHROW([&](){
+        read_obj((std::istream&)iss, &obj_data2);
+    });
     REQUIRE(obj_data2.vertices.size() == 3);
     REQUIRE(obj_data2.vertices[0][0] == 0.152468428f);
     REQUIRE(obj_data2.vertices[0][1] == -1.83673f);
@@ -125,13 +131,13 @@ TEST_CASE( "Read a OFF file", "[utils]" ) {
     Data3D off_data;
     std::ostringstream oss;
     std::istringstream iss;
-    int res;
 
     // Wrong syntax -> ERROR
     oss << "wrong syntax" << std::endl;
     iss = std::istringstream(oss.str());
-    res = read_off((std::istream&)iss, &off_data);
-    REQUIRE(res != 0);
+    REQUIRE_THROWS_AS([&](){
+        read_off((std::istream&)iss, &off_data);
+    }, Parse3DFileException);
     oss.str("");
 
     // Correct OFF
@@ -146,8 +152,9 @@ TEST_CASE( "Read a OFF file", "[utils]" ) {
     oss << "3 2 1 4" << std::endl;
     oss << "3 0 3 2" << std::endl;
     iss = std::istringstream(oss.str());
-    res = read_off((std::istream&)iss, &off_data);
-    REQUIRE(res == 0);
+    REQUIRE_NOTHROW([&](){
+        read_off((std::istream&)iss, &off_data);
+    });
     REQUIRE(off_data.vertices.size() == 5);
     REQUIRE(off_data.vertices[0][0] == -0.06939f);
     REQUIRE(off_data.vertices[0][1] == 0.04081f);

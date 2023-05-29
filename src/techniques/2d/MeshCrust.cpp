@@ -15,10 +15,7 @@ MeshCrust::MeshCrust() : Mesh2D() {
     float x, y;
     Vertex *vtx;
     // Read OBJ file
-    if (read_3d_file(filename, &crust_data) != 0) {
-        std::cerr << "Error: could not read obj file at " << filename << std::endl;
-        return;
-    }
+    read_3d_file(filename, &crust_data);
     // Insert vertices from OBJ data
     for (size_t i = 0; i < crust_data.vertices.size(); ++i) {
         vtx = delaunay::insert_vertex(

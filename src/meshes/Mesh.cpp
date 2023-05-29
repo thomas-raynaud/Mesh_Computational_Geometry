@@ -1,7 +1,5 @@
 #include "Mesh.h"
 
-#include <iostream>
-
 #include "Face.h"
 #include "Vertex.h"
 #include "Edge.h"

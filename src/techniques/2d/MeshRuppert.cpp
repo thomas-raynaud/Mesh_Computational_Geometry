@@ -11,10 +11,7 @@ MeshRuppert::MeshRuppert(const float alpha) {
     Data3D ruppert_data;
     std::string filename = "resources/ruppert.obj";
     // Read OBJ file
-    if (read_3d_file(filename, &ruppert_data) != 0) {
-        std::cerr << "Error: could not read obj file at " << filename << std::endl;
-        return;
-    }
+    read_3d_file(filename, &ruppert_data);
     // Fill the graph the OBJ structure
     std::array<float, 4> vt_data;
     for (size_t i = 0; i < ruppert_data.vertices.size(); ++i) {

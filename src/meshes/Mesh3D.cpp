@@ -9,11 +9,7 @@
 
 Mesh3D::Mesh3D(const std::string filename) {
     Data3D mesh_data;
-    int status = read_3d_file(filename, &mesh_data);
-    if (status == -1) {
-        std::cerr << "Error: 3D mesh construction from file " << filename
-            << " failed" << std::endl;
-    }
+    read_3d_file(filename, &mesh_data);
     // Vertices
     std::vector<Vertex*> vts;
     std::vector<Face*> faces;

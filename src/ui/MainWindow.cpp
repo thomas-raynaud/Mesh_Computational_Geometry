@@ -133,34 +133,41 @@ void MainWindow::on_center_camera_push_button_released() {
 
 void MainWindow::on_algorithm_type_combobox_currentIndexChanged(int index) {
     m_mesh_config->algorithm_2d_type = (Algorithm2DType)index;
-    if (m_mesh_config->algorithm_2d_type == Algorithm2DType::Delaunay) {
-        ui.parabola_widget->hide();
-        ui.ruppert_widget->hide();
-        set_mesh(std::make_shared<Mesh2D>());
-        build_convex_hull();
+    try {
+        if (m_mesh_config->algorithm_2d_type == Algorithm2DType::Delaunay) {
+            ui.parabola_widget->hide();
+            ui.ruppert_widget->hide();
+            set_mesh(std::make_shared<Mesh2D>());
+            build_convex_hull();
+        }
+        else if (m_mesh_config->algorithm_2d_type == Algorithm2DType::Crust) {
+            ui.parabola_widget->hide();
+            ui.ruppert_widget->hide();
+            set_mesh(std::make_shared<MeshCrust>());
+        }
+        else if (m_mesh_config->algorithm_2d_type == Algorithm2DType::Ruppert) {
+            ui.parabola_widget->hide();
+            ui.ruppert_widget->show();
+            float alpha = 35.f; // Default alpha parameter for Ruppert
+            QLocale eng(QLocale::English, QLocale::UnitedKingdom);
+            ui.alpha_ruppert_line_edit->setText(eng.toString(alpha, 'f', 2));
+            set_mesh(std::make_shared<MeshRuppert>(alpha));
+        }
+        else if (m_mesh_config->algorithm_2d_type == Algorithm2DType::Parabola) {
+            ui.parabola_widget->show();
+            ui.ruppert_widget->hide();
+            set_mesh(std::make_shared<MeshParabola>());
+        }
+        update_voronoi_vertices();
+        ui.scene->center_camera();
+        ui.scene->update_view_matrix();
+        ui.scene->updateGL();
     }
-    else if (m_mesh_config->algorithm_2d_type == Algorithm2DType::Crust) {
-        ui.parabola_widget->hide();
-        ui.ruppert_widget->hide();
-        set_mesh(std::make_shared<MeshCrust>());
+    catch(std::exception& e) {
+        QMessageBox message_box;
+        message_box.critical(0, "Error while creating mesh", e.what());
+        message_box.setFixedSize(500,200);
     }
-    else if (m_mesh_config->algorithm_2d_type == Algorithm2DType::Ruppert) {
-        ui.parabola_widget->hide();
-        ui.ruppert_widget->show();
-        float alpha = 35.f; // Default alpha parameter for Ruppert
-        QLocale eng(QLocale::English, QLocale::UnitedKingdom);
-        ui.alpha_ruppert_line_edit->setText(eng.toString(alpha, 'f', 2));
-        set_mesh(std::make_shared<MeshRuppert>(alpha));
-    }
-    else if (m_mesh_config->algorithm_2d_type == Algorithm2DType::Parabola) {
-        ui.parabola_widget->show();
-        ui.ruppert_widget->hide();
-        set_mesh(std::make_shared<MeshParabola>());
-    }
-    update_voronoi_vertices();
-    ui.scene->center_camera();
-    ui.scene->update_view_matrix();
-    ui.scene->updateGL();
 }
 
 void MainWindow::on_voronoi_display_push_button_released() {
@@ -217,15 +224,36 @@ void MainWindow::on_color_display_combobox_currentIndexChanged(int index) {
 }
 
 void MainWindow::on_mesh_3d_type_combobox_currentIndexChanged(int index) {
-    m_mesh_config->mesh_3d_type = (Mesh3DType)index;
-    if (m_mesh_config->mesh_3d_type == Mesh3DType::Tetrahedron)
-        set_mesh(std::make_shared<Mesh3D>("resources/tetrahedron.obj"));
-    else if (m_mesh_config->mesh_3d_type == Mesh3DType::Pyramid)
-        set_mesh(std::make_shared<Mesh3D>("resources/pyramid.obj"));
-    else
-        set_mesh(std::make_shared<Mesh3D>("resources/queen.off"));
-    compute_laplacians((Mesh3D*)m_mesh.get());
-    set_curvature_colors((Mesh3D*)m_mesh.get(), m_mesh_config->color_display_type);
+    Mesh3DType current_mesh_type = m_mesh_config->mesh_3d_type;
+    if (index == (int)current_mesh_type) // if index is the same, don't do anything
+        return;
+    try {
+        m_mesh_config->mesh_3d_type = (Mesh3DType)index;
+        switch(m_mesh_config->mesh_3d_type) {
+            case Mesh3DType::Tetrahedron:
+                set_mesh(std::make_shared<Mesh3D>("resources/tetrahedron.obj"));
+                break;
+            case Mesh3DType::Pyramid:
+                set_mesh(std::make_shared<Mesh3D>("resources/pyramid.obj"));
+                break;
+            case Mesh3DType::QueenStatue:
+                set_mesh(std::make_shared<Mesh3D>("resources/queen.off"));
+                break;
+            case Mesh3DType::Monkey:
+            default:
+                set_mesh(std::make_shared<Mesh3D>("resources/monkey.obj"));
+                break;
+        }
+        compute_laplacians((Mesh3D*)m_mesh.get());
+        set_curvature_colors((Mesh3D*)m_mesh.get(), m_mesh_config->color_display_type);
+    }
+    catch(std::exception& e) {
+        QMessageBox message_box;
+        message_box.critical(0, "Error while creating 3D mesh", e.what());
+        message_box.setFixedSize(500,200);
+        m_mesh_config->mesh_3d_type = current_mesh_type;
+        ui.mesh_3d_type_combobox->setCurrentIndex((int)current_mesh_type);
+    }
 }
 
 void MainWindow::on_simplify_push_button_released() {
